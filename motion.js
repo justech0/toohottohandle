@@ -68,7 +68,7 @@
   function eio(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
   function span(t, a, b) { return clamp((t - a) / (b - a)); }
 
-  var t0 = null, last = 0, paused = false;
+  var t0 = null, last = 0, paused = false, lastVB = "", lastL = "", lastPh = -1;
   function render(t, dt) {
     var W = window.innerWidth, H = window.innerHeight;
     var mid = H * 0.5;                                    // dalga ekranın yarısında durur
@@ -76,16 +76,19 @@
     var k = Math.min(bw / LOCK_BOX[2], (H * 0.48) / LOCK_BOX[3]);
     var c = { k: k, cx: LOCK_BOX[0] + LOCK_BOX[2] / 2, cy: 493, sx: W / 2, sy: mid - 9 };   // 493 = iki satırın arası
     var vb = cam(c, W, H);
-    stage.setAttribute("viewBox", vb.map(function (v) { return v.toFixed(2); }).join(" "));
+    var vbs = vb.map(function (v) { return v.toFixed(2); }).join(" ");
+    if (vbs !== lastVB) { stage.setAttribute("viewBox", vbs); lastVB = vbs; }
     var fl = eio(span(t, 0, 0.9));                        // kırmızı hemen yükselir
     var L = H + 18 - (H + 18 - mid) * fl;
-    flood.style.setProperty("--fy", L.toFixed(1) + "px");
+    var Ls = L.toFixed(1);
+    if (Ls !== lastL) { flood.style.setProperty("--fy", Ls + "px"); lastL = Ls; }
     var yUser = vb[1] + (L - 9) / k;                  // dalganın ortası
     belowR.setAttribute("y", yUser.toFixed(1));
     aboveR.setAttribute("y", (yUser - 5000).toFixed(1));
     var bt = (audio && !audio.paused) ? audio.currentTime : t;
     var beat = ((bt - 0.08) / 0.62) % 1; if (beat < 0) beat += 1;
-    drawHot(-1e9, 0.14 * Math.exp(-beat * 5) * fl);
+    var ph = 0.14 * Math.exp(-beat * 5) * fl;
+    if (Math.abs(ph - lastPh) > 0.003) { drawHot(-1e9, ph); lastPh = ph; }   // sadece değişince çiz
     slogan.style.top = ((916 - vb[1]) * k + Math.max(16, H * 0.025)).toFixed(1) + "px";   // TO HANDLE'ın hemen altı
     if (t > 0.5) scene.classList.add("lit");
     if (t > 1.2) scene.classList.add("done");
