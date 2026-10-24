@@ -1,0 +1,94 @@
+/* Too Hot To Handle — Isınıyoruz
+   Krem zemin, düz kırmızı HOT. Kırmızı alttan dolar, HOT ısınıp dalgalanır, logo yerine oturur. */
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-400.woff") format("woff"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-700.woff") format("woff"); font-weight: 700; font-display: swap; }
+
+:root {
+  --paper: #F3ECE6;
+  --red: #E51A23;
+  --ink: #2A1514;
+  --text: "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100svh; overflow: hidden; font: 400 16px/1.5 var(--text); color: #fff; -webkit-font-smoothing: antialiased; }
+.no-js body { background: var(--red); }
+p { margin: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* kırmızı dolum: üst kenarı hafif dalgalı */
+.flood {
+  position: fixed; inset: 0; z-index: 0; background: var(--red);
+  transform: translateY(var(--fy, 100%)); will-change: transform;
+}
+.flood::before {
+  content: ""; position: absolute; left: -10%; right: -10%; top: -17px; height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 18' preserveAspectRatio='none'%3E%3Cpath fill='%23E51A23' d='M0 18V9C30 -3 30 -3 60 9S90 21 120 9V18Z'/%3E%3C/svg%3E") repeat-x 0 0 / 120px 18px;
+  animation: slosh 2.4s linear infinite;
+}
+@keyframes slosh { to { background-position: 120px 0; } }
+.no-js .flood { display: none; }
+
+.scene { position: relative; z-index: 1; height: 100svh; }
+.stage { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+
+
+/* alt metin ve Instagram */
+.copy {
+  position: absolute; left: 0; right: 0; bottom: calc(clamp(28px, 7svh, 72px) + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.4svh, 22px); padding: 0 20px;
+}
+.line { font: 400 clamp(15px, 2.2svh, 19px)/1.2 var(--text); letter-spacing: .02em; }
+.js .copy > * { opacity: 0; transform: translateY(10px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.js .done .copy > * { opacity: 1; transform: none; }
+.js .done .copy > :nth-child(2) { transition-delay: .18s; }
+
+.cta { display: flex; gap: 18px; }
+.pick { position: relative; }
+.cta__btn {
+  appearance: none; display: grid; place-items: center; width: 48px; height: 48px; padding: 0; cursor: pointer;
+  background: none; border: 0; color: #fff; opacity: .9; transition: opacity .2s, transform .2s;
+}
+.cta__btn:hover, .cta__btn[aria-expanded="true"] { opacity: 1; transform: scale(1.08); }
+.ig { width: 26px; height: 26px; }
+.branches {
+  position: absolute; left: 50%; bottom: calc(100% + 6px); width: 200px; margin-left: -100px; z-index: 3;
+  display: grid; padding: 6px; border-radius: 18px; text-align: left; background: #fff;
+  box-shadow: 0 18px 50px rgba(70, 0, 5, .3); transform-origin: 50% 100%; animation: pop .3s var(--ease);
+}
+.branches[hidden] { display: none; }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+.branches a { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; align-items: center; padding: 12px 14px; border-radius: 12px; color: var(--ink); text-decoration: none; transition: background .2s, color .2s; }
+.branches a:hover, .branches a:focus-visible { background: var(--red); color: #fff; outline: none; }
+.branches span { font: 700 16px/1.2 var(--text); }
+.branches small { grid-row: 2; font-size: 12.5px; opacity: .7; }
+.arr { grid-row: 1 / 3; grid-column: 2; width: 18px; height: 18px; }
+
+.sound {
+  position: fixed; z-index: 6; right: max(10px, env(safe-area-inset-right)); top: calc(10px + env(safe-area-inset-top));
+  appearance: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; cursor: pointer;
+  background: none; border: 0; color: var(--ink); opacity: .85; transition: color .6s, opacity .2s;
+}
+.sound:hover { opacity: 1; }
+.sound svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.sound .spk { fill: currentColor; stroke: none; }
+.sound .w1, .sound .w2 { display: none; }
+.sound[aria-pressed="true"] .x { display: none; }
+.sound[aria-pressed="true"] .w1, .sound[aria-pressed="true"] .w2 { display: inline; animation: wave 1.6s ease-in-out infinite; }
+.sound[aria-pressed="true"] .w2 { animation-delay: .25s; }
+@keyframes wave { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flood::before { animation: none; }
+  .js .copy > * { transition: none; }
+}
+.js .stage { opacity: 0; transition: opacity 1s var(--ease); }
+.js .lit .stage { opacity: 1; }
+
+#slogan { position: absolute; left: 0; right: 0; top: 0; padding: 0 20px; text-align: center; color: #fff; font-size: clamp(15px, 2.3svh, 20px); }
+.js #slogan { opacity: 0; transition: opacity .8s var(--ease); }
+.js .done #slogan { opacity: 1; }
