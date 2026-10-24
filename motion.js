@@ -123,8 +123,10 @@
   document.addEventListener("click", function (e) { if (!e.target.closest(".pick")) closeAll(null); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(null); });
 
-  /* --- ses (isteğe bağlı) */
+  /* --- ses */
   var sb = document.getElementById("sound"), fadeT = 0;
+  var TARGET_VOL = 0.7;
+
   function fade(to, done) {
     clearInterval(fadeT);
     fadeT = setInterval(function () {
@@ -133,24 +135,35 @@
       else audio.volume = Math.max(0, Math.min(1, v));
     }, 40);
   }
-  function startSound() {
-    audio.volume = 0;
+
+  function startSound(instant) {
+    audio.volume = TARGET_VOL;
     var p = audio.play();
-    if (p && p.then) p.then(function () { fade(0.7); }).catch(waitForGesture); else fade(0.7);
+    if (p && p.then) {
+      p.then(function () {
+        audio.volume = TARGET_VOL;
+      }).catch(waitForGesture);
+    }
   }
-  function waitForGesture() {                      // tarayıcı izin vermezse ilk dokunuşta başlar
+
+  function waitForGesture() {                      // tarayıcı kısıtlarsa ilk dokunuşta/etkileşimde başlar
     var go = function () {
-      ["pointerdown", "keydown", "touchstart", "wheel"].forEach(function (ev) { window.removeEventListener(ev, go, true); });
-      if (sb.getAttribute("aria-pressed") === "true" && audio.paused) startSound();
+      ["pointerdown", "keydown", "touchstart", "wheel", "click"].forEach(function (ev) { window.removeEventListener(ev, go, true); });
+      if (sb.getAttribute("aria-pressed") === "true" && audio.paused) {
+        startSound(true);
+      }
     };
-    ["pointerdown", "keydown", "touchstart", "wheel"].forEach(function (ev) { window.addEventListener(ev, go, true); });
+    ["pointerdown", "keydown", "touchstart", "wheel", "click"].forEach(function (ev) { window.addEventListener(ev, go, true); });
   }
-  startSound();
+
+  // Sayfa açılır açılmaz doğrudan sesli başlat
+  startSound(true);
+
   sb.addEventListener("click", function () {
     var on = sb.getAttribute("aria-pressed") !== "true";
     sb.setAttribute("aria-pressed", on ? "true" : "false");
     sb.setAttribute("aria-label", on ? "Sesi kapat" : "Sesi aç");
-    if (on) startSound();
+    if (on) startSound(true);
     else fade(0, function () { audio.pause(); });
   });
 })();
