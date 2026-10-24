@@ -87,6 +87,10 @@
     var beat = ((bt - 0.08) / 0.62) % 1; if (beat < 0) beat += 1;
     drawHot(-1e9, 0.14 * Math.exp(-beat * 5) * fl);
     slogan.style.top = ((916 - vb[1]) * k + Math.max(16, H * 0.025)).toFixed(1) + "px";   // TO HANDLE'ın hemen altı
+    if (hotTap && !hotTap.hidden) {
+      hotTap.style.left = ((751 - vb[0]) * k).toFixed(1) + "px";
+      hotTap.style.top = ((260 - vb[1]) * k).toFixed(1) + "px";
+    }
     if (t > 0.5) scene.classList.add("lit");
     if (t > 1.2) scene.classList.add("done");
   }
@@ -124,13 +128,13 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(null); });
 
   /* --- ses */
-  var sb = document.getElementById("sound"), cue = document.getElementById("sound-cue"), fadeT = 0;
+  var sb = document.getElementById("sound"), hotTap = document.getElementById("hot-tap"), fadeT = 0;
   var TARGET_VOL = 0.7;
 
-  function hideCue() {
-    if (cue && !cue.classList.contains("fade-out")) {
-      cue.classList.add("fade-out");
-      setTimeout(function () { if (cue) cue.hidden = true; }, 400);
+  function hideHotTap() {
+    if (hotTap && !hotTap.classList.contains("fade-out")) {
+      hotTap.classList.add("fade-out");
+      setTimeout(function () { if (hotTap) hotTap.hidden = true; }, 350);
     }
   }
 
@@ -149,17 +153,17 @@
     if (p && p.then) {
       p.then(function () {
         audio.volume = TARGET_VOL;
-        hideCue();
+        hideHotTap();
       }).catch(waitForGesture);
     } else {
-      hideCue();
+      hideHotTap();
     }
   }
 
   function waitForGesture() {                      // tarayıcı kısıtlarsa ilk dokunuşta/etkileşimde başlar
     var go = function () {
       ["pointerdown", "keydown", "touchstart", "wheel", "click"].forEach(function (ev) { window.removeEventListener(ev, go, true); });
-      hideCue();
+      hideHotTap();
       if (sb.getAttribute("aria-pressed") === "true" && audio.paused) {
         startSound(true);
       }
@@ -170,10 +174,10 @@
   // Sayfa açılır açılmaz doğrudan sesli başlat
   startSound(true);
 
-  if (cue) {
-    cue.addEventListener("click", function (e) {
+  if (hotTap) {
+    hotTap.addEventListener("click", function (e) {
       e.stopPropagation();
-      hideCue();
+      hideHotTap();
       startSound(true);
     });
   }
@@ -182,7 +186,7 @@
     var on = sb.getAttribute("aria-pressed") !== "true";
     sb.setAttribute("aria-pressed", on ? "true" : "false");
     sb.setAttribute("aria-label", on ? "Sesi kapat" : "Sesi aç");
-    hideCue();
+    hideHotTap();
     if (on) startSound(true);
     else fade(0, function () { audio.pause(); });
   });
