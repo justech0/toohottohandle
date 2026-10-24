@@ -124,8 +124,15 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(null); });
 
   /* --- ses */
-  var sb = document.getElementById("sound"), fadeT = 0;
+  var sb = document.getElementById("sound"), cue = document.getElementById("sound-cue"), fadeT = 0;
   var TARGET_VOL = 0.7;
+
+  function hideCue() {
+    if (cue && !cue.classList.contains("fade-out")) {
+      cue.classList.add("fade-out");
+      setTimeout(function () { if (cue) cue.hidden = true; }, 400);
+    }
+  }
 
   function fade(to, done) {
     clearInterval(fadeT);
@@ -142,13 +149,17 @@
     if (p && p.then) {
       p.then(function () {
         audio.volume = TARGET_VOL;
+        hideCue();
       }).catch(waitForGesture);
+    } else {
+      hideCue();
     }
   }
 
   function waitForGesture() {                      // tarayıcı kısıtlarsa ilk dokunuşta/etkileşimde başlar
     var go = function () {
       ["pointerdown", "keydown", "touchstart", "wheel", "click"].forEach(function (ev) { window.removeEventListener(ev, go, true); });
+      hideCue();
       if (sb.getAttribute("aria-pressed") === "true" && audio.paused) {
         startSound(true);
       }
@@ -159,10 +170,19 @@
   // Sayfa açılır açılmaz doğrudan sesli başlat
   startSound(true);
 
+  if (cue) {
+    cue.addEventListener("click", function (e) {
+      e.stopPropagation();
+      hideCue();
+      startSound(true);
+    });
+  }
+
   sb.addEventListener("click", function () {
     var on = sb.getAttribute("aria-pressed") !== "true";
     sb.setAttribute("aria-pressed", on ? "true" : "false");
     sb.setAttribute("aria-label", on ? "Sesi kapat" : "Sesi aç");
+    hideCue();
     if (on) startSound(true);
     else fade(0, function () { audio.pause(); });
   });
