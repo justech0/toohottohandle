@@ -18,10 +18,15 @@ export function CategoryStrip({ groups, categories }: { groups: StripGroup[]; ca
     return sticky ? sticky.getBoundingClientRect().bottom : 0;
   }, []);
 
+  // Sekmeye basılınca seçim, kullanıcı kendisi kaydırana kadar korunur.
+  // Sayfa sonu kısa kalınca son bölümler başlığın altına gelemez; yoksa seçim geri kayardı.
+  const jumpRef = useRef<string | null>(null);
+
   const jumpTo = useCallback(
     (slug: string) => {
       const el = document.getElementById(`cat-${slug}`);
       if (!el) return;
+      jumpRef.current = slug;
       setActive(slug);
       window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - headerBottom() + 1, behavior: "auto" });
     },
@@ -32,6 +37,10 @@ export function CategoryStrip({ groups, categories }: { groups: StripGroup[]; ca
     let frame = 0;
     const update = () => {
       frame = 0;
+      if (jumpRef.current) {
+        setActive(jumpRef.current);
+        return;
+      }
       const limit = headerBottom() + 8;
       let current = categories[0]?.slug ?? "";
       for (const c of categories) {
@@ -43,10 +52,16 @@ export function CategoryStrip({ groups, categories }: { groups: StripGroup[]; ca
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+    const release = () => {
+      jumpRef.current = null;
+    };
+    const inputs = ["wheel", "touchstart", "pointerdown", "keydown"] as const;
     window.addEventListener("scroll", onScroll, { passive: true });
+    for (const t of inputs) window.addEventListener(t, release, { passive: true });
     update();
     return () => {
       window.removeEventListener("scroll", onScroll);
+      for (const t of inputs) window.removeEventListener(t, release);
       if (frame) cancelAnimationFrame(frame);
     };
   }, [categories, headerBottom]);

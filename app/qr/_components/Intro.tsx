@@ -5,8 +5,7 @@ import { HOT_PATH, LOCKUP_LETTERS, LOCKUP_VIEWBOX } from "@/lib/brand/lockup";
 import { densifyPath, hotPathAt } from "@/lib/motion/hotWave";
 
 const KEY = "thth-intro-seen";
-const TOTAL = 1150; // ms, sayfa açılışından; spec 3.1: en fazla 1,2 sn
-const REDUCED_TOTAL = 300;
+const SAFETY = 3000; // ms: animasyon olayı hiç gelmezse (arka plan sekmesi vb.) yine de kaldır
 
 function LockupSvg({ hotRef }: { hotRef: React.RefObject<SVGPathElement | null> }) {
   return (
@@ -17,60 +16,61 @@ function LockupSvg({ hotRef }: { hotRef: React.RefObject<SVGPathElement | null> 
   );
 }
 
+/**
+ * Giriş (spec 3.1). Tüm akış CSS'te ve ilk boyamada başlar; JavaScript gelmeden de doğru görünür.
+ * Burası yalnızca HOT dalgasını oynatır ve CSS kapanışı bitince katmanı kaldırır.
+ */
 export function Intro() {
   const [gone, setGone] = useState(false);
-  const [reduced, setReduced] = useState(false);
-  const floodRef = useRef<HTMLDivElement>(null);
-  const topRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const hotTop = useRef<SVGPathElement>(null);
   const hotBottom = useRef<SVGPathElement>(null);
 
   useEffect(() => {
-    if (document.documentElement.classList.contains("intro-seen")) {
+    const root = rootRef.current;
+    if (!root || document.documentElement.classList.contains("intro-seen")) {
       setGone(true);
       return;
     }
     try { sessionStorage.setItem(KEY, "1"); } catch {}
-
-    // Süre sayfanın açılışından (performance.now) sayılır; görsel akış CSS'tedir, hidrasyonu beklemez.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setReduced(true);
-      const id = window.setTimeout(() => setGone(true), Math.max(0, REDUCED_TOTAL - performance.now()));
-      return () => window.clearTimeout(id);
+    if (getComputedStyle(root).visibility === "hidden") {
+      setGone(true); // hidrasyondan önce bitmiş
+      return;
     }
 
-    const subs = densifyPath(HOT_PATH.d);
-    let frame = 0;
-    const tick = () => {
-      const ms = performance.now();
-      if (ms >= TOTAL) {
-        setGone(true);
-        return;
-      }
-      const flood = floodRef.current?.getBoundingClientRect();
-      const box = topRef.current?.getBoundingClientRect();
-      if (flood && box && topRef.current && bottomRef.current) {
-        const cut = Math.min(Math.max(flood.top - box.top, 0), box.height);
-        topRef.current.style.clipPath = `inset(0 0 ${box.height - cut}px 0)`;
-        bottomRef.current.style.clipPath = `inset(${cut}px 0 0 0)`;
-      }
-      const d = hotPathAt(subs, (ms / 1000) * ((2 * Math.PI) / 1.4));
-      hotTop.current?.setAttribute("d", d);
-      hotBottom.current?.setAttribute("d", d);
-      frame = requestAnimationFrame(tick);
+    const onEnd = (e: AnimationEvent) => {
+      if (e.target === root) setGone(true);
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
+    root.addEventListener("animationend", onEnd);
+    const safety = window.setTimeout(() => setGone(true), SAFETY);
+
+    let frame = 0;
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const subs = densifyPath(HOT_PATH.d);
+      const t0 = performance.now();
+      const tick = () => {
+        const d = hotPathAt(subs, ((performance.now() - t0) / 1000) * ((2 * Math.PI) / 1.4));
+        hotTop.current?.setAttribute("d", d);
+        hotBottom.current?.setAttribute("d", d);
+        frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+    }
+    return () => {
+      root.removeEventListener("animationend", onEnd);
+      window.clearTimeout(safety);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   if (gone) return null;
-  const cls = reduced ? "intro intro--reduced" : "intro";
   return (
-    <div className={cls} data-testid="intro" onClick={() => setGone(true)}>
-      <div ref={floodRef} className="intro__flood" />
-      <div ref={topRef} className="intro__logo intro__logo--top"><LockupSvg hotRef={hotTop} /></div>
-      <div ref={bottomRef} className="intro__logo intro__logo--bottom"><LockupSvg hotRef={hotBottom} /></div>
+    <div ref={rootRef} className="intro" data-testid="intro" onClick={() => setGone(true)}>
+      <div className="intro__flood" />
+      <div className="intro__logo intro__logo--top"><LockupSvg hotRef={hotTop} /></div>
+      <div className="intro__logo--bottom" aria-hidden="true">
+        <div className="intro__logo"><LockupSvg hotRef={hotBottom} /></div>
+      </div>
       <button type="button" className="intro__skip" onClick={() => setGone(true)}>Geç</button>
     </div>
   );
