@@ -1,10 +1,13 @@
 import seed from "@/db/seed/menu.json";
+import samplePhotos from "@/db/seed/sample-photos.json";
 import type { MenuData, MenuProduct } from "./types";
 
 type SeedProduct = Omit<MenuProduct, "descTr" | "soldOutUntil" | "isNew" | "isFeatured" | "isVisible" | "imageKey">;
 
 /** Bu sürümde menü seed dosyasından okunur; A2'de aynı imzayla veritabanına bağlanır. */
 export async function getMenu(): Promise<MenuData> {
+  // Örnek fotoğraflar yalnızca önizlemede açılır; gerçek menüde fotoğraflar admin'den gelir.
+  const samples: Record<string, string> = process.env.THTH_SAMPLE_PHOTOS === "1" ? samplePhotos : {};
   const products: MenuProduct[] = (seed.products as SeedProduct[]).map((p) => ({
     ...p,
     descTr: null,
@@ -12,7 +15,7 @@ export async function getMenu(): Promise<MenuData> {
     isNew: false,
     isFeatured: false,
     isVisible: true,
-    imageKey: null,
+    imageKey: samples[p.slug] ?? null,
   }));
   return {
     groups: seed.groups as MenuData["groups"],

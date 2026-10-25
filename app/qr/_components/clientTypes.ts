@@ -6,4 +6,5 @@ export interface ClientProduct {
   categoryName: string;
   parts: string[];
   soldOut: boolean;
+  imageKey: string | null;
 }

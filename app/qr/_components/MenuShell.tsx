@@ -20,7 +20,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
   const clientProducts: ClientProduct[] = sections.flatMap(({ category, items }) =>
     items.map((p) => {
       const price = priceLabel(p, menu.serverNow);
-      return { slug: p.slug, name: p.name, descTr: p.descTr, categoryName: category.nameTr, parts: price.parts, soldOut: price.soldOut };
+      return { slug: p.slug, name: p.name, descTr: p.descTr, categoryName: category.nameTr, parts: price.parts, soldOut: price.soldOut, imageKey: p.imageKey };
     }),
   );
   const groupsWithItems = menu.groups.filter((g) => sections.some((s) => s.group.slug === g.slug));

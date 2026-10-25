@@ -4,6 +4,7 @@ import { useRef } from "react";
 import type { ClientProduct } from "./clientTypes";
 import { CloseIcon } from "./Icons";
 import { useDialogFocus } from "./useDialogFocus";
+import { imageSrc, imageSrcSet } from "@/lib/menu/image";
 
 export function ProductSheet({ product, onClose }: { product: ClientProduct; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -16,6 +17,16 @@ export function ProductSheet({ product, onClose }: { product: ClientProduct; onC
         <button type="button" className="icon-btn sheet__close" aria-label="Kapat" onClick={onClose}>
           <CloseIcon />
         </button>
+        {product.imageKey ? (
+          <img
+            className="sheet__img"
+            src={imageSrc(product.imageKey, 720)}
+            srcSet={imageSrcSet(product.imageKey)}
+            sizes="(min-width: 640px) 600px, 100vw"
+            alt={product.name}
+            decoding="async"
+          />
+        ) : null}
         <p className="sheet__cat">{product.categoryName}</p>
         <h2 id="sheet-title" className="sheet__title">{product.name}</h2>
         {product.descTr ? <p className="sheet__desc" data-testid="sheet-desc">{product.descTr}</p> : null}
