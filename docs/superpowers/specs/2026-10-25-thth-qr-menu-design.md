@@ -229,7 +229,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 - **Geri al yalnızca iki yerde:** son yapılan değişiklik ve son toplu fiyat güncellemesi. Aradan eski bir kaydı geri almak, sonradan yapılan değişikliklerle çakışıp veriyi bozabileceği için yoktur.
 - Silinen ürünler çöp kutusundan ayrıca geri getirilir (4.2).
 - Kayıt doğrudan yayına çıkar. Taslak ve yayınla adımı yoktur.
-- Kaydedilen değişiklik menüde en geç 10 saniyede görünür.
+- Kaydedilen değişiklik, kayıt biter bitmez açılan her menüde görünür.
 
 ### 4.5 Kategoriler, etiketler ve ayarlar
 
