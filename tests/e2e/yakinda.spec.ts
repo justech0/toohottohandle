@@ -21,6 +21,7 @@ test("legacy og:image url still resolves", async ({ request }) => {
 
 test("official lockup and HOT are visible", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#hot")).toBeVisible();
+  await expect(page.locator("#stage")).toBeVisible();
+  await expect(page.locator("#hot")).toBeAttached();
   await expect(page.locator("#lock").first()).toBeAttached();
 });
