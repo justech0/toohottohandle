@@ -3,7 +3,7 @@ import { openMenu } from "./helpers/menu";
 
 test.beforeEach(async ({ page }) => {
   await openMenu(page);
-  await page.getByRole("button", { name: "Ara" }).click();
+  await page.getByRole("button", { name: "Ara", exact: true }).click();
 });
 
 test("finds pistachio products with Turkish letters", async ({ page }) => {
