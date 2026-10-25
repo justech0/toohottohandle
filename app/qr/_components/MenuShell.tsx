@@ -5,6 +5,7 @@ import { ProductRow } from "./ProductRow";
 import { ExtrasLine } from "./ExtrasLine";
 import { CategoryStrip } from "./CategoryStrip";
 import { MenuClient } from "./MenuClient";
+import { Intro } from "./Intro";
 import type { ClientProduct } from "./clientTypes";
 import { priceLabel } from "@/lib/menu/soldout";
 
@@ -26,6 +27,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
 
   return (
     <div className="menu">
+      <Intro />
       <div className="sticky">
         <header className="topbar">
           <Logo className="topbar__logo" />

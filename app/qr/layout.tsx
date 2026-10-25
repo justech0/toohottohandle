@@ -13,6 +13,13 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#DC2524", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
+const INTRO_SEEN = `try{if(sessionStorage.getItem("thth-intro-seen"))document.documentElement.classList.add("intro-seen")}catch(e){}`;
+
 export default function QrLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script dangerouslySetInnerHTML={{ __html: INTRO_SEEN }} />
+      {children}
+    </>
+  );
 }

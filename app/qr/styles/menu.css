@@ -96,3 +96,28 @@
 .wifi__copy { flex: none; min-height: var(--tap); min-width: 104px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--c-ink); color: var(--c-paper); font: 600 14px var(--f-text); cursor: pointer; }
 .wifi__error { margin: 2px 2px 0; font: 600 13px/1.4 var(--f-text); color: var(--c-red-text); }
 .wifi__note { margin: 0; font: 500 13.5px/1.45 var(--f-text); color: var(--c-ink-soft); }
+
+/* Giriş (spec 3.1): yakında sayfasının dalgası, en fazla 1,2 sn */
+.intro { position: fixed; inset: 0; z-index: 100; background: var(--c-paper); overflow: hidden; cursor: pointer;
+  transition: opacity .28s ease; }
+html.intro-seen .intro { display: none; }
+.intro__flood { position: absolute; left: 0; right: 0; top: 0; height: 100%; background: var(--c-red); transform: translateY(100%); will-change: transform; }
+.intro__flood::before { content: ""; position: absolute; left: -10%; width: calc(120% + 240px); top: -17px; height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 18' preserveAspectRatio='none'%3E%3Cpath fill='%23DC2524' d='M0 18V9C30 -3 30 -3 60 9S90 21 120 9V18Z'/%3E%3C/svg%3E") repeat-x 0 0 / 120px 18px;
+  animation: slosh 1.2s linear infinite; }
+@keyframes slosh { to { transform: translateX(-120px); } }
+.intro__logo { position: absolute; left: 50%; top: 50%; width: min(78vw, 560px); transform: translate(-50%, -50%);
+  transition: transform .28s var(--ease); }
+.intro__logo svg { display: block; width: 100%; height: auto; }
+.intro__logo--top { color: var(--c-red); }
+.intro__logo--bottom { color: var(--c-white); clip-path: inset(100% 0 0 0); }
+.intro--leave { opacity: 0; }
+.intro--leave .intro__logo { transform: translate(-50%, -50%) translateY(-38vh) scale(.3); }
+.intro__skip { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom));
+  min-height: var(--tap); padding: 0 18px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .16); color: var(--c-white);
+  font: 600 15px var(--f-text); cursor: pointer; }
+.intro--reduced { animation: introFade .28s ease forwards; }
+.intro--reduced .intro__flood { transform: translateY(50%); }
+.intro--reduced .intro__flood::before { animation: none; }
+.intro--reduced .intro__logo--bottom { clip-path: inset(50% 0 0 0); }
+@keyframes introFade { to { opacity: 0; } }
