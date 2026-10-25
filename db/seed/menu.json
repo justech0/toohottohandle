@@ -6,8 +6,8 @@
    "color": "red"
   },
   {
-   "slug": "kahvesiz",
-   "nameTr": "Kahvesiz",
+   "slug": "spesiyal",
+   "nameTr": "Spesiyal",
    "color": "blue"
   },
   {
@@ -58,49 +58,49 @@
   {
    "slug": "cream-frappe",
    "nameTr": "Cream Frappe",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "cold",
    "defaultInSuggest": true
   },
   {
    "slug": "matcha-ube",
    "nameTr": "Matcha & Ube",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "cold",
    "defaultInSuggest": true
   },
   {
    "slug": "frozen",
    "nameTr": "Frozen",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "cold",
    "defaultInSuggest": true
   },
   {
    "slug": "ice-shaken",
    "nameTr": "Ice Shaken",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "cold",
    "defaultInSuggest": true
   },
   {
    "slug": "kahvesiz",
    "nameTr": "Kahvesiz İçecekler",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "hot",
    "defaultInSuggest": true
   },
   {
    "slug": "caylar",
    "nameTr": "Çaylar",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "hot",
    "defaultInSuggest": true
   },
   {
    "slug": "mesrubat",
    "nameTr": "Meşrubat",
-   "group": "kahvesiz",
+   "group": "spesiyal",
    "defaultTemp": "cold",
    "defaultInSuggest": false
   },
