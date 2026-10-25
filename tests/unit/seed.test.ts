@@ -47,7 +47,14 @@ describe("seed menu.json", () => {
   it("sets product temperature and groups", () => {
     expect(product("portakal-suyu").temp).toBe("cold");
     const matcha = seed.categories.find((c: { slug: string }) => c.slug === "matcha-ube");
-    expect(matcha.group).toBe("kahvesiz");
+    expect(matcha.group).toBe("spesiyal");
+  });
+
+  it("names the blue group Spesiyal", () => {
+    expect(seed.groups.map((g: { slug: string; nameTr: string }) => [g.slug, g.nameTr])).toEqual([
+      ["kahve", "Kahve"], ["spesiyal", "Spesiyal"], ["yiyecek", "Yiyecek"], ["tatli", "Tatlı"], ["paket", "Paket & Atıştırmalık"],
+    ]);
+    expect(seed.categories.filter((c: { group: string }) => c.group === "spesiyal")).toHaveLength(7);
   });
 
   it("scopes extras", () => {
