@@ -5,8 +5,8 @@ import { HOT_PATH, LOCKUP_LETTERS, LOCKUP_VIEWBOX } from "@/lib/brand/lockup";
 import { densifyPath, hotPathAt } from "@/lib/motion/hotWave";
 
 const KEY = "thth-intro-seen";
-const TOTAL = 1150; // ms; spec 3.1: en fazla 1,2 sn
-const RISE = 600;
+const TOTAL = 1150; // ms, sayfa açılışından; spec 3.1: en fazla 1,2 sn
+const REDUCED_TOTAL = 300;
 
 function LockupSvg({ hotRef }: { hotRef: React.RefObject<SVGPathElement | null> }) {
   return (
@@ -19,9 +19,7 @@ function LockupSvg({ hotRef }: { hotRef: React.RefObject<SVGPathElement | null> 
 
 export function Intro() {
   const [gone, setGone] = useState(false);
-  const [leaving, setLeaving] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
   const floodRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -35,36 +33,31 @@ export function Intro() {
     }
     try { sessionStorage.setItem(KEY, "1"); } catch {}
 
+    // Süre sayfanın açılışından (performance.now) sayılır; görsel akış CSS'tedir, hidrasyonu beklemez.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setReduced(true);
-      const id = window.setTimeout(() => setGone(true), 300);
+      const id = window.setTimeout(() => setGone(true), Math.max(0, REDUCED_TOTAL - performance.now()));
       return () => window.clearTimeout(id);
     }
 
     const subs = densifyPath(HOT_PATH.d);
-    const start = performance.now();
     let frame = 0;
-    const tick = (now: number) => {
-      const ms = now - start;
-      const H = window.innerHeight;
-      const p = Math.min(1, ms / RISE);
-      const eased = 1 - Math.pow(1 - p, 3);
-      const level = H - (H / 2) * eased; // kırmızının üst kenarı (px)
-      if (floodRef.current) floodRef.current.style.transform = `translateY(${level}px)`;
+    const tick = () => {
+      const ms = performance.now();
+      if (ms >= TOTAL) {
+        setGone(true);
+        return;
+      }
+      const flood = floodRef.current?.getBoundingClientRect();
       const box = topRef.current?.getBoundingClientRect();
-      if (box && topRef.current && bottomRef.current) {
-        const cut = Math.min(Math.max(level - box.top, 0), box.height);
+      if (flood && box && topRef.current && bottomRef.current) {
+        const cut = Math.min(Math.max(flood.top - box.top, 0), box.height);
         topRef.current.style.clipPath = `inset(0 0 ${box.height - cut}px 0)`;
         bottomRef.current.style.clipPath = `inset(${cut}px 0 0 0)`;
       }
       const d = hotPathAt(subs, (ms / 1000) * ((2 * Math.PI) / 1.4));
       hotTop.current?.setAttribute("d", d);
       hotBottom.current?.setAttribute("d", d);
-      if (ms > TOTAL - 300) setLeaving(true);
-      if (ms >= TOTAL) {
-        setGone(true);
-        return;
-      }
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
@@ -72,9 +65,9 @@ export function Intro() {
   }, []);
 
   if (gone) return null;
-  const cls = ["intro", leaving ? "intro--leave" : "", reduced ? "intro--reduced" : ""].filter(Boolean).join(" ");
+  const cls = reduced ? "intro intro--reduced" : "intro";
   return (
-    <div ref={rootRef} className={cls} data-testid="intro" onClick={() => setGone(true)}>
+    <div className={cls} data-testid="intro" onClick={() => setGone(true)}>
       <div ref={floodRef} className="intro__flood" />
       <div ref={topRef} className="intro__logo intro__logo--top"><LockupSvg hotRef={hotTop} /></div>
       <div ref={bottomRef} className="intro__logo intro__logo--bottom"><LockupSvg hotRef={hotBottom} /></div>
