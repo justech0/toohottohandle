@@ -1,6 +1,6 @@
 # Too Hot To Handle — QR Menü Tasarım Belgesi (Spec) · Sürüm 2
 
-- Tarih: 2026-10-25 (sürüm 2: gerçek ürün listesi, AI incelemeleri, font ve barındırma kararları işlendi; sürüm 2.1: ikinci AI incelemesi, gerçekçi 3D yolu; sürüm 2.2: basılı liste çıkarıldı, sayfa yeniden üretme yerine kısa önbellek, Android ayrıntıları)
+- Tarih: 2026-10-25 (sürüm 2: gerçek ürün listesi, AI incelemeleri, font ve barındırma kararları işlendi; sürüm 2.1: ikinci AI incelemesi, gerçekçi 3D yolu; sürüm 2.2: basılı liste çıkarıldı, sayfa yeniden üretme yerine kısa önbellek, Android ayrıntıları; sürüm 2.3: önbellek, yedek ve fotoğraf silme ayrıntıları)
 - Adres: `toohottohandlecoffee.com/qr` (menü), `toohottohandlecoffee.com/qr/admin` (admin)
 - Şube: yalnızca Batman (Petrol City AVM)
 - Proje yürütücüsü: Enes
@@ -11,10 +11,10 @@
 Masadaki QR okutulunca açılan, markaya sadık ve hızlı bir menü yapılacak. Kafe menüyü kod bilmeden admin panelinden yönetecek.
 
 Başarı ölçütleri:
-1. Menü metni, mobil 4G'de 2,5 saniye içinde okunur hale gelir. Giriş animasyonu bunu geciktirmez.
+1. Menü metni, mobil 4G'de 2,5 saniye içinde okunur hale gelir. Giriş animasyonu bunu geciktirmez. Önbellek eski veriyi beklemeden sunduğu için ziyaretçi uyuyan veritabanını beklemez (5.2). Tek istisna, yeni yayından ya da önbellek tamamen boşaldıktan sonraki ilk istektir; o da yaklaşık 0,5 sn uzar.
 2. Menüyü ilk kez gören biri, örnek 5 ürünün (Caramel Macchiato, Ton Balıklı Sandviç, Lotus Cheesecake, Cool Lime, Fas Nanesi) her birini ortalama 10 saniyede bulur. Ölçüm en az 3 kişiyle, gerçek telefonda yapılır.
 3. WiFi kullanıcı adı ve şifresi ayrı ayrı kopyalanır. Kopyalama çalışmazsa metin büyük yazıyla okunabilir.
-4. Admin'de kaydedilen değişiklik menüde en geç 10 saniyede görünür. Açık duran menüler, sekmeye dönüldüğünde kendini günceller.
+4. Admin'de kaydedilen değişiklik, kayıttan 10 saniye sonra gelen ilk ziyaretle yenilenir ve hemen ardından herkese görünür. Açık duran menüler, sekmeye dönüldüğünde kendini günceller.
 5. Menü TR, EN ve AR dillerinde okunur. Arapça sağdan sola akar.
 6. Repo gizlidir, repoda şifre veya anahtar bulunmaz. Maliyet verisi repoya, veritabanına ve menüye girmez.
 7. Site Vercel'e bağımlı değildir. Hostinger'e taşımak için ortam değişkenlerini değiştirmek ve yeniden derlemek yeterlidir.
@@ -210,6 +210,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 - Ekleme, düzenleme, çoğaltma ve sürükleyerek sıralama yapılır.
 - Silinen ürün 30 gün çöp kutusunda kalır ve geri alınabilir. Zamanlanmış iş olmadığı için 30 günü geçenler ve eski fotoğraf dosyaları admin her giriş yaptığında temizlenir.
+- **Fotoğraf dosyası silme kuralı:** ürün çoğaltılınca aynı fotoğraf dosyası iki üründe kullanılabilir. Bu yüzden bir dosya yalnızca hiçbir ürün (çöp kutusundakiler dahil) onu kullanmıyorsa ve 30 günden eski bir kullanım dışı kaydı varsa silinir. Kullanım durumu her temizlikte veritabanından yeniden hesaplanır.
 - Alanlar: ad (dile göre isteğe bağlı), açıklama (TR/EN/AR), boy ve fiyat listesi (tek fiyat da bir satırdır; boy adı hazır listeden seçilir: Normal, Büyük, Tek, Duble), kategori, fotoğraf, içindekiler (3 dil), alerjenler ve "alerjen bilgisi girildi" anahtarı, kalori (boş bırakılabilir), sıcak/soğuk, etiketler, Yeni, Öne çıkan, Görünür.
 - **Tükendi:** ürün satırında tek dokunuşluk anahtar. "Bugün tükendi" seçilince ürün, ertesi açılış saatinde (admin ayarı, varsayılan 08:00) kendiliğinden geri gelir. "Ben açana kadar" seçeneği de vardır.
 - **Kaydedilmemiş değişiklik uyarısı:** sayfadan çıkarken sorar.
@@ -263,9 +264,11 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 ### 4.9 Yedek
 
-- Admin'de "Yedek indir" düğmesi bir ZIP dosyası indirir. İçinde menü verisi (kategoriler, ürünler, ekstralar, ayarlar; admin hesabı ve WiFi şifresi hariç) JSON olarak ve bütün ürün fotoğrafları (1280 px WebP) bulunur. Böylece depo bozulsa da fotoğraflar geri gelir.
+- Admin'de "Yedek indir" düğmesi bir ZIP dosyası indirir. Hazırlanırken ilerleme ("48 / 129 fotoğraf") ve İptal düğmesi görünür. Dosya parça parça yazıldığı (akış halinde) için fotoğrafların hepsi aynı anda belleğe alınmaz. 129 fotoğraf yaklaşık 20 MB eder. Ekranda "Bilgisayardan almak daha hızlıdır" notu bulunur. İçinde menü verisi (kategoriler, ürünler, ekstralar, ayarlar; admin hesabı ve WiFi şifresi hariç) JSON olarak ve bütün ürün fotoğrafları (1280 px WebP) bulunur. Böylece depo bozulsa da fotoğraflar geri gelir.
 - ZIP sunucuda değil tarayıcıda hazırlanır. Fotoğraflar depodan tek tek çekilip telefonda paketlenir. Sunucu yanıt sınırına takılmaz ve Hostinger'de de aynı çalışır.
-- "Yedekten geri yükle" ZIP'i alır, mevcut menünün tamamını yedektekiyle değiştirir ve fotoğrafları depoya yeniden yükler. Öncesinde yedekteki kategori, ürün ve fotoğraf sayısını gösterip onay ister. Değiştirmeden hemen önce mevcut menünün yedeği otomatik indirilir.
+- "Yedekten geri yükle" ZIP'i alır, mevcut menünün tamamını yedektekiyle değiştirir ve fotoğrafları depoya yeniden yükler. Öncesinde yedekteki kategori, ürün ve fotoğraf sayısını gösterip onay ister.
+- **Geri yüklemeden önce güvence:** tarayıcı indirmesi engellenebileceği için ona güvenilmez. Sunucu, üzerine yazmadan önce mevcut menünün kopyasını veritabanında `menu_snapshots` tablosuna alır. Kopya alınamazsa geri yükleme başlamaz. Son 5 kopya tutulur, admin'den tek dokunuşla geri dönülür. Eski fotoğraflar 30 gün silinmediği için kopyayla birlikte geri gelir.
+- **WiFi:** WiFi şifresi yedeğe girmez. Geri yüklemede mevcut WiFi ağ adı, kullanıcı adı ve şifresi olduğu gibi korunur. Ekranda "WiFi bilgileri değiştirilmedi" yazar.
 - Ayrıca veritabanı sağlayıcısının kendi geri dönüş özelliği kullanılır.
 - Admin ana sayfasında "Son yedek: 12 gün önce" yazar (`last_backup_at`). 30 günü geçince uyarı kırmızıya döner. Ayda bir yedek almak `docs/KULLANIM.md`'de rutin olarak yazılıdır.
 
@@ -315,7 +318,8 @@ Kural: Vercel'e özel API kullanılmaz. Her şey düz Node.js sunucusunda da ça
 - Taşıma adımları `docs/KULLANIM.md`'de yazılıdır: ortam değişkenlerini kopyala, depo dosyalarını aktar, DNS'i çevir.
 - **Sayfa yeniden üretme yoktur.** Menü her istekte sunucuda hazırlanır, ama veri 10 saniye önbellekte tutulur. 10 saniye içinde gelen bütün ziyaretçiler aynı veriyi alır, veritabanına en fazla 10 saniyede bir sorgu gider. Admin kaydından sonra yeni veri en geç 10 saniyede görünür. Dosya yazma, statik sürüm dosyası ya da kayıtta yeniden üretme kullanılmaz. Bu düzen Vercel'de ve tek sunuculu Hostinger'de aynı çalışır.
 - Önbellek dolu olduğu sürece veritabanı uyuyabilir. Uyanması gerekirse ilk istek yaklaşık 0,5 sn gecikir. Veritabanına ulaşılamazsa son başarılı veri sunulmaya devam eder.
-- **Açık duran menü:** sekmeye dönüldüğünde `/qr/api/menu` adresinden veriyi yeniden ister. Bu adres de aynı 10 saniyelik önbellekten gelir. Veri değişmişse ekran sessizce yenilenir.
+- **Önbellek başlığı:** menü sayfası ve `/qr/api/menu` aynı veri fonksiyonundan (`getMenu`) beslenir ve aynı başlığı kullanır: `s-maxage=10, stale-while-revalidate=86400, stale-if-error=86400`. Vercel'in CDN'i süresi geçen veriyi hemen sunar ve arka planda yeniler. Böylece ziyaretçi veritabanının uyanmasını beklemez, veritabanı hata verirse son veri sunulmaya devam eder. Hostinger'de aynı süreler Next.js veri önbelleğiyle uygulanır.
+- **Açık duran menü:** sekmeye dönüldüğünde `/qr/api/menu` adresinden veriyi yeniden ister. Sayfa ile aynı önbellekten geldiği için ilk ekran ile sonraki yenileme arasında fiyat farkı oluşmaz. Veri değişmişse ekran sessizce yenilenir.
 - **Tükendi ve saat:** her yanıtta sunucunun o anki zamanı bulunur. Telefon kendi saatiyle arasındaki farkı hesaplar ve tükendi süresini sunucu saatine göre değerlendirir. Telefonun saati yanlış olsa da sonuç doğru çıkar.
 - **Saat dilimi:** sunucular UTC çalışır. Açılış saati ve "ertesi açılış" hesabı her yerde açıkça `Europe/Istanbul` ile yapılır. Tarihler veritabanında UTC saklanır.
 - **Service worker:** yalnızca menü sayfasını, menü verisini, fontları ve logo dosyalarını saklar. Önce ağa gider. 2,5 saniyede yanıt gelmezse saklanan menüyü gösterir. Admin sayfalarına ve diğer API adreslerine hiç karışmaz. Daha önce hiç açılmamışsa 3.11'deki bağlantı ekranı çıkar.
@@ -347,6 +351,8 @@ Three.js kalır, ama hiçbir şeyi bekletmeyecek şekilde kullanılır.
 `tags`, `product_tags`: `id`, `label_tr`, `label_en`, `label_ar`, `group_color`
 
 `settings` (tek satır): `wifi_ssid`, `wifi_username`, `wifi_password`, `wifi_note_tr/en/ar`, `opening_time`, `footer_note_tr/en/ar`, `last_backup_at`
+
+`menu_snapshots`: `id`, `at`, `reason` (ör. "geri yükleme öncesi"), `data` (JSON, WiFi şifresi hariç). Son 5 kayıt tutulur.
 
 `audit_log`: `id`, `admin_id`, `at`, `entity`, `entity_id`, `action`, `before` (JSON), `after` (JSON). WiFi şifresi alanı yazılmadan önce `"[değiştirildi]"` ile değiştirilir.
 
@@ -429,7 +435,7 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 - Sunucu ve istemci mantığı (doğrulama, giriş, oturum, deneme sınırının aynı anda gelen isteklerde doğru sayması, yükleme kontrolü, toplu fiyat hesabı, tükendi süresinin Europe/Istanbul ile hesabı, "Ne içsem?" uygunluk filtresi, WiFi şifresinin geçmişte maskelenmesi, Türkçe arama eşlemesi, seed dönüştürme) için birim testleri yazılır. Test koddan önce yazılır.
 - Playwright testleri:
   - Menü: açılış, kategori geçişi, arama (sonuçlu ve sonuçsuz), detay açma ve kapama (geri tuşu dahil), WiFi kopyalama, dil değişimi, AR'de RTL, tükendi görünümü, bağlantısız açılış.
-  - Admin: giriş, ürün ekleme, çoğaltma, fotoğraf yükleme (JPEG ile) ve odak noktası, sıralama, tükendi, toplu fiyat önizleme ve uygulama, son değişikliği geri alma, WiFi değiştirme, yedek indirme ve geri yükleme.
+  - Admin: giriş, ürün ekleme, çoğaltma, fotoğraf yükleme (JPEG ile) ve odak noktası, sıralama, tükendi, toplu fiyat önizleme ve uygulama, son değişikliği geri alma, WiFi değiştirme, yedek indirme (ilerleme ve iptal), geri yükleme, kopya alınamazsa geri yüklemenin başlamaması, geri yüklemede WiFi'ın korunması, çoğaltılmış üründe fotoğrafın silinmemesi.
   - Admin ve API yanıtlarında `noindex` başlığı.
 - Ekran görüntüsü kontrolü: 390, 768, 1440 px.
 - Lighthouse mobil: performans ≥ 85, erişilebilirlik ≥ 95.
