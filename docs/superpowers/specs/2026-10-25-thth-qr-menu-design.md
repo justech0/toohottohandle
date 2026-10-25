@@ -112,7 +112,7 @@ Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya d
 - Satıra dokununca detay alttan açılır. Telefonun geri tuşu detayı kapatır, menüden çıkarmaz.
 - İçeriği: varsa fotoğraf, ad, açıklama, boy ve fiyatlar, içindekiler, alerjenler, varsa kalori, etiketler.
 - İçindekiler normal cümle düzeninde yazılır, tamamı büyük harf olmaz.
-- **Alerjenler:** simge ve yanında adı yazılı durur ("Süt", "Gluten", "Antep fıstığı (sert kabuklu)"). Alerjen bölümü yalnızca işletme o ürünün alerjenlerini onayladıysa görünür.
+- **Alerjenler:** simge ve yanında adı yazılı durur ("Süt", "Gluten", "Antep fıstığı (sert kabuklu)"). Alerjenler admin'den elle girilir. Alerjen bölümü yalnızca o ürün için "alerjen bilgisi girildi" işaretliyse görünür. Böylece hiç girilmemiş ürün "alerjen yok" gibi görünmez.
 - **Eksik bilgi:** girilmemiş alan hiç gösterilmez. Kalori yoksa yazmaz, 0 yazmaz. Açıklama yoksa ad ve fiyat yeter.
 - Ürün videosu yoktur.
 
@@ -146,7 +146,7 @@ Türk Gıda Kodeksi ve AB'nin 14 alerjeni: gluten, kabuklu deniz ürünleri, yum
 
 - "Fıstık" kelimesi tek başına kullanılmaz. Ekranda "Yer fıstığı" ya da "Antep fıstığı (sert kabuklu)" yazar.
 - Simgeler resmi ikon dilinde, düz ve dolu siluet olarak çizilir. Hazır ikon paketi kullanılmaz.
-- Alerjen bilgisini işletme sorumlusu onaylar. Onaylanmamış ürünün alerjen bölümü görünmez. Onay admin'de ürün başına işaretlenir.
+- Alerjenler admin'de ürün başına elle işaretlenir. İşaretleme bitince "alerjen bilgisi girildi" anahtarı açılır. Anahtar kapalıysa menüde alerjen bölümü görünmez.
 
 ### 3.9 Dil
 
@@ -189,7 +189,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 - Ekleme, düzenleme, çoğaltma ve sürükleyerek sıralama yapılır.
 - Silinen ürün 30 gün çöp kutusunda kalır ve geri alınabilir.
-- Alanlar: ad (dile göre isteğe bağlı), açıklama (TR/EN/AR), boy ve fiyat listesi (tek fiyat da bir satırdır; boy adı hazır listeden seçilir: Normal, Büyük, Tek, Duble), kategori, fotoğraf, içindekiler (3 dil), alerjenler ve "alerjenler onaylandı" işareti, kalori (boş bırakılabilir), sıcak/soğuk, etiketler, Yeni, Öne çıkan, Görünür.
+- Alanlar: ad (dile göre isteğe bağlı), açıklama (TR/EN/AR), boy ve fiyat listesi (tek fiyat da bir satırdır; boy adı hazır listeden seçilir: Normal, Büyük, Tek, Duble), kategori, fotoğraf, içindekiler (3 dil), alerjenler ve "alerjen bilgisi girildi" anahtarı, kalori (boş bırakılabilir), sıcak/soğuk, etiketler, Yeni, Öne çıkan, Görünür.
 - **Tükendi:** ürün satırında tek dokunuşluk anahtar. "Bugün tükendi" seçilince ürün, ertesi açılış saatinde (admin ayarı, varsayılan 08:00) kendiliğinden geri gelir. "Ben açana kadar" seçeneği de vardır.
 - **Kaydedilmemiş değişiklik uyarısı:** sayfadan çıkarken sorar.
 - **Fiyat değişikliği onayı:** kaydetmeden önce "210 ₺ → 230 ₺" biçiminde eski ve yeni fiyat gösterilir.
@@ -211,7 +211,8 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 - Kategoriler: ad (3 dil), grup, sıralama, görünürlük, "Ne içsem'e dahil" ve varsayılan sıcak/soğuk.
 - Gruplar: ad (3 dil), renk (yalnızca 6 marka renginden).
 - Etiketler: hazır liste ve ekleme.
-- Ayarlar: WiFi (ağ adı, kullanıcı adı, şifre, yönerge metni), açılış saati, servis ücreti notu.
+- Ayarlar: WiFi (ağ adı, kullanıcı adı, şifre, yönerge metni), açılış saati, servis ücreti notu. Hepsi admin'den girilir.
+- Geliştirme ve demo için seed test değerleri koyar: ağ adı `HOT | WIFI`, kullanıcı adı `test`, şifre `test1234`, açılış saati 08:00. Admin ana sayfasında "WiFi test bilgisi kullanılıyor" uyarısı, gerçek bilgi girilene kadar durur.
 
 ### 4.6 Fotoğraf yükleme
 
@@ -293,7 +294,7 @@ Kural: Vercel'e özel API kullanılmaz. Her şey düz Node.js sunucusunda da ça
 
 `categories`: `id`, `slug`, `group_id`, `name_tr`, `name_en`, `name_ar`, `sort_order`, `is_visible`, `in_suggest` (Ne içsem'e dahil), `default_temp` (hot | cold | null)
 
-`products`: `id`, `slug`, `category_id`, `name`, `name_en`, `name_ar` (boşsa `name`), `desc_tr`, `desc_en`, `desc_ar`, `ingredients_tr`, `ingredients_en`, `ingredients_ar`, `kcal` (null olabilir, 0 anlamına gelmez), `allergens` (dizi, 14 kod), `allergens_verified` (bool), `temp` (hot | cold | null → kategoriden gelir), `image_key`, `is_new`, `is_featured`, `is_visible`, `sold_out_until` (null | zaman | "süresiz" için uzak tarih), `sort_order`, `updated_at`, `deleted_at`
+`products`: `id`, `slug`, `category_id`, `name`, `name_en`, `name_ar` (boşsa `name`), `desc_tr`, `desc_en`, `desc_ar`, `ingredients_tr`, `ingredients_en`, `ingredients_ar`, `kcal` (null olabilir, 0 anlamına gelmez), `allergens` (dizi, 14 kod), `allergens_entered` (bool, "alerjen bilgisi girildi"), `temp` (hot | cold | null → kategoriden gelir), `image_key`, `is_new`, `is_featured`, `is_visible`, `sold_out_until` (null | zaman | "süresiz" için uzak tarih), `sort_order`, `updated_at`, `deleted_at`
 
 `product_variants`: `id`, `product_id`, `label` (null = tek fiyat; Normal | Büyük | Tek | Duble | serbest), `price_kurus` (tam sayı), `sort_order`. Her üründe en az bir satır bulunur. Tek fiyat yapısı budur, ayrı `price` sütunu yoktur.
 
@@ -359,8 +360,6 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 
 1. Matcha & Ube ve Signatures içecekleri sıcak mı, soğuk mu, ikisi de mi?
 2. Servis ücreti alınıyor mu?
-3. WiFi kullanıcı adı ve şifresi, açılış saati.
-4. Alerjen bilgisini kim onaylayacak?
 
 ## 7. Aşamalar
 
@@ -398,7 +397,7 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 
 ## 10. Riskler
 
-- **Gerçek fotoğraf, açıklama ve alerjen yok.** Menü yazı ağırlıklı başlar, tasarım bunu kaldıracak şekilde kurulur. Alerjenler onaylanana kadar gizli kalır.
+- **Gerçek fotoğraf, açıklama ve alerjen yok.** Menü yazı ağırlıklı başlar, tasarım bunu kaldıracak şekilde kurulur. Alerjenler admin'den girilene kadar gizli kalır.
 - **Vercel Hobby ticari kullanıma izin vermez.** Canlıya çıkışta ücretli plana ya da Hostinger'e geçilir.
 - **Neon compute süresi.** İstatistik yazmaları sınırı zorlarsa istatistik kapatılır ya da plan yükseltilir.
 - **Unbounded genişliği.** Uzun ürün adlarında Montserrat kullanılarak çözülür. Kategori başlıkları dar ekranda iki satıra iner.
