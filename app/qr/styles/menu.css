@@ -68,3 +68,18 @@
 .search__empty { padding: 40px 12px; text-align: center; display: grid; gap: 16px; justify-items: center; }
 .search__empty p { margin: 0; font: 600 16px/1.45 var(--f-text); max-width: 28ch; }
 .btn-ghost { min-height: var(--tap); padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--c-ink); background: none; font: 600 15px var(--f-text); cursor: pointer; }
+
+/* Ürün detayı */
+.sheet-layer { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(42, 21, 20, .45); animation: fade .2s ease; }
+@keyframes fade { from { opacity: 0; } }
+.sheet { position: relative; width: 100%; max-width: 640px; max-height: 86svh; overflow-y: auto; background: var(--c-paper);
+  border-radius: 24px 24px 0 0; padding: 10px 20px calc(28px + env(safe-area-inset-bottom)); animation: rise .28s var(--ease); }
+@keyframes rise { from { transform: translateY(40px); opacity: 0; } }
+.sheet__grip { width: 44px; height: 5px; border-radius: 3px; background: var(--c-line); margin: 0 auto 10px; }
+.sheet__close { position: absolute; top: 8px; right: 8px; }
+.sheet__cat { margin: 8px 0 4px; font: 600 13px/1.2 var(--f-text); text-transform: uppercase; letter-spacing: .08em; color: var(--c-ink-soft); }
+.sheet__title { margin: 0 48px 12px 0; font: 800 clamp(22px, 6.4vw, 28px)/1.12 var(--f-display); color: var(--c-ink); text-wrap: balance; }
+.sheet__desc { margin: 0 0 14px; font: 500 15px/1.5 var(--f-text); }
+.sheet__prices { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--c-line); }
+.sheet__price { padding: 12px 0; border-bottom: 1px solid var(--c-line); font: 600 17px/1.3 var(--f-text); font-variant-numeric: tabular-nums; }

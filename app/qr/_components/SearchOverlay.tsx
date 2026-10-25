@@ -6,15 +6,17 @@ import type { ClientProduct } from "./clientTypes";
 import { ClientRow } from "./ClientRow";
 import { CloseIcon, SearchIcon } from "./Icons";
 
-export function SearchOverlay({ products, onClose }: { products: ClientProduct[]; onClose: () => void }) {
+export function SearchOverlay({ products, onClose, paused = false }: { products: ClientProduct[]; onClose: () => void; paused?: boolean }) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
   const results = useMemo(() => (query.trim() ? searchProducts(products, query) : []), [products, query]);
 
   useEffect(() => {
     inputRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !pausedRef.current) onClose();
     };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
