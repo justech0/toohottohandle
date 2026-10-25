@@ -64,10 +64,10 @@ v0 menü düz bir listeydi, "A4 kağıdı gibi" bulundu. Marka Instagram'da afi�
 
 - **Yeni sayfa ya da katman açılmaz.** Kareye dokununca kare yerinde tam genişliğe açılır (altındaki afişler aşağı kayar).
 - Açılan alanda yan yana üç kutu (resmi slot kutusu gibi). Kutularda **dudak, tavşan, yıldız** slot makarası gibi döner.
-- Kutular soldan sağa sırayla durur (1,4 / 1,9 / 2,4 sn), her biri **bir içecek fotoğrafında** durur: üç farklı öneri. Altlarında ad ve fiyat.
+- Kutular soldan sağa sırayla durur (1,4 / 1,9 / 2,4 sn), her biri **bir içecekte** durur: üç farklı öneri. Altlarında ad ve fiyat.
 - Kutuya dokunmak o ürünün detayını açar (detay davranışı aynı). "Tekrar çevir" küçük düğme. Kapatma (×) alanı tekrar kareye döndürür.
 - Makine görünümü yok (kol, ampul, kasa yok).
-- Havuz: görünür, tükenmemiş, fotoğrafı olan, "Ne içsem'e dahil" (kategori varsayılanı) ürünler. Üç kutu farklı ürün seçer. Havuz 3'ten küçükse kutu sayısı ona iner; boşsa "Şu an önerecek içecek yok. Ekibimize sorabilirsin." yazar.
+- Havuz: görünür, tükenmemiş, "Ne içsem'e dahil" (kategori varsayılanı) ürünler; fotoğraf şart değil. Fotoğrafı olan ürün kutuda fotoğrafıyla, olmayan grup renginde ikon ve adıyla durur. Fotoğraflı ürünler önceliklidir (önce onlardan seçilir). Üç kutu farklı ürün seçer. Havuz 3'ten küçükse kutu sayısı ona iner; boşsa "Şu an önerecek içecek yok. Ekibimize sorabilirsin." yazar.
 - Sıcak/Soğuk sorusu bu sürümde yok.
 - Hareket azaltma açıksa dönme yok; öneriler kısa kararmayla belirir.
 
