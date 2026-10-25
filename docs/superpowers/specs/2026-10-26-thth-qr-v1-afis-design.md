@@ -29,15 +29,14 @@ v0 menü düz bir listeydi, "A4 kağıdı gibi" bulundu. Marka Instagram'da afi�
 - Üst bar vitrinin üstündedir: beyaz logo, arama, WiFi (44 px yarı saydam daireler).
 - 3D: ana spec 5.3 aynen geçerli; Three.js geldiğinde FAST slaytındaki HOT kabartması gerçek 3D'ye döner. Bu sürümde görsel resmi render fotoğrafıdır, Three.js sonraki plana kalır.
 
-### 3.2 "Ne içsem?" kartı
-- Vitrinin altına 26 px biner. Sarı (`yellow`), 118 px yüksek, yuvarlak 24 px.
-- İçerik: beyaz daire içinde tavşan, "NE İÇSEM?" (Unbounded 900), "Kararsız mısın? Tavşan senin için seçsin.", sağda yelpaze gibi üç içecek fotoğrafı, köşede dönen kırmızı yıldız içinde "DOKUN".
-- Hareket: tavşan 2,4 sn'de bir zıplar (gölgesiyle), içecek fotoğrafları 4,5 sn'lik döngüde yer değiştirir, kartın üstünden ışık geçer, kart 4 sn'de bir kısa sallanır, yıldız döner, "DOKUN" nabız atar. Hareket azaltma açıksa hepsi durur.
-- Kartta gösterilen üç fotoğraf, "Ne içsem?" havuzundan gelir.
+### 3.2 "Ne içsem?" karesi
+- Ayrı büyük kart yok. Grup afişlerinin arasında, onlarla aynı boyda **sarı bir kare**: ortada tavşan, altında "Ne içsem?" yazar.
+- Hareket sade: tavşan birkaç saniyede bir zıplar. Hareket azaltma açıksa durur.
+- Yeri: grup afişlerinin ilk sırası, Kahve'nin yanı. Beş grup + bu kare = 2×3 ızgara, hepsi aynı boy.
 
 ### 3.3 Grup afişleri
 - 2 sütun fotoğraflı kartlar, 196 px, yuvarlak 18 px. Sol altta grup adı renkli etiket içinde (Unbounded 900).
-- Gruplar: Kahve, **Spesiyal** (eski adı Kahvesiz; kategorileri aynen kalır), Yiyecek, Tatlı, Paket & Atıştırmalık (tam genişlik).
+- Gruplar: Kahve, **Spesiyal** (eski adı Kahvesiz; kategorileri aynen kalır), Yiyecek, Tatlı, Paket & Atıştırmalık.
 - Karta dokunmak o grubun ilk kategorisine kaydırır.
 - Grup fotoğrafı admin'den seçilir (A2); bu sürümde seed'de sabittir.
 
@@ -63,15 +62,14 @@ v0 menü düz bir listeydi, "A4 kağıdı gibi" bulundu. Marka Instagram'da afi�
 
 ## 6. "Ne içsem?" (ana spec 3.5'in yerine)
 
-- Karta dokununca tam ekran sarı katman açılır (geçmişe kayıt eklenir, geri tuşu kapatır).
-- Ortada üç kutu, resmi slot kutusu gibi yan yana. Kutuların içinde **dudak, tavşan, yıldız** ikonları slot makarası gibi döner.
-- Kutular soldan sağa sırayla yavaşlar (1,4 / 1,9 / 2,4 sn) ve her biri **bir içecek fotoğrafında durur**: üç farklı öneri.
-- Durunca her kutunun altında içeceğin adı ve fiyatı çıkar. Kutuya dokunmak o ürünün detayını açar.
-- "Tekrar çevir" düğmesi. Büyük kırmızı "ÇEVİR" düğmesi ilk dönüşü başlatır; katman açılır açılmaz bir kez kendiliğinden döner.
-- Makine görünümü yok (kol, ampul, kasa yok). Yalnızca üç kutu, tavşan maskotu ve konuşma balonu.
-- Havuz: görünür, tükenmemiş, fotoğrafı olan, "Ne içsem'e dahil" (kategori varsayılanı) ürünler. Üç kutu birbirinden farklı ürün seçer. Havuzda 3'ten az ürün varsa kutu sayısı ona iner; hiç yoksa "Şu an önerecek içecek yok. Ekibimize sorabilirsin." yazar.
+- **Yeni sayfa ya da katman açılmaz.** Kareye dokununca kare yerinde tam genişliğe açılır (altındaki afişler aşağı kayar).
+- Açılan alanda yan yana üç kutu (resmi slot kutusu gibi). Kutularda **dudak, tavşan, yıldız** slot makarası gibi döner.
+- Kutular soldan sağa sırayla durur (1,4 / 1,9 / 2,4 sn), her biri **bir içecek fotoğrafında** durur: üç farklı öneri. Altlarında ad ve fiyat.
+- Kutuya dokunmak o ürünün detayını açar (detay davranışı aynı). "Tekrar çevir" küçük düğme. Kapatma (×) alanı tekrar kareye döndürür.
+- Makine görünümü yok (kol, ampul, kasa yok).
+- Havuz: görünür, tükenmemiş, fotoğrafı olan, "Ne içsem'e dahil" (kategori varsayılanı) ürünler. Üç kutu farklı ürün seçer. Havuz 3'ten küçükse kutu sayısı ona iner; boşsa "Şu an önerecek içecek yok. Ekibimize sorabilirsin." yazar.
 - Sıcak/Soğuk sorusu bu sürümde yok.
-- Hareket azaltma açıksa dönme yok; üç öneri kısa kararmayla belirir.
+- Hareket azaltma açıksa dönme yok; öneriler kısa kararmayla belirir.
 
 ## 7. Arama ve WiFi
 
@@ -79,9 +77,9 @@ v0 menü düz bir listeydi, "A4 kağıdı gibi" bulundu. Marka Instagram'da afi�
 
 ## 8. Kabul ölçütleri
 
-1. Ana sayfa 390×844'te tuvaldeki A ekranıyla aynı düzende görünür (vitrin, Ne içsem kartı, grup afişleri).
+1. Ana sayfa 390×844'te tuvaldeki A ekranının düzenini izler (vitrin, grup afişleri, aralarında tavşanlı sarı kare).
 2. Vitrin üç slaytı döndürür; hareket azaltmada durur.
-3. Ne içsem: üç ikon döner, üç farklı içecekte durur, kutuya dokununca detay açılır, geri tuşu menüye döner.
+3. Ne içsem: sarı kare yerinde açılır (yeni sayfa yok), üç ikon döner, üç farklı içecekte durur, kutuya dokununca detay açılır.
 4. Kartlar 360 px'te yatay kaydırma yapmaz; iki boylu üründe iki fiyat da görünür.
 5. Fotoğraf/ikon dışında hiçbir marka öğesi yeniden çizilmez; logo ve ikonlar resmi PNG'lerden gelir.
 6. Mevcut testlerdeki davranışlar (arama, geri tuşu, WiFi kopyalama, tükendi, intro) korunur; görünümle ilgili testler yeni yerleşime göre güncellenir.
