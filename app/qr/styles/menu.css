@@ -7,14 +7,38 @@
 [data-color="gray"] { --gc: var(--c-gray); --gt: var(--c-ink); }
 
 .menu { min-height: 100svh; }
-.sticky { position: sticky; top: 0; z-index: 20; background: var(--c-paper); }
+.sticky { position: sticky; top: 60px; z-index: 20; background: var(--c-paper); }
 
-.topbar { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 0 max(8px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); max-width: 960px; margin: 0 auto; }
-.topbar__logo { height: 34px; width: auto; color: var(--c-red); display: block; }
-.topbar__actions { display: flex; gap: 2px; }
+/* Üst bar: vitrinin üstünde saydam, vitrin geçince kağıt zemin (spec v3 3.1) */
+.topbar { position: sticky; top: 0; z-index: 30; height: 60px; margin-bottom: -60px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 max(8px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); color: var(--c-white); background: transparent;
+  transition: background-color .2s ease, color .2s ease, box-shadow .2s ease; }
+html[data-hero-visible="false"] .topbar { background: var(--c-paper); color: var(--c-red); box-shadow: 0 1px 0 var(--c-line); }
+.topbar__logo { display: flex; }
+.topbar__logo .brand-icon { height: 22px; }
+.topbar__actions { display: flex; gap: 4px; }
 .icon-btn { width: var(--tap); height: var(--tap); display: grid; place-items: center; border: 0; background: none; border-radius: 50%; cursor: pointer; color: var(--c-ink); }
 .icon-btn:active { background: var(--c-line); }
+.topbar .icon-btn { color: var(--c-white); background: rgba(255, 255, 255, .16); }
+html[data-hero-visible="false"] .topbar .icon-btn { color: var(--c-ink); background: none; }
+
+/* Vitrin */
+.hero { position: relative; height: 360px; overflow: hidden; color: var(--c-white); transition: background-color .6s ease; }
+.hero--red { background: var(--c-red); }
+.hero--blue { background: var(--c-blue); }
+.hero--yellow { background: var(--c-yellow); }
+.hero__slide { position: absolute; inset: 0; opacity: 0; transform: scale(1.04); transition: opacity .6s ease, transform .6s ease; }
+.hero__slide[data-on="true"] { opacity: 1; transform: none; }
+.hero__slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero__shade { position: absolute; left: 0; right: 0; bottom: 0; height: 55%; background: linear-gradient(180deg, rgba(42, 21, 20, 0), rgba(42, 21, 20, .55)); }
+.hero__icon { position: absolute; right: 18px; top: 74px; height: 48px; color: var(--c-white); }
+.hero__text { position: absolute; left: 16px; right: 96px; bottom: 22px; }
+.hero__menu { margin: 0 0 6px; font: 600 12px/1 var(--f-text); letter-spacing: .24em; }
+.hero__title { margin: 0; font: 800 clamp(28px, 8.4vw, 40px)/1 var(--f-display); letter-spacing: -.01em; text-shadow: 0 2px 12px rgba(42, 21, 20, .35); }
+.hero__dots { position: absolute; right: 8px; bottom: 10px; display: flex; }
+.hero__dot { width: var(--tap); height: var(--tap); border: 0; background: none; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.hero__dot::before { content: ""; width: 8px; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .55); transition: width .2s ease, background-color .2s ease; }
+.hero__dot[aria-current="true"]::before { width: 22px; background: var(--c-white); }
 
 .strip { border-bottom: 1px solid var(--c-line); }
 .strip__row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 4px 12px; max-width: 960px; margin: 0 auto; }
@@ -27,7 +51,7 @@
 .tab--cat[aria-current="true"] { background: var(--gc); border-color: var(--gc); color: var(--gt); }
 
 .list { max-width: 960px; margin: 0 auto; padding: 4px 12px 8px; }
-.cat { scroll-margin-top: 140px; padding-top: 22px; }
+.cat { scroll-margin-top: 170px; padding-top: 22px; }
 .cat__title { margin: 0 0 4px; padding: 14px 16px 12px; border-radius: 14px; background: var(--gc); color: var(--gt);
   font: 800 clamp(20px, 6vw, 26px)/1.05 var(--f-display); text-transform: uppercase; letter-spacing: .01em; text-wrap: balance;
   box-shadow: 0 3px 0 rgba(42, 21, 20, .18); }

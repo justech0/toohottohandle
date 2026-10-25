@@ -14,8 +14,9 @@ export function CategoryStrip({ groups, categories }: { groups: StripGroup[]; ca
   const groupColor = groups.find((g) => g.slug === activeGroup)?.color ?? "red";
 
   const headerBottom = useCallback(() => {
+    // Şerit yapışmış haldeki alt kenarı: sticky top + kendi yüksekliği (yapışmadan önce de doğru hedef verir).
     const sticky = rootRef.current?.closest(".sticky") as HTMLElement | null;
-    return sticky ? sticky.getBoundingClientRect().bottom : 0;
+    return sticky ? parseFloat(getComputedStyle(sticky).top) + sticky.offsetHeight : 0;
   }, []);
 
   // Sekmeye basılınca seçim, kullanıcı kendisi kaydırana kadar korunur.

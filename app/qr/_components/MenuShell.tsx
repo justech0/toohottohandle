@@ -1,5 +1,6 @@
 import type { MenuData } from "@/lib/menu/types";
-import { Logo } from "./Logo";
+import { BrandIcon } from "./BrandIcon";
+import { HeroSlides } from "./HeroSlides";
 import { Footer } from "./Footer";
 import { ProductRow } from "./ProductRow";
 import { ExtrasLine } from "./ExtrasLine";
@@ -28,11 +29,12 @@ export function MenuShell({ menu }: { menu: MenuData }) {
   return (
     <div className="menu">
       <Intro />
+      <header className="topbar">
+        <span className="topbar__logo"><BrandIcon name="logo" label="Too Hot To Handle" /></span>
+        <MenuClient products={clientProducts} settings={menu.settings} />
+      </header>
+      <HeroSlides />
       <div className="sticky">
-        <header className="topbar">
-          <Logo className="topbar__logo" />
-          <MenuClient products={clientProducts} settings={menu.settings} />
-        </header>
         <CategoryStrip
           groups={groupsWithItems.map(({ slug, nameTr, color }) => ({ slug, nameTr, color }))}
           categories={sections.map((s) => ({ slug: s.category.slug, nameTr: s.category.nameTr, group: s.group.slug }))}
