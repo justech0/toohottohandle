@@ -50,3 +50,9 @@
 
 .menu-footer { max-width: 960px; margin: 28px auto 0; padding: 20px 16px calc(28px + env(safe-area-inset-bottom));
   text-align: center; font: 500 13px/1.5 var(--f-text); color: var(--c-ink-soft); border-top: 1px solid var(--c-line); }
+
+/* Dar ekranda boylar alt alta, sağa hizalı; ayırıcı nokta gizli */
+@media (max-width: 560px) {
+  .price { flex-direction: column; align-items: flex-end; gap: 2px; }
+  .price__sep { display: none; }
+}
