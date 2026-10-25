@@ -347,29 +347,26 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 - Fiyatlar "Yeni Fiyat" sütunundan olduğu gibi alınır, ekstralar dahil. Küsurlu fiyatlar (176, 198, 231, 253, 187) değiştirilmez. Yalnızca Excel'in hesap kalıntısı temizlenir (229,999999 → 230).
 - Aynı ürünün boyları tek ürün olur: "Büyük", "12", "12oz", "16", "16 OZ" satırları birleşir. Küçük boy "Normal", büyük boy "Büyük" adını alır. Espresso ve Türk kahvesi "Tek · Duble" kullanır.
 - Ad yazımı düzeltilir: Chocalate → Chocolate, Rasberry → Raspberry, Cheescake → Cheesecake, Ofreso → Ofresko, Ethiophia → Ethiopia, Chocolaate → Chocolate, Cappucino → Cappuccino, Coffe → Coffee.
+- Adı farklı yazılmış satırlar birleştirilmez, ayrı ürün olarak kalır: White Mocha Frappe (yalnızca Büyük) ve White Chocolate Frappe (yalnızca Normal); White Mocha Cream Frappe ve White Chocolate Cream Frappe; Melonberry Frozen ve Melonberry Twist Frozen. Tek boyu olan üründe boy adı fiyatın yanında yazar.
 - "DEMO ÜRÜN" satırı alınmaz.
 - Excel'de açıklama, içindekiler, alerjen, kalori ve fotoğraf yoktur. Bu alanlar boş başlar ve menüde görünmez. İşletme doldurdukça görünür hale gelir.
 
 ### 6.2 Sonuç
 
-19 kategori, 126 ürün ve 4 ekstra. Liste Ek A'da.
+19 kategori, 129 ürün ve 4 ekstra. Liste Ek A'da.
 
 ### 6.3 Kafeye sorulacaklar (yayın öncesi)
 
-1. Birleştirme varsayımları doğru mu?
-   - "White Mocha Frappe Büyük" ile "White Chocolate Frappe" aynı ürün mü?
-   - "White Mocha Cream Büyük" ile "White Chocolate Cream Frappe 12oz" aynı ürün mü?
-   - "Melonberry Frozen Büyük" ile "Melonberry Twist Frozen" aynı ürün mü?
-2. Matcha & Ube ve Signatures içecekleri sıcak mı, soğuk mu, ikisi de mi?
-3. Servis ücreti alınıyor mu?
-4. WiFi kullanıcı adı ve şifresi, açılış saati.
-5. Alerjen bilgisini kim onaylayacak?
+1. Matcha & Ube ve Signatures içecekleri sıcak mı, soğuk mu, ikisi de mi?
+2. Servis ücreti alınıyor mu?
+3. WiFi kullanıcı adı ve şifresi, açılış saati.
+4. Alerjen bilgisini kim onaylayacak?
 
 ## 7. Aşamalar
 
 | Aşama | İş | Bitti tanımı |
 |---|---|---|
-| A0 | Gizli repo, `yakinda/` taşıma, Next.js iskeleti, fontlar, logo ve ikon SVG'leri, Excel → `menu.json` dönüştürme | `/` yakında sayfası aynen çalışır, build geçer, seed 126 ürünü yükler |
+| A0 | Gizli repo, `yakinda/` taşıma, Next.js iskeleti, fontlar, logo ve ikon SVG'leri, Excel → `menu.json` dönüştürme | `/` yakında sayfası aynen çalışır, build geçer, seed 129 ürünü yükler |
 | A1 | Menü ekranı, arama, detay, WiFi kartı, 3 dil ve RTL, 2D giriş, service worker | 390, 768 ve 1440 px'te ekran görüntüsü kontrolü, gerçek ürün listesiyle |
 | A2 | Veritabanı, admin, yükleme, toplu fiyat, geçmiş ve geri al, tükendi, yedek, istatistik, basılı liste, QR | Bölüm 8 testleri geçer |
 | A3 | 3D giriş ve 3D "Ne içsem?" (tavşan gözü geçişi), alerjen simgeleri, etiket ve rozet seti | 3D bütçe içinde, zayıf cihazda 2D çalışır |
@@ -402,7 +399,6 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 ## 10. Riskler
 
 - **Gerçek fotoğraf, açıklama ve alerjen yok.** Menü yazı ağırlıklı başlar, tasarım bunu kaldıracak şekilde kurulur. Alerjenler onaylanana kadar gizli kalır.
-- **Birleştirme varsayımları.** 6.3'teki sorular yayın öncesi kapatılır.
 - **Vercel Hobby ticari kullanıma izin vermez.** Canlıya çıkışta ücretli plana ya da Hostinger'e geçilir.
 - **Neon compute süresi.** İstatistik yazmaları sınırı zorlarsa istatistik kapatılır ya da plan yükseltilir.
 - **Unbounded genişliği.** Uzun ürün adlarında Montserrat kullanılarak çözülür. Kategori başlıkları dar ekranda iki satıra iner.
@@ -459,7 +455,7 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Ube Vanilya Matcha Latte | 280 ₺ |
 | Strawberry Matcha Latte | 280 ₺ |
 
-### Coffee Frappe · Kahve · red · cold · Ne içsem (5)
+### Coffee Frappe · Kahve · red · cold · Ne içsem (6)
 
 | Ürün | Fiyat |
 |---|---|
@@ -467,9 +463,10 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Espresso Frappe | Normal 230 ₺ · Büyük 250 ₺ |
 | Mocha Frappe | Normal 230 ₺ · Büyük 250 ₺ |
 | Coconut Mocha Frappe | Normal 230 ₺ · Büyük 250 ₺ |
-| White Chocolate Mocha Frappe | Normal 230 ₺ · Büyük 250 ₺ |
+| White Mocha Frappe | Büyük 250 ₺ |
+| White Chocolate Frappe | Normal 230 ₺ |
 
-### Cream Frappe · Kahve · red · cold · Ne içsem (5)
+### Cream Frappe · Kahve · red · cold · Ne içsem (6)
 
 | Ürün | Fiyat |
 |---|---|
@@ -477,19 +474,21 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Strawberries & Cream Frappe | Normal 230 ₺ · Büyük 250 ₺ |
 | Vanilla Cream Frappe | Normal 230 ₺ · Büyük 250 ₺ |
 | Caramel Cream Frappe | Normal 230 ₺ · Büyük 250 ₺ |
-| White Chocolate Cream Frappe | Normal 230 ₺ · Büyük 250 ₺ |
+| White Mocha Cream Frappe | Büyük 250 ₺ |
+| White Chocolate Cream Frappe | Normal 230 ₺ |
 
-### Frozen · Kahvesiz · blue · cold · Ne içsem (7)
+### Frozen · Kahvesiz · blue · cold · Ne içsem (8)
 
 | Ürün | Fiyat |
 |---|---|
 | Mango Frozen | Normal 220 ₺ · Büyük 240 ₺ |
 | Raspberry Frozen | Normal 220 ₺ · Büyük 240 ₺ |
 | Strawberry Frozen | Normal 220 ₺ · Büyük 240 ₺ |
-| Melonberry Twist Frozen | Normal 220 ₺ · Büyük 240 ₺ |
+| Melonberry Frozen | Büyük 240 ₺ |
 | Cool Lime Frozen | Normal 220 ₺ · Büyük 240 ₺ |
 | Berry Hibiscus Frozen | Normal 220 ₺ · Büyük 240 ₺ |
 | Orange Mango Frozen | Normal 220 ₺ · Büyük 240 ₺ |
+| Melonberry Twist Frozen | Normal 220 ₺ |
 
 ### Ice Shaken · Kahvesiz · blue · cold · Ne içsem (3)
 
