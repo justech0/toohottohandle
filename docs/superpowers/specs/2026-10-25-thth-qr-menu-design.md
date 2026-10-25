@@ -31,8 +31,8 @@ Marka paleti (`toohottohandle-renkler.pdf`, Pantone Solid Coated):
 | `yellow` | 100 C | `#F0EE40` | Vurgu: Yeni, Öne çıkan |
 | `pink` | 2051 C | `#DDBBD1` | Tatlı grubu |
 | `blue` | 3506 C | `#335DB2` | Kahvesiz içecek grubu |
-| `green` | 6144 C | `#35A97C` | Tuzlu yiyecek grubu |
-| `gray` | Cool Gray 1 C | `#DBDAD4` | Paket kahve ve kasa önü |
+| `green` | 6144 C | `#35A97C` | Yiyecek grubu |
+| `gray` | Cool Gray 1 C | `#DBDAD4` | Paket & Atıştırmalık grubu |
 
 Renk kategoriye değil gruba bağlıdır. Böylece kategori sayısı artsa da kural bozulmaz. Renk her zaman bir anlam taşır.
 
@@ -93,7 +93,7 @@ Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya d
 ### 3.2 Menü ekranı
 
 - **Üst bar:** küçük TOO HOT / TO HANDLE logosu. Sağda arama, WiFi ve dil (TR / EN / AR).
-- **Grup ve kategori şeridi** (yapışkan): beş grup (Kahve, Kahvesiz, Tuzlu, Tatlı, Kasa) ve altında kategoriler. Seçili kategori kendi grup rengiyle dolar. Kategoriye geçerken dalga o rengin içinden geçer. Ekranda tek baskın hareket bu dalgadır.
+- **Grup ve kategori şeridi** (yapışkan): beş grup (Kahve, Kahvesiz, Yiyecek, Tatlı, Paket & Atıştırmalık) ve altında kategoriler. Menüde yalnızca grup ve kategori adları yazar. Renk adı, sıcaklık gibi iç bilgiler yazmaz, renk yalnızca görsel olarak kullanılır. Seçili kategori kendi grup rengiyle dolar. Kategoriye geçerken dalga o rengin içinden geçer. Ekranda tek baskın hareket bu dalgadır.
 - **Öne çıkan:** admin'de "öne çıkan" işaretli en fazla 6 ürün, en üstte büyük kartlarda durur. Elle kaydırılır, kendi kendine kaymaz. Etiketi "Öne çıkan"dır, "en çok satan" yazılmaz.
 - **Ürün listesi:** tek sütun liste. Her satırda ad, varsa bir satır açıklama ve sağda fiyat bulunur. İki boylu üründe fiyat "Normal 210 · Büyük 230" biçimindedir. Fotoğrafı olan ürünün satırında küçük kare fotoğraf görünür. Fotoğrafı olmayan satır da eksik durmaz: menü bir kafe panosu gibi yalnızca yazıyla da tamamlanmış görünür. 768 px üstünde liste iki sütuna geçer.
 - **Kategori başlıkları:** Unbounded, büyük harf, grup rengi. Kabartma görünümü statik CSS gölgesiyle verilir, hareket etmez.
@@ -409,9 +409,11 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 
 ## Ek A. Menü listesi (Excel'den dönüştürüldü)
 
-Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içsem'e dahil mi (ürün sayısı).
+Başlık, menüde görünen kategori adıdır. Altındaki italik satır yalnızca iç nottur ve menüde yazmaz: grubu, rengi, varsayılan sıcaklığı ve "Ne içsem?" çarkına dahil olup olmadığını gösterir.
 
-### Sıcak Kahveler · Kahve · red · hot · Ne içsem (11)
+### Sıcak Kahveler (11)
+
+_İç not, menüde yazmaz: grup Kahve · renk kırmızı · sıcak · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -427,7 +429,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | White Chocolate Mocha | Normal 210 ₺ · Büyük 230 ₺ |
 | Türk Kahvesi | Tek 120 ₺ · Duble 160 ₺ |
 
-### Soğuk Kahveler · Kahve · red · cold · Ne içsem (8)
+### Soğuk Kahveler (8)
+
+_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -440,7 +444,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Iced White Chocolate Mocha | Normal 231 ₺ · Büyük 253 ₺ |
 | Iced Filtre Kahve | Normal 165 ₺ · Büyük 187 ₺ |
 
-### Signatures · Kahve · red · cold · Ne içsem (5)
+### Signatures (5)
+
+_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -450,7 +456,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Citrus Berry Cloud | 260 ₺ |
 | Blue Garden | 260 ₺ |
 
-### Matcha & Ube · Kahve · red · cold · Ne içsem (3)
+### Matcha & Ube (3)
+
+_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -458,7 +466,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Ube Vanilya Matcha Latte | 280 ₺ |
 | Strawberry Matcha Latte | 280 ₺ |
 
-### Coffee Frappe · Kahve · red · cold · Ne içsem (6)
+### Coffee Frappe (6)
+
+_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -469,7 +479,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | White Mocha Frappe | Büyük 250 ₺ |
 | White Chocolate Frappe | Normal 230 ₺ |
 
-### Cream Frappe · Kahve · red · cold · Ne içsem (6)
+### Cream Frappe (6)
+
+_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -480,7 +492,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | White Mocha Cream Frappe | Büyük 250 ₺ |
 | White Chocolate Cream Frappe | Normal 230 ₺ |
 
-### Frozen · Kahvesiz · blue · cold · Ne içsem (8)
+### Frozen (8)
+
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -493,7 +507,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Orange Mango Frozen | Normal 220 ₺ · Büyük 240 ₺ |
 | Melonberry Twist Frozen | Normal 220 ₺ |
 
-### Ice Shaken · Kahvesiz · blue · cold · Ne içsem (3)
+### Ice Shaken (3)
+
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -501,7 +517,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Berry Hibiscus | Normal 210 ₺ · Büyük 230 ₺ |
 | Orange Mango | Normal 210 ₺ · Büyük 230 ₺ |
 
-### Kahvesiz İçecekler · Kahvesiz · blue · Ne içsem (5)
+### Kahvesiz İçecekler (5)
+
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -511,7 +529,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Chai Tea Latte | Normal 205 ₺ · Büyük 220 ₺ |
 | Sahlep | 205 ₺ |
 
-### Çaylar · Kahvesiz · blue · hot · Ne içsem (8)
+### Çaylar (8)
+
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · sıcak · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -524,7 +544,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Nar & Baharat | 160 ₺ |
 | Kış Çayı | 160 ₺ |
 
-### Meşrubat · Kahvesiz · blue · cold (10)
+### Meşrubat (10)
+
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · soğuk_
 
 | Ürün | Fiyat |
 |---|---|
@@ -539,7 +561,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Red Bull | 220 ₺ |
 | Premium Soda | 165 ₺ |
 
-### Ekmek Üstü · Tuzlu · green (5)
+### Ekmek Üstü (5)
+
+_İç not, menüde yazmaz: grup Yiyecek · renk yeşil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -549,7 +573,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Garden | 280 ₺ |
 | Füme Et & Yumurta | 350 ₺ |
 
-### Sandviç & Börek · Tuzlu · green (10)
+### Sandviç & Börek (10)
+
+_İç not, menüde yazmaz: grup Yiyecek · renk yeşil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -564,7 +590,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Morning Sando | 300 ₺ |
 | Italy Sando | 350 ₺ |
 
-### Kruvasan · Tuzlu · green (3)
+### Kruvasan (3)
+
+_İç not, menüde yazmaz: grup Yiyecek · renk yeşil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -572,7 +600,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Kruvasan Sandviç | 275 ₺ |
 | Tatlı Kruvasan | 280 ₺ |
 
-### Magnolia · Tatlı · pink (3)
+### Magnolia (3)
+
+_İç not, menüde yazmaz: grup Tatlı · renk pembe_
 
 | Ürün | Fiyat |
 |---|---|
@@ -580,7 +610,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Çikolatalı Magnolia | 250 ₺ |
 | Fıstıklı Magnolia | 250 ₺ |
 
-### Tatlılar · Tatlı · pink (13)
+### Tatlılar (13)
+
+_İç not, menüde yazmaz: grup Tatlı · renk pembe_
 
 | Ürün | Fiyat |
 |---|---|
@@ -598,7 +630,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Beyaz Kardelen | 300 ₺ |
 | Brownie | 285 ₺ |
 
-### Cookies · Tatlı · pink (4)
+### Cookies (4)
+
+_İç not, menüde yazmaz: grup Tatlı · renk pembe_
 
 | Ürün | Fiyat |
 |---|---|
@@ -607,7 +641,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Triple Chocolate Cookie | 180 ₺ |
 | Chocolate Chip Cookie | 170 ₺ |
 
-### Paket Kahve · Kasa · gray (5)
+### Paket Kahve (5)
+
+_İç not, menüde yazmaz: grup Paket & Atıştırmalık · renk gri_
 
 | Ürün | Fiyat |
 |---|---|
@@ -617,7 +653,9 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Ethiopia Sidamo · 200 g | 330 ₺ |
 | Aç Demle Kahve | 385 ₺ |
 
-### Kasa Önü · Kasa · gray (13)
+### Kasa Önü (13)
+
+_İç not, menüde yazmaz: grup Paket & Atıştırmalık · renk gri_
 
 | Ürün | Fiyat |
 |---|---|
