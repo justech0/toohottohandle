@@ -40,6 +40,7 @@ test("falls back to selecting the text when clipboard is refused", async ({ page
 test("tapping outside closes the card", async ({ page }) => {
   await openMenu(page);
   await openWifi(page);
+  await expect(page.getByTestId("wifi-card")).toBeVisible();
   await page.mouse.click(200, 800);
   await expect(page.getByTestId("wifi-card")).toHaveCount(0);
 });
