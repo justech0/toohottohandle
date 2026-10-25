@@ -4,7 +4,9 @@ import { Footer } from "./Footer";
 import { ProductRow } from "./ProductRow";
 import { ExtrasLine } from "./ExtrasLine";
 import { CategoryStrip } from "./CategoryStrip";
-import { SearchIcon, WifiIcon } from "./Icons";
+import { MenuClient } from "./MenuClient";
+import type { ClientProduct } from "./clientTypes";
+import { priceLabel } from "@/lib/menu/soldout";
 
 export function MenuShell({ menu }: { menu: MenuData }) {
   const visible = menu.products.filter((p) => p.isVisible);
@@ -14,6 +16,12 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       .map((c) => ({ group: g, category: c, items: visible.filter((p) => p.category === c.slug) }))
       .filter((s) => s.items.length > 0),
   );
+  const clientProducts: ClientProduct[] = sections.flatMap(({ category, items }) =>
+    items.map((p) => {
+      const price = priceLabel(p, menu.serverNow);
+      return { slug: p.slug, name: p.name, descTr: p.descTr, categoryName: category.nameTr, parts: price.parts, soldOut: price.soldOut };
+    }),
+  );
   const groupsWithItems = menu.groups.filter((g) => sections.some((s) => s.group.slug === g.slug));
 
   return (
@@ -21,16 +29,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       <div className="sticky">
         <header className="topbar">
           <Logo className="topbar__logo" />
-          <div className="topbar__actions">
-            <button type="button" className="icon-btn" aria-label="Ara" data-action="search">
-              <SearchIcon />
-            </button>
-            {menu.settings.wifiSsid ? (
-              <button type="button" className="icon-btn" aria-label="WiFi" data-action="wifi">
-                <WifiIcon />
-              </button>
-            ) : null}
-          </div>
+          <MenuClient products={clientProducts} settings={menu.settings} />
         </header>
         <CategoryStrip
           groups={groupsWithItems.map(({ slug, nameTr, color }) => ({ slug, nameTr, color }))}

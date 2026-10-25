@@ -56,3 +56,15 @@
   .price { flex-direction: column; align-items: flex-end; gap: 2px; }
   .price__sep { display: none; }
 }
+
+/* Arama paneli */
+.search { position: fixed; inset: 0; z-index: 50; background: var(--c-paper); display: flex; flex-direction: column; animation: drop .22s var(--ease); }
+@keyframes drop { from { opacity: 0; transform: translateY(-12px); } }
+.search__bar { display: flex; align-items: center; gap: 6px; padding: calc(8px + env(safe-area-inset-top)) 8px 8px 14px; border-bottom: 1px solid var(--c-line); }
+.search__icon { display: grid; color: var(--c-ink-soft); }
+.search__input { flex: 1; min-width: 0; height: var(--tap); border: 0; background: none; font: 600 17px var(--f-text); color: var(--c-ink); outline: none; }
+.search__input::-webkit-search-cancel-button { display: none; }
+.search__body { flex: 1; overflow-y: auto; padding: 4px 12px 24px; }
+.search__empty { padding: 40px 12px; text-align: center; display: grid; gap: 16px; justify-items: center; }
+.search__empty p { margin: 0; font: 600 16px/1.45 var(--f-text); max-width: 28ch; }
+.btn-ghost { min-height: var(--tap); padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--c-ink); background: none; font: 600 15px var(--f-text); cursor: pointer; }
