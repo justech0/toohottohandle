@@ -50,3 +50,42 @@ test("tabs are at least 44px tall", async ({ page }) => {
     expect(box!.height).toBeGreaterThanOrEqual(44);
   }
 });
+
+test("a sold-out row keeps 4.5:1 contrast for the name and Tükendi", async ({ page }) => {
+  await openMenu(page);
+  const ratios = await row(page, "cortado").evaluate((li) => {
+    li.classList.add("row--out");
+    const price = li.querySelector<HTMLElement>(".price")!;
+    price.className = "price price--out";
+    price.textContent = "Tükendi";
+    const nums = (c: string) => (c.match(/[\d.]+/g) ?? []).map(Number);
+    const lin = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+    const bg = nums(getComputedStyle(document.body).backgroundColor);
+    const ratio = (el: Element) => {
+      let a = 1;
+      for (let n: Element | null = el; n; n = n.parentElement) a *= parseFloat(getComputedStyle(n).opacity);
+      const c = nums(getComputedStyle(el).color);
+      const A = a * (c[3] ?? 1);
+      const L1 = lum([0, 1, 2].map((i) => c[i] * A + bg[i] * (1 - A)));
+      const L2 = lum(bg);
+      return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+    };
+    return { name: ratio(li.querySelector(".row__name")!), price: ratio(price) };
+  });
+  expect(ratios.name).toBeGreaterThanOrEqual(4.5);
+  expect(ratios.price).toBeGreaterThanOrEqual(4.5);
+});
+
+for (const size of [{ width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
+  test(`tapping the last group and category keeps them selected at ${size.width}px`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await openMenu(page);
+    await page.getByTestId("group-tab").filter({ hasText: "Paket" }).click();
+    await page.waitForTimeout(300);
+    await expect(page.getByTestId("category-tab").filter({ hasText: "Paket Kahve" })).toHaveAttribute("aria-current", "true");
+    await page.getByTestId("category-tab").filter({ hasText: "Kasa Önü" }).click();
+    await page.waitForTimeout(300);
+    await expect(page.getByTestId("category-tab").filter({ hasText: "Kasa Önü" })).toHaveAttribute("aria-current", "true");
+  });
+}
