@@ -67,6 +67,19 @@ export function CategoryStrip({ groups, categories }: { groups: StripGroup[]; ca
     };
   }, [categories, headerBottom]);
 
+  // Grup afişleri (data-jump) şeridin kaydırma mantığını kullanır: yapışkan başlığın altına tam oturur.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-jump]");
+      const slug = link?.dataset.jump;
+      if (!slug) return;
+      e.preventDefault();
+      jumpTo(slug);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [jumpTo]);
+
   useEffect(() => {
     const row = catRowRef.current;
     const tab = row?.querySelector<HTMLElement>('[aria-current="true"]');

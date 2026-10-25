@@ -1,6 +1,7 @@
 import type { MenuData } from "@/lib/menu/types";
 import { BrandIcon } from "./BrandIcon";
 import { HeroSlides } from "./HeroSlides";
+import { GroupTiles, NeIcsemSquare } from "./GroupTiles";
 import { Footer } from "./Footer";
 import { ProductRow } from "./ProductRow";
 import { ExtrasLine } from "./ExtrasLine";
@@ -34,6 +35,11 @@ export function MenuShell({ menu }: { menu: MenuData }) {
         <MenuClient products={clientProducts} settings={menu.settings} />
       </header>
       <HeroSlides />
+      <GroupTiles
+        groups={groupsWithItems}
+        firstCategoryOf={Object.fromEntries(groupsWithItems.map((g) => [g.slug, sections.find((x) => x.group.slug === g.slug)!.category.slug]))}
+        neIcsem={<NeIcsemSquare />}
+      />
       <div className="sticky">
         <CategoryStrip
           groups={groupsWithItems.map(({ slug, nameTr, color }) => ({ slug, nameTr, color }))}
