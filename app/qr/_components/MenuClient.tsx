@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { closeSheetHistory, openSheetHistory, sheetFromState } from "@/lib/ui/historySheet";
 import { ProductSheet } from "./ProductSheet";
+import { WifiCard } from "./WifiCard";
 import type { MenuSettings } from "@/lib/menu/types";
 import type { ClientProduct } from "./clientTypes";
 import { SearchOverlay } from "./SearchOverlay";
@@ -49,6 +50,7 @@ export function MenuClient({ products, settings }: { products: ClientProduct[]; 
         ) : null}
       </div>
       {panel === "search" ? <SearchOverlay products={products} onClose={close} paused={Boolean(sheetProduct)} /> : null}
+      {panel === "wifi" ? <WifiCard settings={settings} onClose={close} /> : null}
       {sheetProduct ? <ProductSheet product={sheetProduct} onClose={closeSheet} /> : null}
     </>
   );
