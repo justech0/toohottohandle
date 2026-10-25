@@ -1,6 +1,6 @@
 # Too Hot To Handle — QR Menü Tasarım Belgesi (Spec) · Sürüm 2
 
-- Tarih: 2026-10-25 (sürüm 2: gerçek ürün listesi, AI incelemeleri, font ve barındırma kararları işlendi)
+- Tarih: 2026-10-25 (sürüm 2: gerçek ürün listesi, AI incelemeleri, font ve barındırma kararları işlendi; sürüm 2.1: ikinci AI incelemesi, gerçekçi 3D yolu)
 - Adres: `toohottohandlecoffee.com/qr` (menü), `toohottohandlecoffee.com/qr/admin` (admin)
 - Şube: yalnızca Batman (Petrol City AVM)
 - Proje yürütücüsü: Enes
@@ -27,10 +27,10 @@ Marka paleti (`toohottohandle-renkler.pdf`, Pantone Solid Coated):
 
 | Token | Pantone | Hex | Anlamı menüde |
 |---|---|---|---|
-| `red` | 485 C | `#DC2524` | Kahve grubu, ana marka rengi |
+| `red` | 485 C | `#DC2524` | Kahve grubu (espresso ve kahve bazlı), ana marka rengi |
 | `yellow` | 100 C | `#F0EE40` | Vurgu: Yeni, Öne çıkan |
 | `pink` | 2051 C | `#DDBBD1` | Tatlı grubu |
-| `blue` | 3506 C | `#335DB2` | Kahvesiz içecek grubu |
+| `blue` | 3506 C | `#335DB2` | Kahvesiz grup (Cream Frappe, Matcha & Ube dahil) |
 | `green` | 6144 C | `#35A97C` | Yiyecek grubu |
 | `gray` | Cool Gray 1 C | `#DBDAD4` | Paket & Atıştırmalık grubu |
 
@@ -77,18 +77,20 @@ Kafenin BORELA ve Gotham lisansı doğrulanamadığı için açık lisanslı (SI
 
 ## 3. Deneyim
 
-### 3.1 Giriş (oturumdaki ilk açılışta, en fazla 1,2 sn)
+### 3.1 Giriş (oturumdaki ilk açılışta, en fazla 1,2 sn, her zaman 2D)
 
-Giriş, yakında sayfasının dilini sürdürür:
+Giriş, yakında sayfasının dilini sürdürür ve tamamen SVG ve CSS ile çalışır:
 1. Krem zemin. Kırmızı, alttan dalgalı kenarla ekranın yarısına kadar dolar.
 2. HOT logosu dalganın üstünde ısınıp dalgalanır. TOO HOT / TO HANDLE iki satır olarak yerine oturur.
 3. Logo küçülerek üst bara geçer, menü altından görünür.
 
-İki katmanlı çalışır:
-- **2D (herkes):** SVG ve CSS. İlk kare HTML ile birlikte gelir, ek dosya beklemez.
-- **3D (yalnızca güçlü telefonda):** HOT logosu parlak kırmızı kabartmaya dönüşür, hafif döner, sonra düz logoya oturur. 3D yüklemesi şu koşulların hepsi tutarsa başlar: WebGL2 var, `navigator.deviceMemory` ≥ 4 (bilinmiyorsa geçer), işlemci çekirdeği ≥ 6, veri tasarrufu kapalı, bağlantı 3G'den hızlı, hareket azaltma kapalı. 3D sahne 600 ms içinde hazır olmazsa o oturumda 2D oynar.
+- İlk kare HTML ile birlikte gelir, ek dosya beklemez. Girişte Three.js yüklenmez.
+- Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya da "Geç" düğmesi girişi atlar.
+- Hareket azaltma açıksa kısa bir kararma geçişi oynar. Ses yoktur.
 
-Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya da "Geç" düğmesi girişi atlar. Hareket azaltma açıksa kısa bir kararma geçişi oynar. Ses yoktur.
+3D, menü kullanılabilir hale geldikten sonra iki yerde devreye girer (5.3):
+- **Üstteki HOT:** menünün en üstündeki büyük HOT logosu, 3D hazır olunca parlak kırmızı kabartmaya döner. Kendi kendine hareket etmez. Yalnızca kaydırmaya ve parmakla sürüklemeye hafifçe eğilerek tepki verir. 3D yoksa aynı yerde SVG logo durur.
+- **"Ne içsem?" makaraları** (3.5).
 
 ### 3.2 Menü ekranı
 
@@ -97,8 +99,8 @@ Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya d
 - **Öne çıkan:** admin'de "öne çıkan" işaretli en fazla 6 ürün, en üstte büyük kartlarda durur. Elle kaydırılır, kendi kendine kaymaz. Etiketi "Öne çıkan"dır, "en çok satan" yazılmaz.
 - **Ürün listesi:** tek sütun liste. Her satırda ad, varsa bir satır açıklama ve sağda fiyat bulunur. İki boylu üründe fiyat "Normal 210 · Büyük 230" biçimindedir. Fotoğrafı olan ürünün satırında küçük kare fotoğraf görünür. Fotoğrafı olmayan satır da eksik durmaz: menü bir kafe panosu gibi yalnızca yazıyla da tamamlanmış görünür. 768 px üstünde liste iki sütuna geçer.
 - **Kategori başlıkları:** Unbounded, büyük harf, grup rengi. Kabartma görünümü statik CSS gölgesiyle verilir, hareket etmez.
-- **Ekstralar:** kahve ve içecek kategorilerinin sonunda tek satır: "Ekstra shot +75 · Bitkisel süt +60 · Sos ve aroma +50". Ekmek Üstü'nde: "Yumurta +30".
-- **Tükendi:** ürün listede kalır, soluk görünür, fiyat yerine "Tükendi" yazar. "Ne içsem?" onu seçmez.
+- **Ekstralar:** yalnızca espresso ve süt bazlı kategorilerin sonunda tek satır: Sıcak Kahveler, Soğuk Kahveler, Coffee Frappe, Cream Frappe, Matcha & Ube. Metin: "Ekstra shot +75 · Bitkisel süt +60 · Sos ve aroma +50". Ekmek Üstü'nde: "Yumurta +30". Çaylar, Frozen, Meşrubat gibi kategorilerde ekstra satırı çıkmaz. Hangi ekstranın nerede görüneceği admin'den değiştirilebilir.
+- **Tükendi:** ürün listede kalır, soluk görünür, fiyat yerine "Tükendi" yazar. "Ne içsem?" onu seçmez. Tükendi süresinin dolup dolmadığını telefon kendisi hesaplar (5.2).
 - **Alt bilgi:** "Self servis · Servis ücreti alınmaz · Fiyatlara KDV dahildir · Son güncelleme: 25.10.2026". Tarih, en son değişen ürünün tarihinden otomatik alınır. Alt bilgi metni admin'den değiştirilebilir.
 
 ### 3.3 Arama
@@ -120,9 +122,10 @@ Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya d
 
 - Liste sonunda ve üst barda slot ikonu bulunur.
 - Önce sorar: Sıcak / Soğuk / Fark etmez.
-- Resmi slot kutusunun makaraları (dudak, tavşan, yıldız) döner. Güçlü telefonda 3D, diğerlerinde SVG oynar.
+- Resmi slot kutusunun makaraları (dudak, tavşan, yıldız) döner. 3D hazırsa 3D, değilse SVG oynar. Makaralar dokunur dokunmaz döner, 3D'yi beklemez.
 - Makara tavşanda durur. Tavşanın gözüne dalış geçişi ile seçilen içeceğin detayı açılır.
-- Yalnızca görünür, tükenmemiş ve "Ne içsem'e dahil" kategorideki içecekler seçilir. Yiyecek ve meşrubat seçilmez.
+- Uygunluk ürün düzeyinde belirlenir. Seçilebilen ürün: görünür, tükenmemiş, "Ne içsem'e dahil" işaretli ve sıcaklık filtresine uyan içecek. Ürünün sıcaklığı boşsa kategorinin varsayılanı kullanılır. Yiyecek ve meşrubat varsayılan olarak dahil değildir.
+- Seçime uyan ürün yoksa: "Şu an bu seçime uygun içecek yok. Diğer seçeneği dene." yazar.
 - "Bir daha" düğmesi yeniden çevirir.
 
 ### 3.6 WiFi kartı
@@ -171,7 +174,7 @@ Türk Gıda Kodeksi ve AB'nin 14 alerjeni: gluten, kabuklu deniz ürünleri, yum
 | Arama sonuçsuz | "Aradığını bulamadık. Ekibimiz sana yardımcı olabilir." ve temizle düğmesi |
 | Kategori boş ya da tamamı gizli | Kategori şeritte de listede de görünmez |
 | Kopyalama başarısız | Metin seçilir, "Kopyalanamadı. Metne basılı tutup kopyalayın." |
-| Bağlantı yok (daha önce açılmışsa) | Son kaydedilen menü açılır, üstte "Bağlantı yok. Gösterilen menü: 25.10.2026 14:30" yazar |
+| Bağlantı yok ya da 2,5 sn'de yanıt yok (daha önce açılmışsa) | Son kaydedilen menü açılır, üstte "Bağlantı zayıf. Gösterilen menü: 25.10.2026 14:30" yazar |
 | Fotoğraf yüklenemedi | Satır fotoğrafsız haliyle görünür |
 | Veritabanına ulaşılamıyor | Menü son üretilmiş sayfadan sunulur, ziyaretçi farkı görmez |
 
@@ -181,9 +184,12 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 ### 4.1 Giriş ve hesap
 
-- E-posta ve şifre ile giriş yapılır. Yanlış denemelerde artan bekleme süresi uygulanır.
+- E-posta ve şifre ile giriş yapılır. Kayıt sayfası yoktur.
+- **İlk kurulum:** geliştirici `npm run admin:create` komutunu çalıştırır. Komut e-postayı ve şifreyi terminalde sorar, şifreyi ekrana basmaz, argon2id hash'ini veritabanına yazar. Tabloda zaten bir admin varsa çalışmaz.
+- **Şifre sıfırlama:** tek admin olduğu için e-posta servisi kurulmaz. Geliştirici `npm run admin:reset-password` komutunu çalıştırır. Komut yeni şifreyi aynı şekilde terminalde sorar ve o admin'in bütün oturumlarını kapatır.
+- **Deneme sınırı:** hem IP adresi hem e-posta için ayrı sayılır. 15 dakikada 5 yanlış denemeden sonra bekleme süresi katlanarak artar. IP adresi yalnızca barındırmanın kendi eklediği başlıktan okunur (Vercel'de platformun koyduğu `x-forwarded-for` ilk değeri, Hostinger'de sunucunun güvendiği vekil başlığı). Ziyaretçinin gönderdiği başlığa güvenilmez. Sayaç veritabanında tek bir `INSERT … ON CONFLICT … RETURNING` sorgusuyla artırılır, böylece aynı anda gelen istekler sayacı atlatamaz.
 - "Tüm cihazlardan çıkış yap" düğmesi bulunur.
-- Şifre sıfırlama: tek admin olduğu için e-posta servisi kurulmaz. Geliştirici `npm run admin:reset-password` komutunu çalıştırır. Komut yeni şifreyi ekrana basmaz, kullanıcının yazmasını ister. Adımlar `docs/KULLANIM.md` içinde yazılıdır.
+- Adımlar `docs/KULLANIM.md` içinde yazılıdır.
 
 ### 4.2 Ürünler
 
@@ -201,14 +207,18 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 ### 4.4 Değişiklik geçmişi ve geri alma
 
-- Her kayıt (kim, ne zaman, önce, sonra) geçmişe yazılır.
-- Son 100 değişiklik listelenir. Her birinde "Geri al" bulunur.
-- Kayıt doğrudan yayına çıkar. Taslak ve yayınla adımı yoktur, çünkü tek admin vardır ve geri alma bu ihtiyacı karşılar.
+- Her kayıt geçmişe yazılır: kim, ne zaman, hangi kayıt, önce ve sonra.
+- **WiFi şifresi geçmişte maskelenir.** Geçmişe yalnızca "WiFi şifresi değiştirildi" yazılır, eski ya da yeni şifre yazılmaz. Admin şifresi ve oturum bilgisi hiçbir zaman geçmişe girmez.
+- Son 100 değişiklik okunabilir liste olarak görünür.
+- **Geri al yalnızca iki yerde:** son yapılan değişiklik ve son toplu fiyat güncellemesi. Aradan eski bir kaydı geri almak, sonradan yapılan değişikliklerle çakışıp veriyi bozabileceği için yoktur.
+- Silinen ürünler çöp kutusundan ayrıca geri getirilir (4.2).
+- Kayıt doğrudan yayına çıkar. Taslak ve yayınla adımı yoktur.
 - Kaydedilen değişiklik menüde en geç 10 saniyede görünür.
 
 ### 4.5 Kategoriler, etiketler ve ayarlar
 
-- Kategoriler: ad (3 dil), grup, sıralama, görünürlük, "Ne içsem'e dahil" ve varsayılan sıcak/soğuk.
+- Kategoriler: ad (3 dil), grup, sıralama, görünürlük, "Ne içsem'e dahil" varsayılanı ve varsayılan sıcak/soğuk. Ürün kendi değerini girerse kategorinin varsayılanını geçersiz kılar.
+- Ekstralar: ad (3 dil), fiyat, hangi kategorilerde görüneceği.
 - Gruplar: ad (3 dil), renk (yalnızca 6 marka renginden).
 - Etiketler: hazır liste ve ekleme.
 - Ayarlar: WiFi (ağ adı, kullanıcı adı, şifre, yönerge metni), açılış saati, alt bilgi notu (varsayılan: "Self servis · Servis ücreti alınmaz"). Hepsi admin'den girilir.
@@ -216,9 +226,11 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 ### 4.6 Fotoğraf yükleme
 
-- Kabul edilen türler: JPEG, PNG, WebP, HEIC. En fazla 12 MB.
-- Sunucu dosyayı yüklerken `sharp` ile küçültür: 160 px (liste), 720 px ve 1280 px (detay), WebP ve AVIF olarak kaydeder. Vercel'in görsel servisi kullanılmaz.
-- Hata metni nedenini söyler: "Dosya 12 MB'tan büyük. Daha küçük bir fotoğraf seçin."
+- Fotoğraf önce telefonda, tarayıcının içinde küçültülür: uzun kenar 1600 px, WebP (desteklenmezse JPEG), en fazla 1,5 MB. Böylece sunucunun istek sınırına (Vercel'de 4,5 MB) takılmaz. iPhone'un HEIC fotoğrafı da tarayıcı tarafından okunup çevrildiği için sunucuya hiç HEIC gelmez.
+- Sunucu gelen dosyanın türünü içeriğinden kontrol eder ve `sharp` ile 160 px (liste), 720 px ve 1280 px (detay) WebP ve AVIF sürümlerini üretir. Vercel'in görsel servisi kullanılmaz.
+- **Kırpma noktası:** yüklemeden sonra önizleme açılır. Liste karesinde ürünün hangi kısmının görüneceği parmakla odak noktası seçilerek ayarlanır (varsayılan: orta). Odak noktası kaydedilir, kırpma her boyutta buna göre yapılır.
+- **Değiştirme ve silme:** fotoğraf değiştirilebilir ya da silinebilir. Silinince ürün fotoğrafsız haline döner. Eski dosyalar depodan 30 gün sonra temizlenir (geri alma için).
+- Tarayıcı fotoğrafı okuyamazsa: "Bu fotoğraf açılamadı. Telefonun galerisinden JPEG olarak paylaşıp tekrar deneyin." yazar.
 
 ### 4.7 İstatistik
 
@@ -226,7 +238,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 - En çok detayı açılan 10 ürün listelenir.
 - "Saatlere göre menü açılışı" grafiği bulunur. Bu grafik kafe yoğunluğu ya da müşteri sayısı olarak adlandırılmaz.
 - Ziyaretçi takibi için çerez ve kişisel veri kullanılmaz. Yalnızca toplam sayaçlar tutulur. Admin girişi kendi oturum çerezini kullanır.
-- Ziyaretçi başına en fazla 2 yazma yapılır: biri açılışta, diğeri sayfadan çıkarken detay sayaçları için toplu olarak.
+- Menü açılışı oturumda bir kez gönderilir. Açılan detaylar telefonda biriktirilir. Sayfa arka plana geçince yalnızca henüz gönderilmemiş olanlar tek istekte gönderilir. Ziyaretçi WiFi'ye bağlanıp geri dönerse aynı sayaçlar ikinci kez gönderilmez.
 
 ### 4.8 Basılı menü ve QR
 
@@ -236,8 +248,15 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 ### 4.9 Yedek
 
 - Admin'de "Yedek indir" düğmesi menünün tamamını (kategoriler, ürünler, ayarlar; admin hesabı hariç) JSON olarak indirir.
-- "Yedekten geri yükle" önce farkı gösterir, onaydan sonra uygular.
+- "Yedekten geri yükle" mevcut menünün tamamını yedektekiyle değiştirir. Öncesinde yedekteki kategori ve ürün sayısını gösterip onay ister. Değiştirmeden hemen önce mevcut menünün yedeği otomatik alınır.
 - Ayrıca veritabanı sağlayıcısının kendi geri dönüş özelliği kullanılır. Ayda bir yedek indirmek `docs/KULLANIM.md`'de rutin olarak yazılıdır.
+- Admin ana sayfasında "Son yedek: 12 gün önce" yazar. 30 günü geçince uyarı kırmızıya döner.
+
+### 4.10 İzleme ve haber verme
+
+- **Site erişilemezse:** ücretsiz bir erişim izleme servisi (ör. UptimeRobot) `/qr` adresini 5 dakikada bir kontrol eder. Site açılmazsa Enes'e e-posta gider. Devirden sonra kafenin e-postası da eklenir.
+- **Sunucu hataları:** barındırmanın kendi kayıtlarında tutulur (Vercel'de runtime logs). Admin'de "Sistem" sayfası son 20 sunucu hatasını tarih ve kısa açıklamayla gösterir. Kişisel veri ve şifre kayda yazılmaz.
+- **Yedek:** otomatik yedek alınmadığı için başarısızlık bildirimi yerine 4.9'daki son yedek uyarısı kullanılır.
 
 ## 5. Teknik mimari
 
@@ -277,24 +296,31 @@ Kural: Vercel'e özel API kullanılmaz. Her şey düz Node.js sunucusunda da ça
 | İstatistik | Kendi tablolarımız | Aynı |
 
 - Taşıma adımları `docs/KULLANIM.md`'de yazılıdır: ortam değişkenlerini kopyala, depo dosyalarını aktar, DNS'i çevir.
-- Menü sayfası sunucuda önceden üretilir. Ziyaretçi isteği veritabanına gitmez, bu yüzden veritabanı uyurken bile menü hızlı açılır. Admin kaydı sayfayı yeniden üretir. Yedek olarak sayfa 5 dakikada bir tazelenir (tükendi süresi dolan ürünler için).
-- Açık duran menü, sekmeye dönüldüğünde küçük bir sürüm adresine sorar. Sürüm değişmişse veriyi sessizce yeniler.
-- Bağlantı kesilmesine karşı küçük bir service worker son menüyü ve fontları saklar. Önce ağa gider, ağ yoksa saklananı gösterir.
+- Menü sayfası sunucuda önceden üretilir. Ziyaretçi isteği veritabanına gitmez, bu yüzden veritabanı uyurken bile menü hızlı açılır. Sayfa yalnızca admin kaydında yeniden üretilir. Zamanlı yeniden üretim yoktur, böylece veritabanı gereksiz yere uyanmaz.
+- **Tükendi süresi telefonda hesaplanır:** sayfa verisinde her ürünün `sold_out_until` zamanı bulunur. Telefon şu anki zamanla karşılaştırıp ürünü tükendi ya da açık gösterir.
+- **Saat dilimi:** sunucular UTC çalışır. Açılış saati ve "ertesi açılış" hesabı her yerde açıkça `Europe/Istanbul` ile yapılır. Tarihler veritabanında UTC saklanır.
+- **Sürüm kontrolü:** açık duran menü, sekmeye dönüldüğünde `/qr/version.json` adresine sorar. Bu adres admin kaydında yeniden üretilen statik bir dosyadır, veritabanına gitmez. Service worker bu adresi hiçbir zaman önbelleğe almaz. Sürüm değişmişse veri sessizce yenilenir.
+- **Service worker:** yalnızca menü sayfasını, fontları ve logo dosyalarını saklar. Önce ağa gider. 2,5 saniyede yanıt gelmezse saklanan menüyü gösterir, arka planda ağı beklemeye devam eder. Admin sayfalarına ve API adreslerine hiç karışmaz.
 
 ### 5.3 3D
 
-- Three.js yalnızca giriş HOT kabartması ve "Ne içsem?" makaraları için kullanılır. İkisi aynı küçük sahne modülünü paylaşır.
-- Dinamik import ile, ilk boyamadan sonra ve yalnızca cihaz koşulları tutarsa (3.1) yüklenir.
-- Logo ve ikon SVG'leri `SVGLoader` ve `ExtrudeGeometry` ile kabartılır. Malzeme parlak kırmızıdır, gölge yoktur.
-- Bütçe: Three.js ve sahne birlikte en fazla 180 KB gzip. Piksel oranı en fazla 2'dir.
+Three.js kalır, ama hiçbir şeyi bekletmeyecek şekilde kullanılır.
+
+- **Ne zaman yüklenir:** menü açılıp giriş bittikten sonra, tarayıcı boşta kalınca (`requestIdleCallback`, yoksa 2 sn sonra) düşük öncelikle indirilir. Giriş sırasında, ilk boyamada ve arama yazarken yüklenmez.
+- **Kimde yüklenir:** WebGL2 var, veri tasarrufu kapalı, hareket azaltma kapalı ve tarayıcı bağlantı bilgisi veriyorsa bağlantı 2G/3G değil. iOS Safari bellek ve bağlantı bilgisi vermediği için bu iki koşul orada atlanır. Ölçüm, tahminden daha güvenilir olduğu için asıl karar şu testle verilir:
+- **Performans testi:** sahne ekran dışında 30 kare çizer. Ortalama kare süresi 20 ms'yi aşarsa 3D o cihazda kapatılır ve karar oturum boyunca hatırlanır. Böylece zayıf iPhone ya da Android SVG ile devam eder.
+- **Nerede kullanılır:** menü üstündeki büyük HOT kabartması ve "Ne içsem?" makaraları (3.1, 3.5). İkisi aynı küçük sahne modülünü paylaşır.
+- **Geçiş:** 3D hazır olunca SVG logo ile 3D logo aynı yerde, aynı boyda üst üste konur ve 200 ms'lik yumuşak geçişle değişir. Kullanıcı ekranı kaydırıyorsa değişim kaydırma bitince yapılır.
+- **Yapım:** logo ve ikon SVG'leri `SVGLoader` ve `ExtrudeGeometry` ile kabartılır. Malzeme parlak kırmızıdır, gölge yoktur. Sahne görünmezken (ekran dışı ya da sekme arka planda) çizim durur.
+- **Bütçe:** Three.js (yalnızca gereken modüller) ve sahne birlikte en fazla 180 KB gzip. Piksel oranı en fazla 2.
 
 ### 5.4 Veri modeli
 
 `groups`: `id`, `slug`, `name_tr`, `name_en`, `name_ar`, `color` (red | yellow | pink | blue | green | gray), `sort_order`
 
-`categories`: `id`, `slug`, `group_id`, `name_tr`, `name_en`, `name_ar`, `sort_order`, `is_visible`, `in_suggest` (Ne içsem'e dahil), `default_temp` (hot | cold | null)
+`categories`: `id`, `slug`, `group_id`, `name_tr`, `name_en`, `name_ar`, `sort_order`, `is_visible`, `default_in_suggest` (Ne içsem'e dahil varsayılanı), `default_temp` (hot | cold | null)
 
-`products`: `id`, `slug`, `category_id`, `name`, `name_en`, `name_ar` (boşsa `name`), `desc_tr`, `desc_en`, `desc_ar`, `ingredients_tr`, `ingredients_en`, `ingredients_ar`, `kcal` (null olabilir, 0 anlamına gelmez), `allergens` (dizi, 14 kod), `allergens_entered` (bool, "alerjen bilgisi girildi"), `temp` (hot | cold | null → kategoriden gelir), `image_key`, `is_new`, `is_featured`, `is_visible`, `sold_out_until` (null | zaman | "süresiz" için uzak tarih), `sort_order`, `updated_at`, `deleted_at`
+`products`: `id`, `slug`, `category_id`, `name`, `name_en`, `name_ar` (boşsa `name`), `desc_tr`, `desc_en`, `desc_ar`, `ingredients_tr`, `ingredients_en`, `ingredients_ar`, `kcal` (null olabilir, 0 anlamına gelmez), `allergens` (dizi, 14 kod), `allergens_entered` (bool, "alerjen bilgisi girildi"), `temp` (hot | cold | null → kategoriden gelir), `in_suggest` (bool | null → kategoriden gelir), `image_key`, `image_focus_x`, `image_focus_y` (0–1, varsayılan 0,5), `is_new`, `is_featured`, `is_visible`, `sold_out_until` (null | zaman | "süresiz" için uzak tarih), `sort_order`, `updated_at`, `deleted_at`
 
 `product_variants`: `id`, `product_id`, `label` (null = tek fiyat; Normal | Büyük | Tek | Duble | serbest), `price_kurus` (tam sayı), `sort_order`. Her üründe en az bir satır bulunur. Tek fiyat yapısı budur, ayrı `price` sütunu yoktur.
 
@@ -304,7 +330,7 @@ Kural: Vercel'e özel API kullanılmaz. Her şey düz Node.js sunucusunda da ça
 
 `settings` (tek satır): `wifi_ssid`, `wifi_username`, `wifi_password`, `wifi_note_tr/en/ar`, `opening_time`, `footer_note_tr/en/ar`
 
-`audit_log`: `id`, `admin_id`, `at`, `entity`, `entity_id`, `action`, `before` (JSON), `after` (JSON)
+`audit_log`: `id`, `admin_id`, `at`, `entity`, `entity_id`, `action`, `before` (JSON), `after` (JSON). WiFi şifresi alanı yazılmadan önce `"[değiştirildi]"` ile değiştirilir.
 
 `stats_daily`: `date`, `menu_opens`; `stats_hourly`: `date`, `hour`, `opens`; `stats_product`: `date`, `product_id`, `views`
 
@@ -319,19 +345,20 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 - Giriş deneme sınırı uygulanır.
 - Yüklenen dosyanın türü içeriğinden doğrulanır. Boyut sınırı vardır. Dosya adı rastgele üretilir. EXIF verisi silinir.
 - Güvenlik başlıkları: CSP, X-Content-Type-Options, Referrer-Policy, frame-ancestors 'none'.
+- **Arama motoru:** `/qr/admin` ve `/api` altındaki her yanıtta `X-Robots-Tag: noindex, nofollow` başlığı ve sayfalarda `noindex` meta etiketi bulunur. `robots.txt` bu yolları kapatır. Menünün kendisi (`/qr`) aranabilir kalır.
 - Anahtarlar yalnızca barındırma ortam değişkenlerinde durur. Repoda yalnızca `.env.example` bulunur. Şifre ve anahtar sohbete veya AI'a yazılmaz.
 
 ### 5.6 Performans bütçesi
 
 - Menü LCP ≤ 2,5 sn (mobil 4G), CLS ≤ 0,1, INP ≤ 200 ms.
 - İlk yüklemede JS ≤ 100 KB gzip (3D hariç).
-- Fontlar: ilk yüklemede Unbounded 800 ve Montserrat 500/600 latin alt kümesi, toplam ≤ 90 KB. Readex Pro yalnızca AR seçilince yüklenir.
+- Fontlar: Türkçe karakterler (ğ Ğ ı İ ş Ş) ve ₺ latin-ext alt kümesinde olduğu için ilk yükleme latin ve latin-ext'i birlikte içerir. İki alt küme tek dosyada birleştirilir, böylece Türkçe harf için ikinci istek ve font sıçraması olmaz. Unbounded 800 ve Montserrat 500/600, toplam ≤ 110 KB. Readex Pro yalnızca AR seçilince yüklenir.
 - Liste fotoğrafı 160 px, ≤ 12 KB. Detay fotoğrafı `srcset` ile verilir.
 
 ### 5.7 Barındırma ve maliyet
 
 - Şimdilik Vercel Hobby (ücretsiz). Hobby planı kişisel ve ticari olmayan kullanım içindir. Kafe menüsü canlıya çıkınca ücretli plana ya da Hostinger'e geçilir. Geçiş kararı ve takvimi Enes'tedir.
-- Neon ücretsiz planı ayda 100 CU-saat ve 1 GB veri verir. Menü sayfası veritabanına gitmez. İstatistik yazmaları veritabanını uyandırır. Gün boyu her 5 dakikada bir ziyaret gelirse aylık süre sınıra yaklaşır. Admin'de bu kullanım görünür. Sınıra yaklaşınca istatistik yazması tek düğmeyle kapatılabilir.
+- Neon ücretsiz planı ayda 100 CU-saat ve 1 GB veri verir. Menü sayfası, sürüm kontrolü ve tükendi hesabı veritabanına gitmez. Veritabanını yalnızca admin işlemleri ve istatistik yazmaları uyandırır. Gün boyu her 5 dakikada bir ziyaret gelirse aylık süre sınıra yaklaşabilir. Sınıra yaklaşınca istatistik yazması admin'den tek düğmeyle kapatılabilir.
 
 ### 5.8 Devir
 
@@ -345,7 +372,9 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 
 - Ürün listesi ve fiyatlar `SATIŞ ve MALİYET SON 1.xlsx` dosyasından gelir. Yalnızca "Ürün Adı", "Kategori" ve "Yeni Fiyat" sütunları kullanılır. Maliyet, COGS ve zam oranı okunmaz.
 - Excel dosyası repoya konmaz. Dönüştürülmüş liste `db/seed/menu.json` olarak repoya girer. Bu dosyada maliyet sütunu yoktur.
-- Fiyatlar "Yeni Fiyat" sütunundan olduğu gibi alınır, ekstralar dahil. Küsurlu fiyatlar (176, 198, 231, 253, 187) değiştirilmez. Yalnızca Excel'in hesap kalıntısı temizlenir (229,999999 → 230).
+- Ürün fiyatları ve ekstraların kendi fiyatları Excel'deki "Yeni Fiyat" sütunundan olduğu gibi alınır. Ekstralar ürün fiyatına dahil değildir, ayrıca ücretlidir ("+75 ₺" gibi). Küsurlu fiyatlar (176, 198, 231, 253, 187) değiştirilmez. Yalnızca Excel'in hesap kalıntısı temizlenir (229,999999 → 230).
+- Gruplar içeriğe göre ayrılır: Cream Frappe ve Matcha & Ube kahve içermediği için Kahvesiz grubundadır. Kruvasan kategorisi (Tatlı Kruvasan dahil) Yiyecek grubundadır.
+- Ürün düzeyinde sıcaklık: Kahvesiz İçecekler kategorisi sıcak varsayılır, Portakal Suyu soğuk işaretlenir.
 - Aynı ürünün boyları tek ürün olur: "Büyük", "12", "12oz", "16", "16 OZ" satırları birleşir. Küçük boy "Normal", büyük boy "Büyük" adını alır. Espresso ve Türk kahvesi "Tek · Duble" kullanır.
 - Ad yazımı düzeltilir: Chocalate → Chocolate, Rasberry → Raspberry, Cheescake → Cheesecake, Ofreso → Ofresko, Ethiophia → Ethiopia, Chocolaate → Chocolate, Cappucino → Cappuccino, Coffe → Coffee.
 - Adı farklı yazılmış satırlar birleştirilmez, ayrı ürün olarak kalır: White Mocha Frappe (yalnızca Büyük) ve White Chocolate Frappe (yalnızca Normal); White Mocha Cream Frappe ve White Chocolate Cream Frappe; Melonberry Frozen ve Melonberry Twist Frozen. Tek boyu olan üründe boy adı fiyatın yanında yazar.
@@ -372,17 +401,18 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 | A0 | Gizli repo, `yakinda/` taşıma, Next.js iskeleti, fontlar, logo ve ikon SVG'leri, Excel → `menu.json` dönüştürme | `/` yakında sayfası aynen çalışır, build geçer, seed 129 ürünü yükler |
 | A1 | Menü ekranı, arama, detay, WiFi kartı, 3 dil ve RTL, 2D giriş, service worker | 390, 768 ve 1440 px'te ekran görüntüsü kontrolü, gerçek ürün listesiyle |
 | A2 | Veritabanı, admin, yükleme, toplu fiyat, geçmiş ve geri al, tükendi, yedek, istatistik, basılı liste, QR | Bölüm 8 testleri geçer |
-| A3 | 3D giriş ve 3D "Ne içsem?" (tavşan gözü geçişi), alerjen simgeleri, etiket ve rozet seti | 3D bütçe içinde, zayıf cihazda 2D çalışır |
+| A3 | 3D HOT kabartması ve 3D "Ne içsem?" (tavşan gözü geçişi), performans testi ve SVG yedekleri, alerjen simgeleri, etiket ve rozet seti | 3D bütçe içinde, zayıf cihazda ve iOS'ta test sonucuna göre doğru yol seçilir, menü 3D'yi hiç beklemez |
 | A4 | QA, gerçek cihaz testi, yayın, QR baskı testi, `KULLANIM.md` | `/qr` canlıda, 3 telefonda okutuldu |
 
 AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında yazılır.
 
 ## 8. Test
 
-- Sunucu mantığı (doğrulama, giriş, oturum, deneme sınırı, yükleme kontrolü, toplu fiyat hesabı, tükendi süresi, Türkçe arama eşlemesi, seed dönüştürme) için birim testleri yazılır. Test koddan önce yazılır.
+- Sunucu ve istemci mantığı (doğrulama, giriş, oturum, deneme sınırının aynı anda gelen isteklerde doğru sayması, yükleme kontrolü, toplu fiyat hesabı, tükendi süresinin Europe/Istanbul ile hesabı, "Ne içsem?" uygunluk filtresi, WiFi şifresinin geçmişte maskelenmesi, Türkçe arama eşlemesi, seed dönüştürme) için birim testleri yazılır. Test koddan önce yazılır.
 - Playwright testleri:
   - Menü: açılış, kategori geçişi, arama (sonuçlu ve sonuçsuz), detay açma ve kapama (geri tuşu dahil), WiFi kopyalama, dil değişimi, AR'de RTL, tükendi görünümü, bağlantısız açılış.
-  - Admin: giriş, ürün ekleme, çoğaltma, fotoğraf yükleme, sıralama, tükendi, toplu fiyat önizleme ve uygulama, geri alma, WiFi değiştirme, yedek indirme ve geri yükleme.
+  - Admin: giriş, ürün ekleme, çoğaltma, fotoğraf yükleme (iPhone HEIC dahil) ve odak noktası, sıralama, tükendi, toplu fiyat önizleme ve uygulama, son değişikliği geri alma, WiFi değiştirme, yedek indirme ve geri yükleme.
+  - Admin ve API yanıtlarında `noindex` başlığı.
 - Ekran görüntüsü kontrolü: 390, 768, 1440 px.
 - Lighthouse mobil: performans ≥ 85, erişilebilirlik ≥ 95.
 - Güvenlik taraması.
@@ -397,7 +427,8 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 - Çok kullanıcılı admin rolleri
 - Müzik ve ses
 - Ürün videosu
-- Taslak ve yayınla akışı (yerine geçmiş ve geri al var)
+- Taslak ve yayınla akışı (yerine geçmiş ve son değişikliği geri alma var)
+- Geçmişten eski bir kaydı tek tek geri alma
 
 ## 10. Riskler
 
@@ -405,7 +436,7 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 - **Vercel Hobby ticari kullanıma izin vermez.** Canlıya çıkışta ücretli plana ya da Hostinger'e geçilir.
 - **Neon compute süresi.** İstatistik yazmaları sınırı zorlarsa istatistik kapatılır ya da plan yükseltilir.
 - **Unbounded genişliği.** Uzun ürün adlarında Montserrat kullanılarak çözülür. Kategori başlıkları dar ekranda iki satıra iner.
-- **3D ağırlığı.** Cihaz koşulu ve 600 ms sınırı tutmazsa 2D oynar. Menü hiçbir zaman 3D'yi beklemez.
+- **3D ağırlığı.** 3D yalnızca menü açıldıktan sonra, boşta yüklenir ve performans testini geçen cihazda açılır. Menü ve giriş hiçbir zaman 3D'yi beklemez.
 
 ## Ek A. Menü listesi (Excel'den dönüştürüldü)
 
@@ -456,16 +487,6 @@ _İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'
 | Citrus Berry Cloud | 260 ₺ |
 | Blue Garden | 260 ₺ |
 
-### Matcha & Ube (3)
-
-_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
-
-| Ürün | Fiyat |
-|---|---|
-| Ube Latte | 280 ₺ |
-| Ube Vanilya Matcha Latte | 280 ₺ |
-| Strawberry Matcha Latte | 280 ₺ |
-
 ### Coffee Frappe (6)
 
 _İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
@@ -481,7 +502,7 @@ _İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'
 
 ### Cream Frappe (6)
 
-_İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'e dahil_
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · soğuk · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
@@ -491,6 +512,16 @@ _İç not, menüde yazmaz: grup Kahve · renk kırmızı · soğuk · Ne içsem'
 | Caramel Cream Frappe | Normal 230 ₺ · Büyük 250 ₺ |
 | White Mocha Cream Frappe | Büyük 250 ₺ |
 | White Chocolate Cream Frappe | Normal 230 ₺ |
+
+### Matcha & Ube (3)
+
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · soğuk · Ne içsem'e dahil_
+
+| Ürün | Fiyat |
+|---|---|
+| Ube Latte | 280 ₺ |
+| Ube Vanilya Matcha Latte | 280 ₺ |
+| Strawberry Matcha Latte | 280 ₺ |
 
 ### Frozen (8)
 
@@ -519,11 +550,11 @@ _İç not, menüde yazmaz: grup Kahvesiz · renk mavi · soğuk · Ne içsem'e d
 
 ### Kahvesiz İçecekler (5)
 
-_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · Ne içsem'e dahil_
+_İç not, menüde yazmaz: grup Kahvesiz · renk mavi · sıcak · Ne içsem'e dahil_
 
 | Ürün | Fiyat |
 |---|---|
-| Portakal Suyu | 205 ₺ |
+| Portakal Suyu | 205 ₺ (iç not: soğuk) |
 | Ballı Süt | 160 ₺ |
 | Sıcak Çikolata | Normal 205 ₺ · Büyük 220 ₺ |
 | Chai Tea Latte | Normal 205 ₺ · Büyük 220 ₺ |
@@ -678,6 +709,6 @@ _İç not, menüde yazmaz: grup Paket & Atıştırmalık · renk gri_
 | Ekstra | Fiyat | Nerede görünür |
 |---|---|---|
 | Yumurta | +30 ₺ | Ekmek Üstü |
-| Ekstra shot | +75 ₺ | Kahve ve içecek bölümleri |
-| Bitkisel süt | +60 ₺ | Kahve ve içecek bölümleri |
-| Sos ve aroma | +50 ₺ | Kahve ve içecek bölümleri |
+| Ekstra shot | +75 ₺ | Sıcak Kahveler, Soğuk Kahveler, Coffee Frappe, Cream Frappe, Matcha & Ube |
+| Bitkisel süt | +60 ₺ | Sıcak Kahveler, Soğuk Kahveler, Coffee Frappe, Cream Frappe, Matcha & Ube |
+| Sos ve aroma | +50 ₺ | Sıcak Kahveler, Soğuk Kahveler, Coffee Frappe, Cream Frappe, Matcha & Ube |
