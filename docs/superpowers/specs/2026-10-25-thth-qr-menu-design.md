@@ -105,7 +105,7 @@ Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya d
 
 - Üstten açılır. Yazdıkça ürün adı, açıklama ve içindekilerde arar. Üç dilde çalışır.
 - Türkçe harfler eşit sayılır: "fistik" yazan "Fıstıklı"yı bulur (ı/i/İ, ş/s, ç/c, ğ/g, ö/o, ü/u).
-- Sonuç yoksa "‘xyz’ için ürün bulunamadı" yazar, altında aramayı temizle düğmesi bulunur.
+- Sonuç yoksa şu metin çıkar: "Aradığını bulamadık. Ekibimiz sana yardımcı olabilir." (EN: "We couldn't find that. Our team is happy to help." AR: "لم نجد ما تبحث عنه. فريقنا يسعده مساعدتك.") Altında aramayı temizle düğmesi bulunur.
 
 ### 3.4 Ürün detayı
 
@@ -168,7 +168,7 @@ Türk Gıda Kodeksi ve AB'nin 14 alerjeni: gluten, kabuklu deniz ürünleri, yum
 
 | Durum | Görünen |
 |---|---|
-| Arama sonuçsuz | "‘xyz’ için ürün bulunamadı" ve temizle düğmesi |
+| Arama sonuçsuz | "Aradığını bulamadık. Ekibimiz sana yardımcı olabilir." ve temizle düğmesi |
 | Kategori boş ya da tamamı gizli | Kategori şeritte de listede de görünmez |
 | Kopyalama başarısız | Metin seçilir, "Kopyalanamadı. Metne basılı tutup kopyalayın." |
 | Bağlantı yok (daha önce açılmışsa) | Son kaydedilen menü açılır, üstte "Bağlantı yok. Gösterilen menü: 25.10.2026 14:30" yazar |
@@ -344,7 +344,7 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 
 - Ürün listesi ve fiyatlar `SATIŞ ve MALİYET SON 1.xlsx` dosyasından gelir. Yalnızca "Ürün Adı", "Kategori" ve "Yeni Fiyat" sütunları kullanılır. Maliyet, COGS ve zam oranı okunmaz.
 - Excel dosyası repoya konmaz. Dönüştürülmüş liste `db/seed/menu.json` olarak repoya girer. Bu dosyada maliyet sütunu yoktur.
-- Kuruşlu fiyatlar en yakın liraya yuvarlanır (229,99 → 230).
+- Fiyatlar "Yeni Fiyat" sütunundan olduğu gibi alınır, ekstralar dahil. Küsurlu fiyatlar (176, 198, 231, 253, 187) değiştirilmez. Yalnızca Excel'in hesap kalıntısı temizlenir (229,999999 → 230).
 - Aynı ürünün boyları tek ürün olur: "Büyük", "12", "12oz", "16", "16 OZ" satırları birleşir. Küçük boy "Normal", büyük boy "Büyük" adını alır. Espresso ve Türk kahvesi "Tek · Duble" kullanır.
 - Ad yazımı düzeltilir: Chocalate → Chocolate, Rasberry → Raspberry, Cheescake → Cheesecake, Ofreso → Ofresko, Ethiophia → Ethiopia, Chocolaate → Chocolate, Cappucino → Cappuccino, Coffe → Coffee.
 - "DEMO ÜRÜN" satırı alınmaz.
@@ -356,16 +356,14 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 
 ### 6.3 Kafeye sorulacaklar (yayın öncesi)
 
-1. %10 zamla küsurlu çıkan fiyatlar yuvarlansın mı? Örnekler: Iced Americano 176 / 198, Iced Caramel Macchiato 231 / 253, Iced Filtre 165 / 187, Paket Türk Kahvesi 253.
-2. Birleştirme varsayımları doğru mu?
+1. Birleştirme varsayımları doğru mu?
    - "White Mocha Frappe Büyük" ile "White Chocolate Frappe" aynı ürün mü?
    - "White Mocha Cream Büyük" ile "White Chocolate Cream Frappe 12oz" aynı ürün mü?
    - "Melonberry Frozen Büyük" ile "Melonberry Twist Frozen" aynı ürün mü?
-3. Ekstraların "Yeni Fiyat"ı eski fiyattan düşük: Shot 110 → 75, Bitkisel süt 120 → 60, Sos 75 → 50. Bu doğru mu?
-4. Matcha & Ube ve Signatures içecekleri sıcak mı, soğuk mu, ikisi de mi?
-5. Servis ücreti alınıyor mu?
-6. WiFi kullanıcı adı ve şifresi, açılış saati.
-7. Alerjen bilgisini kim onaylayacak?
+2. Matcha & Ube ve Signatures içecekleri sıcak mı, soğuk mu, ikisi de mi?
+3. Servis ücreti alınıyor mu?
+4. WiFi kullanıcı adı ve şifresi, açılış saati.
+5. Alerjen bilgisini kim onaylayacak?
 
 ## 7. Aşamalar
 
@@ -404,7 +402,7 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 ## 10. Riskler
 
 - **Gerçek fotoğraf, açıklama ve alerjen yok.** Menü yazı ağırlıklı başlar, tasarım bunu kaldıracak şekilde kurulur. Alerjenler onaylanana kadar gizli kalır.
-- **Fiyat küsuratları ve birleştirme varsayımları.** 6.3'teki sorular yayın öncesi kapatılır.
+- **Birleştirme varsayımları.** 6.3'teki sorular yayın öncesi kapatılır.
 - **Vercel Hobby ticari kullanıma izin vermez.** Canlıya çıkışta ücretli plana ya da Hostinger'e geçilir.
 - **Neon compute süresi.** İstatistik yazmaları sınırı zorlarsa istatistik kapatılır ya da plan yükseltilir.
 - **Unbounded genişliği.** Uzun ürün adlarında Montserrat kullanılarak çözülür. Kategori başlıkları dar ekranda iki satıra iner.
