@@ -1,22 +1,32 @@
 import { test, expect } from "@playwright/test";
 import { openMenu } from "./helpers/menu";
 
-const row = (page: import("@playwright/test").Page, slug: string) => page.locator(`#cat-sicak-kahveler [data-slug="${slug}"], [data-testid="product-row"][data-slug="${slug}"]`).first();
+const row = (page: import("@playwright/test").Page, slug: string) => page.locator(`main [data-testid="product-row"][data-slug="${slug}"]`);
 const loaded = (img: import("@playwright/test").Locator) => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0);
 
-test("a product with a photo shows a small square image in its row", async ({ page }) => {
+test("a product with a photo shows it across the top of its card", async ({ page }) => {
   await openMenu(page);
-  const img = row(page, "cappuccino").locator("img");
+  const card = row(page, "cappuccino").locator("button");
+  const img = card.locator("img");
   await img.scrollIntoViewIfNeeded();
   await expect.poll(() => loaded(img)).toBe(true);
-  const box = (await img.boundingBox())!;
-  expect(Math.round(box.width)).toBe(Math.round(box.height));
-  expect(box.width).toBeGreaterThanOrEqual(56);
+  const ib = (await img.boundingBox())!;
+  const cb = (await card.boundingBox())!;
+  expect(Math.abs(ib.width - cb.width)).toBeLessThan(2);
+  expect(ib.height).toBeGreaterThanOrEqual(140);
+  expect(ib.height).toBeLessThanOrEqual(170);
 });
 
-test("a product without a photo has no image", async ({ page }) => {
+test("a product without a photo shows the group icon instead", async ({ page }) => {
   await openMenu(page);
   await expect(row(page, "cortado").locator("img")).toHaveCount(0);
+  await expect(row(page, "cortado").locator(".brand-icon")).toHaveCount(1);
+});
+
+test("only sample-photo products get photo cards", async ({ page }) => {
+  await openMenu(page);
+  await expect(page.locator("main .card--photo")).toHaveCount(11);
+  await expect(page.locator("main .card--plain")).toHaveCount(118);
 });
 
 test("the detail sheet shows the large photo", async ({ page }) => {
