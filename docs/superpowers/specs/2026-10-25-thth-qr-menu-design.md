@@ -99,7 +99,7 @@ Menü verisi ve metni giriş başlarken sayfada hazırdır. Ekrana dokunmak ya d
 - **Kategori başlıkları:** Unbounded, büyük harf, grup rengi. Kabartma görünümü statik CSS gölgesiyle verilir, hareket etmez.
 - **Ekstralar:** kahve ve içecek kategorilerinin sonunda tek satır: "Ekstra shot +75 · Bitkisel süt +60 · Sos ve aroma +50". Ekmek Üstü'nde: "Yumurta +30".
 - **Tükendi:** ürün listede kalır, soluk görünür, fiyat yerine "Tükendi" yazar. "Ne içsem?" onu seçmez.
-- **Alt bilgi:** "Fiyatlara KDV dahildir · Son güncelleme: 25.10.2026". Tarih, en son değişen ürünün tarihinden otomatik alınır. Servis ücreti alınıyorsa admin'den yazılan not burada görünür.
+- **Alt bilgi:** "Self servis · Servis ücreti alınmaz · Fiyatlara KDV dahildir · Son güncelleme: 25.10.2026". Tarih, en son değişen ürünün tarihinden otomatik alınır. Alt bilgi metni admin'den değiştirilebilir.
 
 ### 3.3 Arama
 
@@ -211,7 +211,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 - Kategoriler: ad (3 dil), grup, sıralama, görünürlük, "Ne içsem'e dahil" ve varsayılan sıcak/soğuk.
 - Gruplar: ad (3 dil), renk (yalnızca 6 marka renginden).
 - Etiketler: hazır liste ve ekleme.
-- Ayarlar: WiFi (ağ adı, kullanıcı adı, şifre, yönerge metni), açılış saati, servis ücreti notu. Hepsi admin'den girilir.
+- Ayarlar: WiFi (ağ adı, kullanıcı adı, şifre, yönerge metni), açılış saati, alt bilgi notu (varsayılan: "Self servis · Servis ücreti alınmaz"). Hepsi admin'den girilir.
 - Geliştirme ve demo için seed test değerleri koyar: ağ adı `HOT | WIFI`, kullanıcı adı `test`, şifre `test1234`, açılış saati 08:00. Admin ana sayfasında "WiFi test bilgisi kullanılıyor" uyarısı, gerçek bilgi girilene kadar durur.
 
 ### 4.6 Fotoğraf yükleme
@@ -302,7 +302,7 @@ Kural: Vercel'e özel API kullanılmaz. Her şey düz Node.js sunucusunda da ça
 
 `tags`, `product_tags`: `id`, `label_tr`, `label_en`, `label_ar`, `group_color`
 
-`settings` (tek satır): `wifi_ssid`, `wifi_username`, `wifi_password`, `wifi_note_tr/en/ar`, `opening_time`, `service_note_tr/en/ar`
+`settings` (tek satır): `wifi_ssid`, `wifi_username`, `wifi_password`, `wifi_note_tr/en/ar`, `opening_time`, `footer_note_tr/en/ar`
 
 `audit_log`: `id`, `admin_id`, `at`, `entity`, `entity_id`, `action`, `before` (JSON), `after` (JSON)
 
@@ -356,10 +356,14 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 
 19 kategori, 129 ürün ve 4 ekstra. Liste Ek A'da.
 
-### 6.3 Kafeye sorulacaklar (yayın öncesi)
+### 6.3 Kafeyle netleşenler
 
-1. Matcha & Ube ve Signatures içecekleri sıcak mı, soğuk mu, ikisi de mi?
-2. Servis ücreti alınıyor mu?
+- Fiyatlar "Yeni Fiyat" sütunundan olduğu gibi alınır, yuvarlanmaz.
+- Adı farklı yazılmış satırlar ayrı ürün kalır.
+- Signatures ve Matcha & Ube soğuk içecektir. Ürün başına admin'den değiştirilebilir.
+- Kafe self servistir, servis ücreti alınmaz.
+- WiFi bilgisi ve açılış saati admin'den girilir. O zamana kadar test değerleri kullanılır.
+- Alerjenler admin'den elle girilir.
 
 ## 7. Aşamalar
 
@@ -446,7 +450,7 @@ Başlık biçimi: kategori · grup · renk · varsayılan sıcaklık · Ne içse
 | Citrus Berry Cloud | 260 ₺ |
 | Blue Garden | 260 ₺ |
 
-### Matcha & Ube · Kahve · red · Ne içsem (3)
+### Matcha & Ube · Kahve · red · cold · Ne içsem (3)
 
 | Ürün | Fiyat |
 |---|---|
