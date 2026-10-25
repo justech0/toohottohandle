@@ -1,6 +1,6 @@
 # Too Hot To Handle — QR Menü Tasarım Belgesi (Spec) · Sürüm 2
 
-- Tarih: 2026-10-25 (sürüm 2: gerçek ürün listesi, AI incelemeleri, font ve barındırma kararları işlendi; sürüm 2.1: ikinci AI incelemesi, gerçekçi 3D yolu; sürüm 2.2: basılı liste çıkarıldı, sayfa yeniden üretme yerine kısa önbellek, Android ayrıntıları; sürüm 2.3: önbellek, yedek ve fotoğraf silme ayrıntıları)
+- Tarih: 2026-10-25 (sürüm 2: gerçek ürün listesi, AI incelemeleri, font ve barındırma kararları işlendi; sürüm 2.1: ikinci AI incelemesi, gerçekçi 3D yolu; sürüm 2.2: basılı liste çıkarıldı, sayfa yeniden üretme yerine kısa önbellek, Android ayrıntıları; sürüm 2.3: önbellek, yedek ve fotoğraf silme ayrıntıları; sürüm 2.4: zamana bağlı önbellek yerine kayıtta geçersiz kılma, iki aşamalı geri yükleme)
 - Adres: `toohottohandlecoffee.com/qr` (menü), `toohottohandlecoffee.com/qr/admin` (admin)
 - Şube: yalnızca Batman (Petrol City AVM)
 - Proje yürütücüsü: Enes
@@ -11,10 +11,10 @@
 Masadaki QR okutulunca açılan, markaya sadık ve hızlı bir menü yapılacak. Kafe menüyü kod bilmeden admin panelinden yönetecek.
 
 Başarı ölçütleri:
-1. Menü metni, mobil 4G'de 2,5 saniye içinde okunur hale gelir. Giriş animasyonu bunu geciktirmez. Önbellek eski veriyi beklemeden sunduğu için ziyaretçi uyuyan veritabanını beklemez (5.2). Tek istisna, yeni yayından ya da önbellek tamamen boşaldıktan sonraki ilk istektir; o da yaklaşık 0,5 sn uzar.
+1. Menü metni, mobil 4G'de 2,5 saniye içinde okunur hale gelir. Giriş animasyonu bunu geciktirmez. Ziyaretçi isteği veritabanına gitmediği için uyuyan veritabanını beklemez (5.2). Tek istisna, yeni yayından ya da admin kaydından sonraki ilk istektir; veritabanı uyuyorsa yaklaşık 0,5 sn uzar.
 2. Menüyü ilk kez gören biri, örnek 5 ürünün (Caramel Macchiato, Ton Balıklı Sandviç, Lotus Cheesecake, Cool Lime, Fas Nanesi) her birini ortalama 10 saniyede bulur. Ölçüm en az 3 kişiyle, gerçek telefonda yapılır.
 3. WiFi kullanıcı adı ve şifresi ayrı ayrı kopyalanır. Kopyalama çalışmazsa metin büyük yazıyla okunabilir.
-4. Admin'de kaydedilen değişiklik, kayıttan 10 saniye sonra gelen ilk ziyaretle yenilenir ve hemen ardından herkese görünür. Açık duran menüler, sekmeye dönüldüğünde kendini günceller.
+4. Admin'de kaydedilen değişiklik, kayıt biter bitmez açılan her menüde görünür. Açık duran menüler, sekmeye dönüldüğünde kendini günceller.
 5. Menü TR, EN ve AR dillerinde okunur. Arapça sağdan sola akar.
 6. Repo gizlidir, repoda şifre veya anahtar bulunmaz. Maliyet verisi repoya, veritabanına ve menüye girmez.
 7. Site Vercel'e bağımlı değildir. Hostinger'e taşımak için ortam değişkenlerini değiştirmek ve yeniden derlemek yeterlidir.
@@ -50,7 +50,7 @@ Renk kategoriye değil gruba bağlıdır. Böylece kategori sayısı artsa da ku
 
 Kurallar:
 - `red` (#DC2524) krem zeminde 4,14 : 1 verir. Bu yüzden yalnızca 24 px ve üstü başlıklarda kullanılır. Küçük kırmızı metinde `red-text` kullanılır.
-- Yeşil zemin üstüne beyaz yazı yazılmaz (2,95 : 1). Yeşil ve pembe zeminde `ink` kullanılır.
+- Beyaz yazı yalnızca `red` ve `blue` zeminde kullanılır. `yellow`, `pink`, `green` ve `gray` zeminde yazı her zaman `ink` olur (yeşilde beyaz yalnızca 2,95 : 1 verir, sarı ve gride beyaz hiç okunmaz).
 - Kodda bu token'lar dışında renk bulunmaz.
 
 ### 2.2 Fontlar
@@ -59,8 +59,8 @@ Kafenin BORELA ve Gotham lisansı doğrulanamadığı için açık lisanslı (SI
 
 | Rol | Font | Yerine geçtiği | Nerede |
 |---|---|---|---|
-| Başlık | **Unbounded** (700, 800) | BORELA | Kategori başlıkları, öne çıkan kart adları, rozetler, fiyat rakamları |
-| Metin | **Montserrat** (500, 600, 700) | Gotham / Gotham Rounded | Ürün adları, açıklamalar, arayüz, admin |
+| Başlık | **Unbounded** (800) | BORELA | Kategori başlıkları, öne çıkan kart adları, rozetler, fiyat rakamları |
+| Metin | **Montserrat** (500, 600) | Gotham / Gotham Rounded | Ürün adları, açıklamalar, arayüz, admin. Kalın yazı gereken yerde 600 kullanılır, 700 yüklenmez |
 | Arapça | **Readex Pro** (400, 600) | — | Yalnızca AR modunda yüklenir |
 
 - Fontlar siteyle birlikte barındırılır. Google'dan çekilmez. WOFF2'ye çevrilir, latin, latin-ext ve arabic alt kümelerine bölünür. OFL lisans dosyaları repoya konur.
@@ -202,7 +202,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 - E-posta ve şifre ile giriş yapılır. Kayıt sayfası yoktur.
 - **İlk kurulum:** geliştirici `npm run admin:create` komutunu çalıştırır. Komut e-postayı ve şifreyi terminalde sorar, şifreyi ekrana basmaz, argon2id hash'ini veritabanına yazar. Tabloda zaten bir admin varsa çalışmaz.
 - **Şifre sıfırlama:** tek admin olduğu için e-posta servisi kurulmaz. Geliştirici `npm run admin:reset-password` komutunu çalıştırır. Komut yeni şifreyi aynı şekilde terminalde sorar ve o admin'in bütün oturumlarını kapatır.
-- **Deneme sınırı:** sayaç (IP adresi + e-posta) çifti için tutulur. Böylece başka yerden deneyen biri gerçek admin'i kilitleyemez. Kafe WiFi'ında aynı dış IP'yi paylaşan bir müşteri de admin'i dışarıda bırakamaz. 15 dakikada 5 yanlış denemeden sonra bekleme süresi katlanarak artar, en fazla 15 dakikada durur. Sayaç, işlemciyi yoran şifre doğrulamasından önce kontrol edilir. IP adresi yalnızca barındırmanın kendi eklediği başlıktan okunur (Vercel'de platformun koyduğu `x-forwarded-for` ilk değeri, Hostinger'de sunucunun güvendiği vekil başlığı). Ziyaretçinin gönderdiği başlığa güvenilmez. Sayaç veritabanında tek bir `INSERT … ON CONFLICT … RETURNING` sorgusuyla artırılır, böylece aynı anda gelen istekler sayacı atlatamaz.
+- **Deneme sınırı:** sayaç (IP adresi + e-posta) çifti için tutulur. Böylece başka yerden deneyen biri gerçek admin'i kilitleyemez. Kafe WiFi'ında aynı dış IP'yi paylaşan bir müşteri de admin'i dışarıda bırakamaz. IP adresi yalnızca barındırmanın kendi eklediği başlıktan okunur (Vercel'de platformun koyduğu `x-forwarded-for` ilk değeri, Hostinger'de sunucunun güvendiği vekil başlığı). Ziyaretçinin gönderdiği başlığa güvenilmez. Sıra şöyledir: (1) yalnızca `locked_until` okunur, kilitliyse şifre hiç kontrol edilmez; (2) şifre argon2id ile doğrulanır; (3) yanlışsa sayaç tek bir `INSERT … ON CONFLICT … DO UPDATE … RETURNING` sorgusuyla artırılır, 15 dakikalık pencere dolmuşsa sıfırdan başlar, 5. yanlıştan sonra `locked_until` katlanarak uzar (1, 2, 4, 8 dk, en fazla 15 dk); (4) doğruysa o çiftin sayacı silinir. Böylece admin art arda doğru girişlerle kendini kilitlemez, aynı anda gelen istekler de sayacı atlatamaz.
 - "Tüm cihazlardan çıkış yap" düğmesi bulunur.
 - Adımlar `docs/KULLANIM.md` içinde yazılıdır.
 
@@ -210,7 +210,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 - Ekleme, düzenleme, çoğaltma ve sürükleyerek sıralama yapılır.
 - Silinen ürün 30 gün çöp kutusunda kalır ve geri alınabilir. Zamanlanmış iş olmadığı için 30 günü geçenler ve eski fotoğraf dosyaları admin her giriş yaptığında temizlenir.
-- **Fotoğraf dosyası silme kuralı:** ürün çoğaltılınca aynı fotoğraf dosyası iki üründe kullanılabilir. Bu yüzden bir dosya yalnızca hiçbir ürün (çöp kutusundakiler dahil) onu kullanmıyorsa ve 30 günden eski bir kullanım dışı kaydı varsa silinir. Kullanım durumu her temizlikte veritabanından yeniden hesaplanır.
+- **Fotoğraf dosyası silme kuralı:** ürün çoğaltılınca aynı fotoğraf dosyası iki üründe kullanılabilir. Bu yüzden bir dosya yalnızca hiçbir ürün (çöp kutusundakiler dahil) ve son 5 `menu_snapshots` kopyasından hiçbiri onu kullanmıyorsa ve 30 günden uzun süredir kullanılmıyorsa silinir. Kullanım durumu her temizlikte veritabanından yeniden hesaplanır.
 - Alanlar: ad (dile göre isteğe bağlı), açıklama (TR/EN/AR), boy ve fiyat listesi (tek fiyat da bir satırdır; boy adı hazır listeden seçilir: Normal, Büyük, Tek, Duble), kategori, fotoğraf, içindekiler (3 dil), alerjenler ve "alerjen bilgisi girildi" anahtarı, kalori (boş bırakılabilir), sıcak/soğuk, etiketler, Yeni, Öne çıkan, Görünür.
 - **Tükendi:** ürün satırında tek dokunuşluk anahtar. "Bugün tükendi" seçilince ürün, ertesi açılış saatinde (admin ayarı, varsayılan 08:00) kendiliğinden geri gelir. "Ben açana kadar" seçeneği de vardır.
 - **Kaydedilmemiş değişiklik uyarısı:** sayfadan çıkarken sorar.
@@ -264,9 +264,10 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 ### 4.9 Yedek
 
-- Admin'de "Yedek indir" düğmesi bir ZIP dosyası indirir. Hazırlanırken ilerleme ("48 / 129 fotoğraf") ve İptal düğmesi görünür. Dosya parça parça yazıldığı (akış halinde) için fotoğrafların hepsi aynı anda belleğe alınmaz. 129 fotoğraf yaklaşık 20 MB eder. Ekranda "Bilgisayardan almak daha hızlıdır" notu bulunur. İçinde menü verisi (kategoriler, ürünler, ekstralar, ayarlar; admin hesabı ve WiFi şifresi hariç) JSON olarak ve bütün ürün fotoğrafları (1280 px WebP) bulunur. Böylece depo bozulsa da fotoğraflar geri gelir.
-- ZIP sunucuda değil tarayıcıda hazırlanır. Fotoğraflar depodan tek tek çekilip telefonda paketlenir. Sunucu yanıt sınırına takılmaz ve Hostinger'de de aynı çalışır.
-- "Yedekten geri yükle" ZIP'i alır, mevcut menünün tamamını yedektekiyle değiştirir ve fotoğrafları depoya yeniden yükler. Öncesinde yedekteki kategori, ürün ve fotoğraf sayısını gösterip onay ister.
+- Admin'de "Yedek indir" düğmesi bir ZIP dosyası indirir. İçinde menü verisi (kategoriler, ürünler, ekstralar, ayarlar; admin hesabı ve WiFi şifresi hariç) JSON olarak ve bütün ürün fotoğrafları (1280 px WebP) bulunur. Böylece depo bozulsa da fotoğraflar geri gelir.
+- Hazırlanırken ilerleme ("48 / 129 fotoğraf") ve İptal düğmesi görünür. Boyut fotoğraflara göre değişir. Sunucu 1280 px WebP dosyasını en fazla 400 KB olacak şekilde kaydeder (gerekirse kaliteyi düşürür), bu yüzden 129 fotoğraf en fazla yaklaşık 52 MB, genelde bunun yarısından azdır. Ekranda "Bilgisayardan almak daha hızlıdır" notu bulunur.
+- ZIP sunucuda değil tarayıcıda hazırlanır, böylece sunucu yanıt sınırına takılmaz. Fotoğraflar depodan doğrudan değil, admin oturumu isteyen aynı alan adındaki `/qr/api/admin/image/[key]` adresinden tek tek çekilir. Depo farklı bir alan adında olduğu için doğrudan çekmek CORS engeline takılırdı. Bu yol Vercel Blob'da da R2'de de aynı çalışır. Akış halinde ZIP üretiminin iPhone Safari ve Android Chrome'da çalıştığı gerçek cihazda test edilir.
+- **Yedekten geri yükleme sırası:** (1) ZIP tarayıcıda açılır ve doğrulanır: JSON biçimi, sürüm, her ürünün fotoğrafının ZIP'te bulunması. Hata varsa hiçbir şey gönderilmez. (2) Yedekteki kategori, ürün ve fotoğraf sayısı gösterilip onay istenir. (3) Fotoğraflar yeni anahtarlarla depoya tek tek yüklenir (her biri 4,5 MB sınırının çok altında). Biri bile başarısız olursa işlem durur, menüye dokunulmaz. (4) Hepsi yüklenince JSON sunucuya gönderilir. Sunucu önce mevcut menünün kopyasını `menu_snapshots`'a alır, sonra bütün anahtarların depoda var olduğunu kontrol eder ve menüyü tek bir veritabanı işleminde (transaction) değiştirir. Herhangi bir adım hata verirse eski menü olduğu gibi kalır. Yarıda kalan yüklemelerden artan dosyalar 30 günlük temizlikte silinir.
 - **Geri yüklemeden önce güvence:** tarayıcı indirmesi engellenebileceği için ona güvenilmez. Sunucu, üzerine yazmadan önce mevcut menünün kopyasını veritabanında `menu_snapshots` tablosuna alır. Kopya alınamazsa geri yükleme başlamaz. Son 5 kopya tutulur, admin'den tek dokunuşla geri dönülür. Eski fotoğraflar 30 gün silinmediği için kopyayla birlikte geri gelir.
 - **WiFi:** WiFi şifresi yedeğe girmez. Geri yüklemede mevcut WiFi ağ adı, kullanıcı adı ve şifresi olduğu gibi korunur. Ekranda "WiFi bilgileri değiştirilmedi" yazar.
 - Ayrıca veritabanı sağlayıcısının kendi geri dönüş özelliği kullanılır.
@@ -274,7 +275,7 @@ Telefonda da rahat kullanılır. Metin fontu Montserrat'tır.
 
 ### 4.10 İzleme ve haber verme
 
-- **Site erişilemezse:** ücretsiz bir erişim izleme servisi (ör. UptimeRobot) `/qr` adresini 5 dakikada bir kontrol eder. Site açılmazsa Enes'e e-posta gider. Devirden sonra kafenin e-postası da eklenir.
+- **Site erişilemezse:** ücretsiz bir erişim izleme servisi (ör. UptimeRobot) `/qr/api/health` adresini 5 dakikada bir kontrol eder. Bu adres veritabanına dokunmaz, yalnızca uygulamanın ayakta olduğunu söyler. Böylece izleme, veritabanını gece boyu uyandırmaz. Site açılmazsa Enes'e e-posta gider. Devirden sonra kafenin e-postası da eklenir.
 - **Sunucu hataları:** yalnızca barındırmanın kendi panelinde okunur (Vercel'de Logs, Hostinger'de kendi kayıtları). Admin'de ayrı bir hata ekranı yoktur. Kayda şifre ve kişisel veri yazılmaz.
 - **Yedek:** otomatik yedek olmadığı için bildirim yerine 4.9'daki son yedek uyarısı kullanılır.
 
@@ -311,18 +312,21 @@ Kural: Vercel'e özel API kullanılmaz. Her şey düz Node.js sunucusunda da ça
 | Veritabanı | Neon Postgres (ücretsiz, Frankfurt), standart `postgres` sürücüsü + Drizzle ORM | Aynı Neon, yalnızca bağlantı adresi ortam değişkeninde. İstenirse Supabase Postgres |
 | Dosyalar | `lib/storage` adaptörü, Vercel Blob | Aynı adaptör, S3 uyumlu depo (ör. Cloudflare R2). Hostinger'in kendi diski kullanılmaz, çünkü her yayında üzerine yazılıyor |
 | Görsel küçültme | Yüklemede `sharp` | Aynı |
-| Önbellek | Menü verisi 10 sn önbellekte tutulur (Vercel'de CDN `s-maxage=10`) | Aynı süre, tek sunucunun belleğinde |
+| Önbellek | Next.js veri önbelleği, `menu` etiketiyle. Yalnızca admin kaydında geçersiz kılınır | Aynı, tek sunucunun diskinde (Next.js varsayılanı) |
 | Zamanlanmış iş | Yok. Tükendi süresi okunurken hesaplanır | Aynı |
 | İstatistik | Kendi tablolarımız | Aynı |
 
 - Taşıma adımları `docs/KULLANIM.md`'de yazılıdır: ortam değişkenlerini kopyala, depo dosyalarını aktar, DNS'i çevir.
-- **Sayfa yeniden üretme yoktur.** Menü her istekte sunucuda hazırlanır, ama veri 10 saniye önbellekte tutulur. 10 saniye içinde gelen bütün ziyaretçiler aynı veriyi alır, veritabanına en fazla 10 saniyede bir sorgu gider. Admin kaydından sonra yeni veri en geç 10 saniyede görünür. Dosya yazma, statik sürüm dosyası ya da kayıtta yeniden üretme kullanılmaz. Bu düzen Vercel'de ve tek sunuculu Hostinger'de aynı çalışır.
-- Önbellek dolu olduğu sürece veritabanı uyuyabilir. Uyanması gerekirse ilk istek yaklaşık 0,5 sn gecikir. Veritabanına ulaşılamazsa son başarılı veri sunulmaya devam eder.
-- **Önbellek başlığı:** menü sayfası ve `/qr/api/menu` aynı veri fonksiyonundan (`getMenu`) beslenir ve aynı başlığı kullanır: `s-maxage=10, stale-while-revalidate=86400, stale-if-error=86400`. Vercel'in CDN'i süresi geçen veriyi hemen sunar ve arka planda yeniler. Böylece ziyaretçi veritabanının uyanmasını beklemez, veritabanı hata verirse son veri sunulmaya devam eder. Hostinger'de aynı süreler Next.js veri önbelleğiyle uygulanır.
+- **Zamana bağlı yenileme yoktur.** Menü verisi (`getMenu`) Next.js'in veri önbelleğinde `menu` etiketiyle tutulur ve süresi dolmaz. Ziyaretçi istekleri yalnızca bu önbellekten okur, veritabanına hiç gitmez. Admin bir şey kaydettiğinde aynı istek içinde `updateTag('menu')` çağrılır. Önbellek o an boşalır ve bir sonraki istek yeni veriyi veritabanından bir kez alıp önbelleğe koyar. Böylece hem kesin güncellik hem hız sağlanır: değişiklik kayıt biter bitmez görünür, ziyaretçi ise veritabanını hiç beklemez.
+- Önbellek yalnızca yeni yayında ve admin kaydında boşalır. Bu iki anın dışında veritabanı ziyaretçi yüzünden hiç uyanmaz. Veritabanına ulaşılamazsa önbellekteki son veri sunulmaya devam eder.
+- Vercel'de veri önbelleği kalıcıdır ve bütün örneklerde ortaktır. Hostinger'de tek Node sunucusunda Next.js bunu varsayılan olarak diskte tutar. Birden fazla sunucuya geçilirse ortak önbellek gerekir (Next.js self-hosting belgesi). Tek sunucu varsayılır.
+
+- **Tek kaynak:** menü sayfası ve `/qr/api/menu` aynı `getMenu` fonksiyonundan ve aynı önbellek kaydından beslenir. Tarayıcı ya da CDN tarafında ayrı bir süreli önbellek yoktur (`Cache-Control: private, no-cache`). Bu yüzden ilk ekran ile sonraki yenileme arasında fiyat farkı oluşmaz.
 - **Açık duran menü:** sekmeye dönüldüğünde `/qr/api/menu` adresinden veriyi yeniden ister. Sayfa ile aynı önbellekten geldiği için ilk ekran ile sonraki yenileme arasında fiyat farkı oluşmaz. Veri değişmişse ekran sessizce yenilenir.
 - **Tükendi ve saat:** her yanıtta sunucunun o anki zamanı bulunur. Telefon kendi saatiyle arasındaki farkı hesaplar ve tükendi süresini sunucu saatine göre değerlendirir. Telefonun saati yanlış olsa da sonuç doğru çıkar.
 - **Saat dilimi:** sunucular UTC çalışır. Açılış saati ve "ertesi açılış" hesabı her yerde açıkça `Europe/Istanbul` ile yapılır. Tarihler veritabanında UTC saklanır.
-- **Service worker:** yalnızca menü sayfasını, menü verisini, fontları ve logo dosyalarını saklar. Önce ağa gider. 2,5 saniyede yanıt gelmezse saklanan menüyü gösterir. Admin sayfalarına ve diğer API adreslerine hiç karışmaz. Daha önce hiç açılmamışsa 3.11'deki bağlantı ekranı çıkar.
+- **Service worker:** yalnızca menü sayfasını, `/qr/api/menu` yanıtını, fontları ve logo dosyalarını saklar. Önce ağa gider. 2,5 saniyede yanıt gelmezse saklanan menüyü gösterir. `/qr/admin` ve diğer `/qr/api/` adreslerine hiç karışmaz. Daha önce hiç açılmamışsa 3.11'deki bağlantı ekranı çıkar.
+- **Adres düzeni:** bütün API adresleri `/qr/api/` altındadır: `/qr/api/menu`, `/qr/api/stats`, `/qr/api/health` ve admin için `/qr/api/admin/*`.
 
 ### 5.3 3D
 
@@ -358,7 +362,7 @@ Three.js kalır, ama hiçbir şeyi bekletmeyecek şekilde kullanılır.
 
 `stats_daily`: `date`, `menu_opens`; `stats_hourly`: `date`, `hour`, `opens`; `stats_product`: `date`, `product_id`, `views`
 
-`admins`: `id`, `email`, `password_hash` (argon2id), `created_at`, `last_login_at`; `sessions`: `id_hash`, `admin_id`, `expires_at`; `login_attempts`: `key_hash`, `attempted_at`
+`admins`: `id`, `email`, `password_hash` (argon2id), `created_at`, `last_login_at`; `sessions`: `id_hash`, `admin_id`, `expires_at`; `login_attempts`: `key_hash` (IP + e-posta, birincil anahtar), `fail_count`, `window_started_at`, `locked_until`
 
 Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 
@@ -369,20 +373,20 @@ Maliyet, COGS ve zam oranı hiçbir tabloda yoktur.
 - Giriş deneme sınırı uygulanır.
 - Yüklenen dosyanın türü içeriğinden doğrulanır. Boyut sınırı vardır. Dosya adı rastgele üretilir. EXIF verisi silinir.
 - Güvenlik başlıkları: CSP, X-Content-Type-Options, Referrer-Policy, frame-ancestors 'none'.
-- **Arama motoru:** `/qr/admin` ve `/api` altındaki her yanıtta `X-Robots-Tag: noindex, nofollow` başlığı ve sayfalarda `noindex` meta etiketi bulunur. `robots.txt` bu yolları kapatır. Menünün kendisi (`/qr`) aranabilir kalır.
+- **Arama motoru:** `/qr/admin` ve `/qr/api` altındaki her yanıtta `X-Robots-Tag: noindex, nofollow` başlığı ve admin sayfalarında `noindex` meta etiketi bulunur. `robots.txt` bu iki yolu kapatır. Menünün kendisi (`/qr`) aranabilir kalır.
 - Anahtarlar yalnızca barındırma ortam değişkenlerinde durur. Repoda yalnızca `.env.example` bulunur. Şifre ve anahtar sohbete veya AI'a yazılmaz.
 
 ### 5.6 Performans bütçesi
 
 - Menü LCP ≤ 2,5 sn (mobil 4G), CLS ≤ 0,1, INP ≤ 200 ms.
 - İlk yüklemede JS ≤ 100 KB gzip (3D hariç).
-- Fontlar: Türkçe karakterler (ğ Ğ ı İ ş Ş) ve ₺ latin-ext alt kümesinde olduğu için ilk yükleme latin ve latin-ext'i birlikte içerir. İki alt küme tek dosyada birleştirilir, böylece Türkçe harf için ikinci istek ve font sıçraması olmaz. Unbounded 800 ve Montserrat 500/600, toplam ≤ 110 KB. Readex Pro yalnızca AR seçilince yüklenir.
-- Liste fotoğrafı 160 px, ≤ 12 KB. Detay fotoğrafı `srcset` ile verilir.
+- Fontlar: Türkçe karakterler (ğ Ğ ı İ ş Ş) ve ₺ latin-ext alt kümesinde olduğu için ilk yükleme latin ve latin-ext'i birlikte içerir. İki alt küme tek dosyada birleştirilir, böylece Türkçe harf için ikinci istek ve font sıçraması olmaz. Yüklenen ağırlıkların tamamı budur: Unbounded 800, Montserrat 500 ve 600, toplam ≤ 110 KB. Başka ağırlık yoktur. Readex Pro (400, 600) yalnızca AR seçilince yüklenir.
+- Liste fotoğrafı 320 px WebP (yüksek çözünürlüklü ekranda 160 px kareye net basılır), 20–25 KB. Detay fotoğrafı 720 ve 1280 px `srcset` ile verilir.
 
 ### 5.7 Barındırma ve maliyet
 
 - Şimdilik Vercel Hobby (ücretsiz). Hobby planı kişisel ve ticari olmayan kullanım içindir. Kafe menüsü canlıya çıkınca ücretli plana ya da Hostinger'e geçilir. Geçiş kararı ve takvimi Enes'tedir.
-- Neon ücretsiz planı ayda 100 CU-saat ve 1 GB veri verir. Ücretsiz planda veritabanı 5 dakika boşta kalınca uyur, bu kapatılamaz. Neon panelinde en büyük işlem gücü 0,25 CU'ya sabitlenir. Böylece veritabanı açık olduğu her saat 0,25 CU-saat harcar. Günde 12 saat hiç uyumasa bile ayda yaklaşık 93 CU-saat eder, sınırın altında kalır. Bu ayar kurulumda Neon panelinde doğrulanır. Gerekirse istatistik yazması admin'den tek düğmeyle kapatılır.
+- Neon ücretsiz planı ayda 100 CU-saat ve 1 GB veri verir. Ücretsiz planda veritabanı 5 dakika boşta kalınca uyur, bu kapatılamaz. Menü okumaları ve site izleme veritabanına dokunmaz. Veritabanını yalnızca admin işlemleri, admin kaydından sonraki ilk menü isteği ve istatistik yazmaları uyandırır. Neon panelinde en büyük işlem gücü 0,25 CU'ya sabitlenir. Kafe açıkken (günde yaklaşık 12 saat) istatistik yazmaları yüzünden hiç uyumasa bile ayda yaklaşık 93 CU-saat eder, gece hiç harcamaz. Bu ayar kurulumda Neon panelinde doğrulanır. Gerekirse istatistik yazması admin'den tek düğmeyle kapatılır.
 
 ### 5.8 Devir
 
@@ -435,8 +439,9 @@ AI'ların iş bölümü ve devir kuralları her aşamanın uygulama planında ya
 - Sunucu ve istemci mantığı (doğrulama, giriş, oturum, deneme sınırının aynı anda gelen isteklerde doğru sayması, yükleme kontrolü, toplu fiyat hesabı, tükendi süresinin Europe/Istanbul ile hesabı, "Ne içsem?" uygunluk filtresi, WiFi şifresinin geçmişte maskelenmesi, Türkçe arama eşlemesi, seed dönüştürme) için birim testleri yazılır. Test koddan önce yazılır.
 - Playwright testleri:
   - Menü: açılış, kategori geçişi, arama (sonuçlu ve sonuçsuz), detay açma ve kapama (geri tuşu dahil), WiFi kopyalama, dil değişimi, AR'de RTL, tükendi görünümü, bağlantısız açılış.
-  - Admin: giriş, ürün ekleme, çoğaltma, fotoğraf yükleme (JPEG ile) ve odak noktası, sıralama, tükendi, toplu fiyat önizleme ve uygulama, son değişikliği geri alma, WiFi değiştirme, yedek indirme (ilerleme ve iptal), geri yükleme, kopya alınamazsa geri yüklemenin başlamaması, geri yüklemede WiFi'ın korunması, çoğaltılmış üründe fotoğrafın silinmemesi.
+  - Admin: giriş, ürün ekleme, çoğaltma, fotoğraf yükleme (JPEG ile) ve odak noktası, sıralama, tükendi, toplu fiyat önizleme ve uygulama, son değişikliği geri alma, WiFi değiştirme, yedek indirme (ilerleme ve iptal), geri yükleme, fotoğraf yüklemesi yarıda kalırsa menünün değişmemesi, kopya alınamazsa geri yüklemenin başlamaması, geri yüklemede WiFi'ın korunması, çoğaltılmış üründe fotoğrafın silinmemesi.
   - Admin ve API yanıtlarında `noindex` başlığı.
+  - Admin kaydından sonra menünün hemen güncellenmesi, `/qr/api/health` isteğinin veritabanına gitmemesi.
 - Ekran görüntüsü kontrolü: 390, 768, 1440 px.
 - Lighthouse mobil: performans ≥ 85, erişilebilirlik ≥ 95.
 - Güvenlik taraması.
