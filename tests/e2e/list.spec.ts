@@ -43,6 +43,8 @@ test("no horizontal scroll at 360 and long names stay whole", async ({ page }) =
 
 test("tabs are at least 44px tall", async ({ page }) => {
   await openMenu(page);
+  await expect(page.getByTestId("group-tab")).toHaveCount(5);
+  expect(await page.getByTestId("category-tab").count()).toBeGreaterThan(0);
   for (const tab of await page.locator('[data-testid="group-tab"], [data-testid="category-tab"]').all()) {
     const box = await tab.boundingBox();
     expect(box!.height).toBeGreaterThanOrEqual(44);
