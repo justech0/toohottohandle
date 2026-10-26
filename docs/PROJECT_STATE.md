@@ -12,7 +12,7 @@ Son güncelleme: 2026-10-26. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- `a2-3b-products`: tükendi zamanları, görünürlük anahtarı, ürün ekleme / çoğaltma / silme / sıralama, silme öncesi son 25 menü kopyası ve bütün işlemler için geri alma.
+- PR #7 (`a2-3b-products`): tükendi zamanları, görünürlük anahtarı, ürün ekleme / çoğaltma / silme / sıralama, silme öncesi son 25 menü kopyası ve bütün işlemler için geri alma.
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
