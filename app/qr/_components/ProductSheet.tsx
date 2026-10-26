@@ -39,12 +39,9 @@ export function ProductSheet({ product, onClose }: { product: CardProduct; onClo
           <div className="sheet__head">
             <h2 id="sheet-title" className="sheet__title">{product.name}</h2>
             {single ? (
-              <span className="sheet__star">
-                <span className="star__bg" aria-hidden="true" />
-                <span className="sheet__star-txt" data-testid="sheet-price">
-                  {singleLabel ? <small>{singleLabel} </small> : null}
-                  <bdi>{single.price}</bdi>
-                </span>
+              <span className="sheet__tag">
+                {singleLabel ? <small>{singleLabel}</small> : null}
+                <span data-testid="sheet-price"><bdi>{single.price}</bdi></span>
               </span>
             ) : null}
           </div>
