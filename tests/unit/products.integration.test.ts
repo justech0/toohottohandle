@@ -163,6 +163,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
 
   it("deletes after a complete menu snapshot, keeps 25 snapshots, and undo restores variants", async () => {
     const pid = await id("espresso");
+    const [beforeOrder] = (await pool.query("SELECT id, sort_order FROM products WHERE category_id = 1 ORDER BY sort_order, id")) as unknown as [[{ id: number; sort_order: number }]];
     const beforeAudit = await auditCount();
     for (let n = 0; n < 30; n++) await pool.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, '{}')", [`eski ${n}`]);
     await markMenuOld();
@@ -174,9 +175,13 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     const [[latest]] = (await pool.query("SELECT reason, data FROM menu_snapshots ORDER BY id DESC LIMIT 1")) as unknown as [[{ reason: string; data: string }]];
     expect(latest.reason).toBe("Espresso silme öncesi");
     expect((JSON.parse(latest.data).products as { id: number }[]).some((p) => p.id === pid)).toBe(true);
+    const [afterOrder] = (await pool.query("SELECT sort_order FROM products WHERE category_id = 1 ORDER BY sort_order, id")) as unknown as [[{ sort_order: number }]];
+    expect(afterOrder.map((row) => row.sort_order)).toEqual(afterOrder.map((_, index) => index));
     await expectMenuTouched();
     await undoLast(pool, adminId);
     expect((await menuProduct("espresso")).variants).toEqual([{ key: "tek", priceKurus: 11000 }, { key: "duble", priceKurus: 15000 }]);
+    const [restoredOrder] = (await pool.query("SELECT id, sort_order FROM products WHERE category_id = 1 ORDER BY sort_order, id")) as unknown as [[{ id: number; sort_order: number }]];
+    expect(restoredOrder).toEqual(beforeOrder);
   });
 
   it("deletes a maximum-length product while keeping the snapshot reason within its column", async () => {

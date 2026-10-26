@@ -258,6 +258,10 @@ export async function deleteProduct(pool: Pool, adminId: number, id: number): Pr
     if (!before) throw new Error("Ürün bulunamadı.");
     await snapshotMenuBeforeDelete(c, before.product.name);
     await c.query("DELETE FROM products WHERE id = ?", [id]);
+    await c.query("UPDATE products SET sort_order = sort_order - 1 WHERE category_id = ? AND sort_order > ?", [
+      before.product.category_id,
+      before.product.sort_order,
+    ]);
     await audit(c, adminId, id, "delete", `${before.product.name}: silindi`, before, null);
     await touchMenu(c);
   });
@@ -308,7 +312,12 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
       await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
       await c.query("UPDATE products SET sort_order = sort_order - 1 WHERE category_id = ? AND sort_order > ?", [after.product.category_id, after.product.sort_order]);
     } else if (top.action === "delete") {
-      await restoreProduct(c, JSON.parse(top.before_json) as ProductSnapshot);
+      const before = JSON.parse(top.before_json) as ProductSnapshot;
+      await c.query("UPDATE products SET sort_order = sort_order + 1 WHERE category_id = ? AND sort_order >= ?", [
+        before.product.category_id,
+        before.product.sort_order,
+      ]);
+      await restoreProduct(c, before);
     } else if (top.action === "reorder") {
       const before = JSON.parse(top.before_json) as OrderSnapshot;
       for (const product of before.products) await c.query("UPDATE products SET sort_order = ? WHERE id = ?", [product.sortOrder, product.id]);
