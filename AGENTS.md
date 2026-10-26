@@ -56,6 +56,8 @@ npx tsc --noEmit -p . && npm run build
 
 Veritabanlı test (MariaDB 10.6+ ya da MySQL 8; boş iki veritabanı: `thth_test`, `thth_dev`):
 
+Windows/Laragon: önce `. .\scripts\test-db.ps1` çalıştır. Script 3307'deki proje test sunucusunu gerekirse başlatır ve `.env.test.local` değişkenlerini yükler.
+
 ```bash
 export TEST_DATABASE_URL=mysql://USER:PASS@127.0.0.1:3306/thth_test
 npx vitest run                                   # entegrasyon dahil
