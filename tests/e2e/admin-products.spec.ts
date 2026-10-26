@@ -10,6 +10,63 @@ const menuPrice = async (page: import("@playwright/test").Page, slug: string) =>
   return page.locator(`[data-testid="product-row"][data-slug="${slug}"] [data-testid="price-full"]`).first().textContent();
 };
 
+const adminRow = (page: import("@playwright/test").Page, name: string) =>
+  page.locator("[data-product-id]").filter({ hasText: name }).first();
+
+const rowId = async (page: import("@playwright/test").Page, name: string) => {
+  const value = await adminRow(page, name).getAttribute("data-product-id");
+  if (!value) throw new Error(`${name} ürün kimliği bulunamadı`);
+  return value;
+};
+
+test("390px product controls keep accessible contrast, targets, and keyboard focus", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+
+  const add = page.getByTestId("product-add");
+  const contrast = await add.evaluate((element) => {
+    const rgb = (value: string) => value.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+    const luminance = (value: string) => {
+      const channels = rgb(value).map((channel) => {
+        const normalized = channel / 255;
+        return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const style = getComputedStyle(element);
+    const lighter = Math.max(luminance(style.color), luminance(style.backgroundColor));
+    const darker = Math.min(luminance(style.color), luminance(style.backgroundColor));
+    return (lighter + 0.05) / (darker + 0.05);
+  });
+  expect(contrast).toBeGreaterThanOrEqual(4.5);
+  expect((await add.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+
+  const operationButtons = page.locator(".adm-op");
+  await expect(operationButtons.first()).toBeVisible();
+  const operationHeights = await operationButtons.filter({ visible: true }).evaluateAll((buttons) =>
+    buttons.map((button) => button.getBoundingClientRect().height),
+  );
+  expect(operationHeights.length).toBeGreaterThan(0);
+  expect(Math.min(...operationHeights)).toBeGreaterThanOrEqual(44);
+
+  const crumb = page.locator(".adm-crumb a");
+  expect((await crumb.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await crumb.focus();
+  await expect(crumb).toBeFocused();
+  expect(await crumb.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return [style.outlineWidth, style.outlineStyle, style.outlineOffset, style.outlineColor];
+  })).toEqual(["2px", "solid", "2px", "rgb(42, 21, 20)"]);
+
+  await add.focus();
+  await expect(add).toBeFocused();
+  expect(await add.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return [style.outlineWidth, style.outlineStyle, style.outlineOffset, style.outlineColor];
+  })).toEqual(["2px", "solid", "2px", "rgb(255, 255, 255)"]);
+});
+
 test("search narrows the admin list", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Ürünler ve fiyatlar" }).click();
@@ -49,4 +106,97 @@ test("undo puts the last change back and then turns itself off", async ({ page }
   await expect(page.getByRole("status")).toContainText("geri alındı");
   await expect(page.getByTestId("undo")).toBeDisabled();
   expect(await menuPrice(page, "cortado")).toContain("170");
+});
+
+test("sold-out choices show the opening target and the product can return to sale", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+  const id = await rowId(page, "Cortado");
+  await page.getByTestId(`product-soldout-${id}`).click();
+  const dialog = page.getByRole("dialog", { name: "Cortado tükendi" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("Yarın 08:00'e kadar");
+  await expect(dialog).toContainText("Ben açana kadar");
+  await dialog.getByRole("button", { name: "Yarın 08:00'e kadar" }).click();
+  await expect(page.getByRole("status")).toContainText("Tükendi bilgisi güncellendi");
+  await page.goto("/qr");
+  await expect(page.locator('[data-testid="product-row"][data-slug="cortado"]')).toContainText("Tükendi");
+
+  await page.goto("/qr/admin/urunler");
+  await page.getByTestId(`product-soldout-${id}`).click();
+  await expect(page.getByRole("status")).toContainText("tekrar satışta");
+  expect(await menuPrice(page, "cortado")).toContain("170");
+});
+
+test("visibility switch removes and restores the product with one touch", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+  const id = await rowId(page, "Cortado");
+  await page.getByTestId(`product-visible-${id}`).click();
+  await expect(page.getByTestId(`product-visible-${id}`)).toHaveAttribute("aria-checked", "false");
+  await page.goto("/qr");
+  await expect(page.locator('[data-testid="product-row"][data-slug="cortado"]')).toHaveCount(0);
+  await page.goto("/qr/admin/urunler");
+  await page.getByTestId(`product-visible-${id}`).click();
+  await expect(page.getByTestId(`product-visible-${id}`)).toHaveAttribute("aria-checked", "true");
+});
+
+test("adds and duplicates a product", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+  await page.getByTestId("product-add").click();
+  await page.getByLabel("Ürün adı").fill("Test Kakaosu");
+  await page.getByLabel("Fiyat (₺)").fill("175");
+  await page.getByRole("button", { name: "Kaydet" }).click();
+  await expect(page.getByRole("status")).toContainText("Ürün eklendi");
+  const id = await rowId(page, "Test Kakaosu");
+  await page.getByTestId(`product-duplicate-${id}`).click();
+  await expect(page.getByRole("status")).toContainText("Ürün çoğaltıldı");
+  await expect(adminRow(page, "Test Kakaosu Kopya")).toContainText("175 ₺");
+});
+
+test("moves inside a category and undo restores the order", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+  const rows = page.locator("[data-cat]").first().locator("[data-product-id]");
+  const first = await rows.nth(0).getAttribute("data-product-id");
+  const second = await rows.nth(1).getAttribute("data-product-id");
+  if (!first || !second) throw new Error("Sıralama için iki ürün bulunamadı");
+  await page.getByTestId(`product-down-${first}`).click();
+  const moved = page.locator("[data-cat]").first().locator("[data-product-id]");
+  await expect(moved.nth(0)).toHaveAttribute("data-product-id", second);
+  await expect(moved.nth(1)).toHaveAttribute("data-product-id", first);
+  await page.goto("/qr/admin");
+  await page.getByTestId("undo").click();
+  await expect(page.getByRole("status")).toContainText("geri alındı");
+  await page.goto("/qr/admin/urunler");
+  const restored = page.locator("[data-cat]").first().locator("[data-product-id]");
+  await expect(restored.nth(0)).toHaveAttribute("data-product-id", first);
+  await expect(restored.nth(1)).toHaveAttribute("data-product-id", second);
+});
+
+test("delete uses an in-page dialog and undo restores the copied product", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+  const id = await rowId(page, "Test Kakaosu Kopya");
+  await page.getByTestId(`product-delete-${id}`).click();
+  const dialog = page.getByRole("dialog", { name: "Test Kakaosu Kopya silinsin mi?" });
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "Evet, sil" }).click();
+  await expect(page.getByRole("status")).toContainText("Ürün silindi");
+  await expect(page.locator(`[data-product-id="${id}"]`)).toHaveCount(0);
+  await page.goto("/qr/admin");
+  await page.getByTestId("undo").click();
+  await expect(page.getByRole("status")).toContainText("geri alındı");
+  await page.goto("/qr/admin/urunler");
+  await expect(page.locator(`[data-product-id="${id}"]`)).toContainText("175 ₺");
+
+  await page.getByTestId(`product-delete-${id}`).click();
+  await page.getByRole("dialog", { name: "Test Kakaosu Kopya silinsin mi?" }).getByRole("button", { name: "Evet, sil" }).click();
+  await expect(page.locator(`[data-product-id="${id}"]`)).toHaveCount(0);
+
+  const originalId = await rowId(page, "Test Kakaosu");
+  await page.getByTestId(`product-delete-${originalId}`).click();
+  await page.getByRole("dialog", { name: "Test Kakaosu silinsin mi?" }).getByRole("button", { name: "Evet, sil" }).click();
+  await expect(page.locator(`[data-product-id="${originalId}"]`)).toHaveCount(0);
 });

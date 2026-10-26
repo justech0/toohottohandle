@@ -28,6 +28,7 @@ export function ProductForm({ initial, categories }: { initial: Record<string, s
   const [confirm, setConfirm] = useState<string[] | null>(null);
   const [dirty, setDirty] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const confirmRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     if (!dirty) return;
@@ -35,6 +36,10 @@ export function ProductForm({ initial, categories }: { initial: Record<string, s
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
+
+  useEffect(() => {
+    if (confirm && !confirmRef.current?.open) confirmRef.current?.showModal();
+  }, [confirm]);
 
   const send = () => {
     const fd = new FormData(formRef.current!);
@@ -121,14 +126,14 @@ export function ProductForm({ initial, categories }: { initial: Record<string, s
       </div>
 
       {confirm ? (
-        <div className="adm-confirm" role="alertdialog" aria-labelledby="price-confirm-title" data-testid="price-confirm">
+        <dialog ref={confirmRef} className="adm-confirm adm-dialog" aria-labelledby="price-confirm-title" data-testid="price-confirm" onClose={() => setConfirm(null)}>
           <p id="price-confirm-title" className="adm-confirm__title">Fiyat değişiyor</p>
           <ul>{confirm.map((c) => <li key={c}>{c}</li>)}</ul>
           <div className="adm-row">
             <button type="button" className="adm-btn adm-btn--main" onClick={send} autoFocus>Evet, kaydet</button>
-            <button type="button" className="adm-btn" onClick={() => setConfirm(null)}>Vazgeç</button>
+            <button type="button" className="adm-btn" onClick={() => confirmRef.current?.close()}>Vazgeç</button>
           </div>
-        </div>
+        </dialog>
       ) : (
         <div className="adm-row">
           <button type="submit" className="adm-btn adm-btn--main" disabled={pending} aria-busy={pending}>{pending ? "Kaydediliyor…" : "Kaydet"}</button>

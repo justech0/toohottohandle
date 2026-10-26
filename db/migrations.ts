@@ -131,4 +131,16 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "004_snapshots",
+    statements: [
+      `CREATE TABLE menu_snapshots (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        reason VARCHAR(120) NOT NULL,
+        data LONGTEXT NOT NULL,
+        INDEX (at)
+      ) ${T}`,
+    ],
+  },
 ];

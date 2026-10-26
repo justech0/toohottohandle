@@ -7,3 +7,6 @@ screens/
 .env*
 !.env.example
 *.tsbuildinfo
+.superpowers/
+.playwright-cli/
+uploads/
