@@ -9,7 +9,8 @@ test("menu lists all 129 products", async ({ page }) => {
 
 test("footer shows the business note, VAT and update date", async ({ page }) => {
   await openMenu(page);
+  // Tarih admin kaydında ilerler; biçim gün.ay.yıl.
   await expect(page.getByTestId("menu-footer")).toHaveText(
-    "Self servis · Servis ücreti alınmaz · Fiyatlara KDV dahildir · Son güncelleme: 25.10.2026",
+    /^Self servis · Servis ücreti alınmaz · Fiyatlara KDV dahildir · Son güncelleme: \d{2}\.\d{2}\.20\d{2}$/,
   );
 });
