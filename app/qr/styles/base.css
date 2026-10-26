@@ -1,0 +1,12 @@
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--c-paper); color: var(--c-ink); font: 500 16px/1.45 var(--f-text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+.brand-icon { display: inline-block; flex: none; background: currentColor; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; }
+.brand-icon--logo { aspect-ratio: 1400 / 256; }
+.brand-icon--lips { aspect-ratio: 324 / 190; }
+.brand-icon--rabbit { aspect-ratio: 235 / 336; }
+.brand-icon--star { aspect-ratio: 1; }

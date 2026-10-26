@@ -1,0 +1,1914 @@
+{
+ "groups": [
+  {
+   "slug": "kahve",
+   "nameTr": "Kahve",
+   "color": "red"
+  },
+  {
+   "slug": "spesiyal",
+   "nameTr": "Spesiyal",
+   "color": "blue"
+  },
+  {
+   "slug": "yiyecek",
+   "nameTr": "Yiyecek",
+   "color": "green"
+  },
+  {
+   "slug": "tatli",
+   "nameTr": "Tatlı",
+   "color": "pink"
+  },
+  {
+   "slug": "paket",
+   "nameTr": "Paket & Atıştırmalık",
+   "color": "gray"
+  }
+ ],
+ "categories": [
+  {
+   "slug": "sicak-kahveler",
+   "nameTr": "Sıcak Kahveler",
+   "group": "kahve",
+   "defaultTemp": "hot",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "soguk-kahveler",
+   "nameTr": "Soğuk Kahveler",
+   "group": "kahve",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "signatures",
+   "nameTr": "Signatures",
+   "group": "kahve",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "coffee-frappe",
+   "nameTr": "Coffee Frappe",
+   "group": "kahve",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "cream-frappe",
+   "nameTr": "Cream Frappe",
+   "group": "spesiyal",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "matcha-ube",
+   "nameTr": "Matcha & Ube",
+   "group": "spesiyal",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "frozen",
+   "nameTr": "Frozen",
+   "group": "spesiyal",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "ice-shaken",
+   "nameTr": "Ice Shaken",
+   "group": "spesiyal",
+   "defaultTemp": "cold",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "kahvesiz",
+   "nameTr": "Kahvesiz İçecekler",
+   "group": "spesiyal",
+   "defaultTemp": "hot",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "caylar",
+   "nameTr": "Çaylar",
+   "group": "spesiyal",
+   "defaultTemp": "hot",
+   "defaultInSuggest": true
+  },
+  {
+   "slug": "mesrubat",
+   "nameTr": "Meşrubat",
+   "group": "spesiyal",
+   "defaultTemp": "cold",
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "ekmek-ustu",
+   "nameTr": "Ekmek Üstü",
+   "group": "yiyecek",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "sandvic",
+   "nameTr": "Sandviç & Börek",
+   "group": "yiyecek",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "kruvasan",
+   "nameTr": "Kruvasan",
+   "group": "yiyecek",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "magnolia",
+   "nameTr": "Magnolia",
+   "group": "tatli",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "tatlilar",
+   "nameTr": "Tatlılar",
+   "group": "tatli",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "cookies",
+   "nameTr": "Cookies",
+   "group": "tatli",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "paket-kahve",
+   "nameTr": "Paket Kahve",
+   "group": "paket",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  },
+  {
+   "slug": "kasa-onu",
+   "nameTr": "Kasa Önü",
+   "group": "paket",
+   "defaultTemp": null,
+   "defaultInSuggest": false
+  }
+ ],
+ "products": [
+  {
+   "slug": "espresso",
+   "name": "Espresso",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "tek",
+     "priceKurus": 11000
+    },
+    {
+     "key": "duble",
+     "priceKurus": 15000
+    }
+   ]
+  },
+  {
+   "slug": "cortado",
+   "name": "Cortado",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 17000
+    }
+   ]
+  },
+  {
+   "slug": "filtre-kahve",
+   "name": "Filtre Kahve",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 15000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 17000
+    }
+   ]
+  },
+  {
+   "slug": "caffe-americano",
+   "name": "Caffè Americano",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 16000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 18000
+    }
+   ]
+  },
+  {
+   "slug": "cappuccino",
+   "name": "Cappuccino",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 18000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 20000
+    }
+   ]
+  },
+  {
+   "slug": "caffe-latte",
+   "name": "Caffè Latte",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 18000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 20000
+    }
+   ]
+  },
+  {
+   "slug": "flat-white",
+   "name": "Flat White",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 20000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "caramel-macchiato",
+   "name": "Caramel Macchiato",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 21000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "caffe-mocha",
+   "name": "Caffè Mocha",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 21000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "white-chocolate-mocha",
+   "name": "White Chocolate Mocha",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 21000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "turk-kahvesi",
+   "name": "Türk Kahvesi",
+   "category": "sicak-kahveler",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "tek",
+     "priceKurus": 12000
+    },
+    {
+     "key": "duble",
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "cold-brew",
+   "name": "Cold Brew",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "iced-americano",
+   "name": "Iced Americano",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 17600
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 19800
+    }
+   ]
+  },
+  {
+   "slug": "iced-latte",
+   "name": "Iced Latte",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 19800
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "iced-flat-white",
+   "name": "Iced Flat White",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 19800
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "iced-caramel-macchiato",
+   "name": "Iced Caramel Macchiato",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23100
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25300
+    }
+   ]
+  },
+  {
+   "slug": "iced-mocha",
+   "name": "Iced Mocha",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23100
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25300
+    }
+   ]
+  },
+  {
+   "slug": "iced-white-chocolate-mocha",
+   "name": "Iced White Chocolate Mocha",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23100
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25300
+    }
+   ]
+  },
+  {
+   "slug": "iced-filtre-kahve",
+   "name": "Iced Filtre Kahve",
+   "category": "soguk-kahveler",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 16500
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 18700
+    }
+   ]
+  },
+  {
+   "slug": "mont-blanc",
+   "name": "Mont Blanc",
+   "category": "signatures",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 26000
+    }
+   ]
+  },
+  {
+   "slug": "chocolate-cloud-espresso",
+   "name": "Chocolate Cloud Espresso",
+   "category": "signatures",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 26000
+    }
+   ]
+  },
+  {
+   "slug": "strawberry-foam-cold-brew",
+   "name": "Strawberry Foam Cold Brew",
+   "category": "signatures",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 26000
+    }
+   ]
+  },
+  {
+   "slug": "citrus-berry-cloud",
+   "name": "Citrus Berry Cloud",
+   "category": "signatures",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 26000
+    }
+   ]
+  },
+  {
+   "slug": "blue-garden",
+   "name": "Blue Garden",
+   "category": "signatures",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 26000
+    }
+   ]
+  },
+  {
+   "slug": "caramel-frappe",
+   "name": "Caramel Frappe",
+   "category": "coffee-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "espresso-frappe",
+   "name": "Espresso Frappe",
+   "category": "coffee-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "mocha-frappe",
+   "name": "Mocha Frappe",
+   "category": "coffee-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "coconut-mocha-frappe",
+   "name": "Coconut Mocha Frappe",
+   "category": "coffee-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "white-mocha-frappe",
+   "name": "White Mocha Frappe",
+   "category": "coffee-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "white-chocolate-frappe",
+   "name": "White Chocolate Frappe",
+   "category": "coffee-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "chocolate-cream-frappe",
+   "name": "Chocolate Cream Frappe",
+   "category": "cream-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "strawberries-cream-frappe",
+   "name": "Strawberries & Cream Frappe",
+   "category": "cream-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "vanilla-cream-frappe",
+   "name": "Vanilla Cream Frappe",
+   "category": "cream-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "caramel-cream-frappe",
+   "name": "Caramel Cream Frappe",
+   "category": "cream-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "white-mocha-cream-frappe",
+   "name": "White Mocha Cream Frappe",
+   "category": "cream-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "buyuk",
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "white-chocolate-cream-frappe",
+   "name": "White Chocolate Cream Frappe",
+   "category": "cream-frappe",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "ube-latte",
+   "name": "Ube Latte",
+   "category": "matcha-ube",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 28000
+    }
+   ]
+  },
+  {
+   "slug": "ube-vanilya-matcha-latte",
+   "name": "Ube Vanilya Matcha Latte",
+   "category": "matcha-ube",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 28000
+    }
+   ]
+  },
+  {
+   "slug": "strawberry-matcha-latte",
+   "name": "Strawberry Matcha Latte",
+   "category": "matcha-ube",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 28000
+    }
+   ]
+  },
+  {
+   "slug": "mango-frozen",
+   "name": "Mango Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "raspberry-frozen",
+   "name": "Raspberry Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "strawberry-frozen",
+   "name": "Strawberry Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "melonberry-frozen",
+   "name": "Melonberry Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "cool-lime-frozen",
+   "name": "Cool Lime Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "berry-hibiscus-frozen",
+   "name": "Berry Hibiscus Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "orange-mango-frozen",
+   "name": "Orange Mango Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 24000
+    }
+   ]
+  },
+  {
+   "slug": "melonberry-twist-frozen",
+   "name": "Melonberry Twist Frozen",
+   "category": "frozen",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "cool-lime",
+   "name": "Cool Lime",
+   "category": "ice-shaken",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 21000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "berry-hibiscus",
+   "name": "Berry Hibiscus",
+   "category": "ice-shaken",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 21000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "orange-mango",
+   "name": "Orange Mango",
+   "category": "ice-shaken",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 21000
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 23000
+    }
+   ]
+  },
+  {
+   "slug": "portakal-suyu",
+   "name": "Portakal Suyu",
+   "category": "kahvesiz",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 20500
+    }
+   ]
+  },
+  {
+   "slug": "balli-sut",
+   "name": "Ballı Süt",
+   "category": "kahvesiz",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "sicak-cikolata",
+   "name": "Sıcak Çikolata",
+   "category": "kahvesiz",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 20500
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "chai-tea-latte",
+   "name": "Chai Tea Latte",
+   "category": "kahvesiz",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": "normal",
+     "priceKurus": 20500
+    },
+    {
+     "key": "buyuk",
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "sahlep",
+   "name": "Sahlep",
+   "category": "kahvesiz",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 20500
+    }
+   ]
+  },
+  {
+   "slug": "fincan-cay",
+   "name": "Fincan Çay",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 12000
+    }
+   ]
+  },
+  {
+   "slug": "cay",
+   "name": "Çay",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 8000
+    }
+   ]
+  },
+  {
+   "slug": "fas-nanesi",
+   "name": "Fas Nanesi",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "hibiscus",
+   "name": "Hibiscus",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "relax",
+   "name": "Relax",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "wake-up",
+   "name": "Wake Up",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "nar-baharat",
+   "name": "Nar & Baharat",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "kis-cayi",
+   "name": "Kış Çayı",
+   "category": "caylar",
+   "temp": "hot",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16000
+    }
+   ]
+  },
+  {
+   "slug": "kola",
+   "name": "Kola",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "fanta",
+   "name": "Fanta",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "kutu-kola-vanilya",
+   "name": "Kutu Kola Vanilya",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 20000
+    }
+   ]
+  },
+  {
+   "slug": "kutu-kola-cherry",
+   "name": "Kutu Kola Cherry",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 20000
+    }
+   ]
+  },
+  {
+   "slug": "su",
+   "name": "Su",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 5000
+    }
+   ]
+  },
+  {
+   "slug": "meyve-suyu",
+   "name": "Meyve Suyu",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "beyoglu-gazoz",
+   "name": "Beyoğlu Gazoz",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16500
+    }
+   ]
+  },
+  {
+   "slug": "fuse-tea",
+   "name": "Fuse Tea",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "red-bull",
+   "name": "Red Bull",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 22000
+    }
+   ]
+  },
+  {
+   "slug": "premium-soda",
+   "name": "Premium Soda",
+   "category": "mesrubat",
+   "temp": "cold",
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16500
+    }
+   ]
+  },
+  {
+   "slug": "caprese",
+   "name": "Caprese",
+   "category": "ekmek-ustu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 32000
+    }
+   ]
+  },
+  {
+   "slug": "avokado-ricotta",
+   "name": "Avokado & Ricotta",
+   "category": "ekmek-ustu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 29000
+    }
+   ]
+  },
+  {
+   "slug": "norwegian",
+   "name": "Norwegian",
+   "category": "ekmek-ustu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 40000
+    }
+   ]
+  },
+  {
+   "slug": "garden",
+   "name": "Garden",
+   "category": "ekmek-ustu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 28000
+    }
+   ]
+  },
+  {
+   "slug": "fume-et-yumurta",
+   "name": "Füme Et & Yumurta",
+   "category": "ekmek-ustu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 35000
+    }
+   ]
+  },
+  {
+   "slug": "peynirli-borek",
+   "name": "Peynirli Börek",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "ispanakli-borek",
+   "name": "Ispanaklı Börek",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "fume-somonlu-sandvic",
+   "name": "Füme Somonlu Sandviç",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 40000
+    }
+   ]
+  },
+  {
+   "slug": "summer-sandvic",
+   "name": "Summer Sandviç",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 35000
+    }
+   ]
+  },
+  {
+   "slug": "ton-balikli-sandvic",
+   "name": "Ton Balıklı Sandviç",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 37000
+    }
+   ]
+  },
+  {
+   "slug": "hindi-fume-sandvic",
+   "name": "Hindi Füme Sandviç",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 32000
+    }
+   ]
+  },
+  {
+   "slug": "karisik-sarkuteri-sandvic",
+   "name": "Karışık Şarküteri Sandviç",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 39000
+    }
+   ]
+  },
+  {
+   "slug": "akdeniz-sandvic",
+   "name": "Akdeniz Sandviç",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 29000
+    }
+   ]
+  },
+  {
+   "slug": "morning-sando",
+   "name": "Morning Sando",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 30000
+    }
+   ]
+  },
+  {
+   "slug": "italy-sando",
+   "name": "Italy Sando",
+   "category": "sandvic",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 35000
+    }
+   ]
+  },
+  {
+   "slug": "sade-kruvasan",
+   "name": "Sade Kruvasan",
+   "category": "kruvasan",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "kruvasan-sandvic",
+   "name": "Kruvasan Sandviç",
+   "category": "kruvasan",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 27500
+    }
+   ]
+  },
+  {
+   "slug": "tatli-kruvasan",
+   "name": "Tatlı Kruvasan",
+   "category": "kruvasan",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 28000
+    }
+   ]
+  },
+  {
+   "slug": "orman-meyveli-magnolia",
+   "name": "Orman Meyveli Magnolia",
+   "category": "magnolia",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "cikolatali-magnolia",
+   "name": "Çikolatalı Magnolia",
+   "category": "magnolia",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "fistikli-magnolia",
+   "name": "Fıstıklı Magnolia",
+   "category": "magnolia",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 25000
+    }
+   ]
+  },
+  {
+   "slug": "cheesecake",
+   "name": "Cheesecake",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 33000
+    }
+   ]
+  },
+  {
+   "slug": "cikolatali-kardelen",
+   "name": "Çikolatalı Kardelen",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 31000
+    }
+   ]
+  },
+  {
+   "slug": "rulo-pasta",
+   "name": "Rulo Pasta",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 30000
+    }
+   ]
+  },
+  {
+   "slug": "visneli-brownie",
+   "name": "Vişneli Brownie",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 31000
+    }
+   ]
+  },
+  {
+   "slug": "mousse-pasta",
+   "name": "Mousse Pasta",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 31000
+    }
+   ]
+  },
+  {
+   "slug": "yaban-mersinli-pasta",
+   "name": "Yaban Mersinli Pasta",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 30000
+    }
+   ]
+  },
+  {
+   "slug": "cilekli-pasta",
+   "name": "Çilekli Pasta",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 30000
+    }
+   ]
+  },
+  {
+   "slug": "bowl",
+   "name": "Bowl",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 36500
+    }
+   ]
+  },
+  {
+   "slug": "karamelli-pasta",
+   "name": "Karamelli Pasta",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 30000
+    }
+   ]
+  },
+  {
+   "slug": "lotus-cheesecake",
+   "name": "Lotus Cheesecake",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 33000
+    }
+   ]
+  },
+  {
+   "slug": "fistikli-cheesecake",
+   "name": "Fıstıklı Cheesecake",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 33000
+    }
+   ]
+  },
+  {
+   "slug": "beyaz-kardelen",
+   "name": "Beyaz Kardelen",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 30000
+    }
+   ]
+  },
+  {
+   "slug": "brownie",
+   "name": "Brownie",
+   "category": "tatlilar",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 28500
+    }
+   ]
+  },
+  {
+   "slug": "fistikli-cookie",
+   "name": "Fıstıklı Cookie",
+   "category": "cookies",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16500
+    }
+   ]
+  },
+  {
+   "slug": "rocher-cookie",
+   "name": "Rocher Cookie",
+   "category": "cookies",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 16500
+    }
+   ]
+  },
+  {
+   "slug": "triple-chocolate-cookie",
+   "name": "Triple Chocolate Cookie",
+   "category": "cookies",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 18000
+    }
+   ]
+  },
+  {
+   "slug": "chocolate-chip-cookie",
+   "name": "Chocolate Chip Cookie",
+   "category": "cookies",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 17000
+    }
+   ]
+  },
+  {
+   "slug": "turk-kahvesi-200-g",
+   "name": "Türk Kahvesi · 200 g",
+   "category": "paket-kahve",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 25300
+    }
+   ]
+  },
+  {
+   "slug": "colombia-medellin-200-g",
+   "name": "Colombia Medellín · 200 g",
+   "category": "paket-kahve",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 33000
+    }
+   ]
+  },
+  {
+   "slug": "espresso-roast-200-g",
+   "name": "Espresso Roast · 200 g",
+   "category": "paket-kahve",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 33000
+    }
+   ]
+  },
+  {
+   "slug": "ethiopia-sidamo-200-g",
+   "name": "Ethiopia Sidamo · 200 g",
+   "category": "paket-kahve",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 33000
+    }
+   ]
+  },
+  {
+   "slug": "ac-demle-kahve",
+   "name": "Aç Demle Kahve",
+   "category": "paket-kahve",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 38500
+    }
+   ]
+  },
+  {
+   "slug": "zuber",
+   "name": "Züber",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "ofresko-strawberry",
+   "name": "Ofresko Strawberry",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 12000
+    }
+   ]
+  },
+  {
+   "slug": "ofresko-melon",
+   "name": "Ofresko Melon",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 12000
+    }
+   ]
+  },
+  {
+   "slug": "ofresko-green-apple",
+   "name": "Ofresko Green Apple",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 11000
+    }
+   ]
+  },
+  {
+   "slug": "ofresko-fig",
+   "name": "Ofresko Fig",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 14000
+    }
+   ]
+  },
+  {
+   "slug": "ofresko-black-mulberry",
+   "name": "Ofresko Black Mulberry",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 14000
+    }
+   ]
+  },
+  {
+   "slug": "mini-oreo",
+   "name": "Mini Oreo",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 27500
+    }
+   ]
+  },
+  {
+   "slug": "cips-sade",
+   "name": "Cips Sade",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "cips-acili",
+   "name": "Cips Acılı",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "cips-mantar",
+   "name": "Cips Mantar",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "zuber-kids",
+   "name": "Züber Kids",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 10000
+    }
+   ]
+  },
+  {
+   "slug": "zuber-granola",
+   "name": "Züber Granola",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  },
+  {
+   "slug": "zuber-cips",
+   "name": "Züber Cips",
+   "category": "kasa-onu",
+   "temp": null,
+   "variants": [
+    {
+     "key": null,
+     "priceKurus": 13000
+    }
+   ]
+  }
+ ],
+ "extras": [
+  {
+   "slug": "yumurta",
+   "nameTr": "Yumurta",
+   "priceKurus": 3000,
+   "categories": [
+    "ekmek-ustu"
+   ]
+  },
+  {
+   "slug": "ekstra-shot",
+   "nameTr": "Ekstra shot",
+   "priceKurus": 7500,
+   "categories": [
+    "sicak-kahveler",
+    "soguk-kahveler",
+    "coffee-frappe",
+    "cream-frappe",
+    "matcha-ube"
+   ]
+  },
+  {
+   "slug": "bitkisel-sut",
+   "nameTr": "Bitkisel süt",
+   "priceKurus": 6000,
+   "categories": [
+    "sicak-kahveler",
+    "soguk-kahveler",
+    "coffee-frappe",
+    "cream-frappe",
+    "matcha-ube"
+   ]
+  },
+  {
+   "slug": "sos-ve-aroma",
+   "nameTr": "Sos ve aroma",
+   "priceKurus": 5000,
+   "categories": [
+    "sicak-kahveler",
+    "soguk-kahveler",
+    "coffee-frappe",
+    "cream-frappe",
+    "matcha-ube"
+   ]
+  }
+ ],
+ "settings": {
+  "wifiSsid": "HOT | WIFI",
+  "wifiUsername": "test",
+  "wifiPassword": "test1234",
+  "wifiNoteTr": "HOT | WIFI ağına bağlanın. Açılan giriş ekranına bu bilgileri yazın.",
+  "openingTime": "08:00",
+  "footerNoteTr": "Self servis · Servis ücreti alınmaz",
+  "statsEnabled": true,
+  "menuUpdatedAt": "2026-10-25T00:00:00+03:00"
+ }
+}
