@@ -12,21 +12,21 @@ Son güncelleme: 2026-10-26. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- Yok.
+- `a2-3b-products`: tükendi zamanları, görünürlük anahtarı, ürün ekleme / çoğaltma / silme / sıralama, silme öncesi son 25 menü kopyası ve bütün işlemler için geri alma.
+- Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
 
-1. 3b — tükendi, görünür anahtarı, ekle / çoğalt / sil (kopya ile) / sıralama
-2. 4 — kategoriler, gruplar, ekstralar, etiketler, ayarlar (WiFi, açılış saati, alt not)
-3. 5 — fotoğraf yükleme
-4. Geri bildirim (HVK uyarlaması, yalnızca admin görür) — prompt 12
-5. 6 — toplu fiyat + menü kopyaları
-6. 7 — ZIP yedek / geri yükleme
-7. 8 — istatistik + logolu QR
-8. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
-9. EN + AR (RTL)
-10. 3D (A3)
-11. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
+1. 4 — kategoriler, gruplar, ekstralar, etiketler, ayarlar (WiFi, açılış saati, alt not)
+2. 5 — fotoğraf yükleme
+3. Geri bildirim (HVK uyarlaması, yalnızca admin görür) — prompt 12
+4. 6 — toplu fiyat + menü kopyaları
+5. 7 — ZIP yedek / geri yükleme
+6. 8 — istatistik + logolu QR
+7. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
+8. EN + AR (RTL)
+9. 3D (A3)
+10. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
 
 ## Açık konular
 
