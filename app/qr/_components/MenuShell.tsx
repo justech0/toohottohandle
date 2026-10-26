@@ -20,7 +20,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
   const visible = menu.products.filter((p) => p.isVisible);
   const sections = menu.groups.flatMap((g) =>
     menu.categories
-      .filter((c) => c.group === g.slug)
+      .filter((c) => c.group === g.slug && c.isVisible)
       .map((c) => ({ group: g, category: c, items: visible.filter((p) => p.category === c.slug) }))
       .filter((s) => s.items.length > 0),
   );
@@ -41,6 +41,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
         stars: badges.stars,
         sizes: priceLabel(p, menu.serverNow).parts,
         inSuggest: category.defaultInSuggest,
+        tags: p.tags,
       };
     }
   }

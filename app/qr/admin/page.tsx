@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/session";
 import { getPool, hasDb } from "@/lib/db/client";
 import { lastChange } from "@/lib/admin/products";
+import { catalogData } from "@/lib/admin/catalog";
 import { logout, logoutEverywhere } from "./actions";
 import { undoLastAction } from "./urunler/actions";
 
@@ -15,16 +16,18 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
   await connection();
   if (!hasDb()) redirect("/qr/admin/giris");
   const admin = await requireAdmin();
-  const last = await lastChange(getPool());
+  const [last, catalog] = await Promise.all([lastChange(getPool()), catalogData(getPool())]);
   const undone = Boolean((await searchParams).geri);
   return (
     <>
       <p className="adm-lead" data-testid="admin-email">{admin.email}</p>
       {undone ? <p className="adm-ok" role="status">Son işlem geri alındı.</p> : null}
+      {catalog.usesTestWifi ? <p className="adm-warning" role="alert">WiFi test bilgisi kullanılıyor</p> : null}
 
       <nav className="adm-card" aria-label="Bölümler">
         <Link href="/qr/admin/urunler" className="adm-btn adm-btn--main adm-btn--block">Ürünler ve fiyatlar</Link>
-        <p className="adm-note">Kategoriler, ayarlar, fotoğraf ve toplu fiyat sıradaki adımlarda eklenecek.</p>
+        <Link href="/qr/admin/katalog" className="adm-btn adm-btn--block">Katalog ve ayarlar</Link>
+        <p className="adm-note">Fotoğraf ve toplu fiyat sıradaki adımlarda eklenecek.</p>
       </nav>
 
       <section className="adm-card" aria-labelledby="last-title">

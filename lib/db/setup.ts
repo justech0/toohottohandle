@@ -53,6 +53,11 @@ export async function seedIfEmpty(pool: Pool, rows: MenuRows = seedRows(seed, ph
     await insertAll(conn, "product_variants", rows.variants);
     await insertAll(conn, "extras", rows.extras);
     await insertAll(conn, "extra_categories", rows.extraCategories);
+    if (rows.tags.length) {
+      const values = rows.tags.map((tag) => [tag.id, tag.slug, tag.name_tr, tag.sort_order]);
+      await conn.query("INSERT IGNORE INTO tags (id, slug, name_tr, sort_order) VALUES ?", [values]);
+    }
+    await insertAll(conn, "product_tags", rows.productTags);
     await insertAll(conn, "settings", rows.settings);
     await conn.commit();
     return true;
@@ -67,14 +72,16 @@ export async function seedIfEmpty(pool: Pool, rows: MenuRows = seedRows(seed, ph
 /** Menüyü oluşturan bütün satırlar. */
 export async function readMenuRows(pool: Pool): Promise<MenuRows> {
   const q = async <T>(sql: string) => (await pool.query<RowDataPacket[]>(sql))[0] as unknown as T[];
-  const [groups, categories, products, variants, extras, extraCategories, settings] = await Promise.all([
+  const [groups, categories, products, variants, extras, extraCategories, tags, productTags, settings] = await Promise.all([
     q<MenuRows["groups"][number]>("SELECT * FROM menu_groups"),
     q<MenuRows["categories"][number]>("SELECT * FROM categories"),
     q<MenuRows["products"][number]>("SELECT * FROM products"),
     q<MenuRows["variants"][number]>("SELECT * FROM product_variants"),
     q<MenuRows["extras"][number]>("SELECT * FROM extras"),
     q<MenuRows["extraCategories"][number]>("SELECT * FROM extra_categories"),
+    q<MenuRows["tags"][number]>("SELECT * FROM tags"),
+    q<MenuRows["productTags"][number]>("SELECT * FROM product_tags"),
     q<MenuRows["settings"][number]>("SELECT * FROM settings WHERE id = 1"),
   ]);
-  return { groups, categories, products, variants, extras, extraCategories, settings };
+  return { groups, categories, products, variants, extras, extraCategories, tags, productTags, settings };
 }
