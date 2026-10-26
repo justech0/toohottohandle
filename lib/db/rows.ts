@@ -20,6 +20,8 @@ export interface ProductRow {
 export interface VariantRow { id: number; product_id: number; label_key: Exclude<VariantKey, null> | null; price_kurus: number; sort_order: number }
 export interface ExtraRow { id: number; slug: string; name_tr: string; name_en: string | null; name_ar: string | null; price_kurus: number; sort_order: number }
 export interface ExtraCategoryRow { extra_id: number; category_id: number }
+export interface TagRow { id: number; slug: string; name_tr: string; sort_order: number }
+export interface ProductTagRow { product_id: number; tag_id: number }
 export interface SettingsRow {
   id: 1; wifi_ssid: string; wifi_username: string; wifi_password: string;
   wifi_note_tr: string; wifi_note_en: string | null; wifi_note_ar: string | null;
@@ -34,5 +36,7 @@ export interface MenuRows {
   variants: VariantRow[];
   extras: ExtraRow[];
   extraCategories: ExtraCategoryRow[];
+  tags: TagRow[];
+  productTags: ProductTagRow[];
   settings: SettingsRow[];
 }

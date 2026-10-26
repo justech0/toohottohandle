@@ -41,7 +41,10 @@ export async function saveProductAction(_: SaveState, f: FormData): Promise<Save
   const id = Number(rawId);
   const creating = rawId === "";
   if (!creating && (!Number.isInteger(id) || id < 1)) return { error: "Ürün bulunamadı." };
-  const raw = Object.fromEntries(FIELDS.map((k) => [k, f.get(k) === null ? undefined : String(f.get(k))]));
+  const raw = {
+    ...Object.fromEntries(FIELDS.map((k) => [k, f.get(k) === null ? undefined : String(f.get(k))])),
+    tagIds: f.getAll("tagIds").map(String).join(","),
+  };
   const parsed = parseProductInput(raw);
   if (!parsed.ok) return { error: parsed.error };
   let savedId = id;

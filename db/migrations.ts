@@ -143,4 +143,30 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "005_catalog",
+    statements: [
+      `CREATE TABLE tags (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        slug VARCHAR(64) NOT NULL UNIQUE,
+        name_tr VARCHAR(80) NOT NULL UNIQUE,
+        sort_order INT NOT NULL DEFAULT 0
+      ) ${T}`,
+      `CREATE TABLE product_tags (
+        product_id INT NOT NULL,
+        tag_id INT NOT NULL,
+        PRIMARY KEY (product_id, tag_id),
+        CONSTRAINT fk_pt_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        CONSTRAINT fk_pt_tag FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+      ) ${T}`,
+      `CREATE TABLE audit_undo_secrets (
+        audit_id INT PRIMARY KEY,
+        wifi_password VARCHAR(255) NOT NULL,
+        CONSTRAINT fk_audit_secret FOREIGN KEY (audit_id) REFERENCES audit_log(id) ON DELETE CASCADE
+      ) ${T}`,
+      `INSERT INTO tags (slug, name_tr, sort_order) VALUES
+        ('vegan','VEGAN',0), ('sekersiz','ŞEKERSİZ',1), ('bitkisel-sut-secenekli','BİTKİSEL SÜT SEÇENEKLİ',2),
+        ('sicak','SICAK',3), ('soguk','SOĞUK',4), ('acili','ACILI',5)`,
+    ],
+  },
 ];

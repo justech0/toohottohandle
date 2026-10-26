@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { parseProductInput, priceChanges } from "@/lib/admin/productInput";
-import type { AdminCategory } from "@/lib/admin/products";
+import type { AdminCategory, AdminTag } from "@/lib/admin/products";
 import { saveProductAction, type SaveState } from "../urunler/actions";
 
 const SIZE_OPTIONS: [string, string, string[]][] = [
@@ -22,7 +22,7 @@ const readForm = (form: HTMLFormElement) => Object.fromEntries([...new FormData(
  * Ürün düzenleme. Form React'in kendiliğinden sıfırlamasına bırakılmaz (hata sonrası yazılanlar kalır).
  * Fiyat değişiyorsa kaydetmeden önce eski → yeni gösterilir (spec 4.2). Kaydedilmemiş değişiklikte çıkarken sorar.
  */
-export function ProductForm({ initial, categories }: { initial: Record<string, string>; categories: AdminCategory[] }) {
+export function ProductForm({ initial, categories, tags }: { initial: Record<string, string>; categories: AdminCategory[]; tags: AdminTag[] }) {
   const [state, action, pending] = useActionState<SaveState, FormData>(saveProductAction, { error: null });
   const [sizes, setSizes] = useState(initial.sizes);
   const [confirm, setConfirm] = useState<string[] | null>(null);
@@ -61,6 +61,7 @@ export function ProductForm({ initial, categories }: { initial: Record<string, s
 
   const labels = SIZE_OPTIONS.find(([k]) => k === sizes)?.[2] ?? ["Fiyat (₺)"];
   const groups = [...new Set(categories.map((c) => c.groupName))];
+  const selectedTags = new Set((initial.tagIds ?? "").split(",").filter(Boolean));
 
   return (
     <form ref={formRef} className="adm-form" onSubmit={onSubmit} onChange={() => setDirty(true)} noValidate>
@@ -124,6 +125,15 @@ export function ProductForm({ initial, categories }: { initial: Record<string, s
         <label><input type="checkbox" name="isNew" defaultChecked={initial.isNew === "on"} /> Yeni</label>
         <label><input type="checkbox" name="isFeatured" defaultChecked={initial.isFeatured === "on"} /> Öne çıkan</label>
       </div>
+
+      <fieldset className="adm-fieldset">
+        <legend>Etiketler (en fazla 3)</legend>
+        <div className="adm-check-grid">
+          {tags.map((tag) => (
+            <label key={tag.id}><input type="checkbox" name="tagIds" value={tag.id} defaultChecked={selectedTags.has(String(tag.id))} /> {tag.name}</label>
+          ))}
+        </div>
+      </fieldset>
 
       {confirm ? (
         <dialog ref={confirmRef} className="adm-confirm adm-dialog" aria-labelledby="price-confirm-title" data-testid="price-confirm" onClose={() => setConfirm(null)}>

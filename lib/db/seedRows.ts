@@ -1,5 +1,6 @@
 import type { MenuData, MenuProduct } from "@/lib/menu/types";
 import type { MenuRows, ProductRow } from "./rows";
+import { READY_TAGS } from "@/lib/menu/tags";
 
 type SeedProduct = Pick<MenuProduct, "slug" | "name" | "category" | "temp" | "variants">;
 export interface SeedFile {
@@ -44,6 +45,13 @@ export function seedRows(seed: SeedFile, photos: Record<string, string>): MenuRo
     variants,
     extras: seed.extras.map((e, i) => ({ id: i + 1, slug: e.slug, name_tr: e.nameTr, name_en: null, name_ar: null, price_kurus: e.priceKurus, sort_order: i })),
     extraCategories: seed.extras.flatMap((e, i) => e.categories.map((c) => ({ extra_id: i + 1, category_id: need(catId, c, "kategori") }))),
+    tags: READY_TAGS.map((name, i) => ({
+      id: i + 1,
+      slug: ["vegan", "sekersiz", "bitkisel-sut-secenekli", "sicak", "soguk", "acili"][i],
+      name_tr: name,
+      sort_order: i,
+    })),
+    productTags: [],
     settings: [{
       id: 1, wifi_ssid: s.wifiSsid, wifi_username: s.wifiUsername, wifi_password: s.wifiPassword,
       wifi_note_tr: s.wifiNoteTr, wifi_note_en: null, wifi_note_ar: null, opening_time: s.openingTime,

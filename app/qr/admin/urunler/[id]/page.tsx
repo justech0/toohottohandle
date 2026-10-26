@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { getPool } from "@/lib/db/client";
 import { requireAdmin } from "@/lib/auth/session";
-import { adminProductList, loadProductForm } from "@/lib/admin/products";
+import { adminProductList, adminTags, loadProductForm } from "@/lib/admin/products";
 import { ProductForm } from "../../_components/ProductForm";
 
 async function Content({ params }: { params: Promise<{ id: string }> }) {
@@ -13,11 +13,11 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   const id = Number((await params).id);
   const initial = Number.isInteger(id) && id > 0 ? await loadProductForm(getPool(), id) : null;
   if (!initial) notFound();
-  const { categories } = await adminProductList(getPool());
+  const [{ categories }, tags] = await Promise.all([adminProductList(getPool()), adminTags(getPool())]);
   return (
     <>
       <h1 className="adm-h1">{initial.name}</h1>
-      <ProductForm initial={initial} categories={categories} />
+      <ProductForm initial={initial} categories={categories} tags={tags} />
     </>
   );
 }

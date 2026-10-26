@@ -9,6 +9,7 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
   const groupSlug = new Map(rows.groups.map((g) => [g.id, g.slug]));
   const catSlug = new Map(rows.categories.map((c) => [c.id, c.slug]));
   const variantsOf = new Map<number, MenuRows["variants"]>();
+  const tagName = new Map(rows.tags.map((tag) => [tag.id, tag.name_tr]));
   for (const v of [...rows.variants].sort(bySort)) {
     const list = variantsOf.get(v.product_id) ?? [];
     list.push(v);
@@ -18,9 +19,10 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
   if (!s) throw new Error("settings satırı yok");
 
   return {
-    groups: [...rows.groups].sort(bySort).map((g) => ({ slug: g.slug, nameTr: g.name_tr, color: g.color })),
+    groups: [...rows.groups].sort(bySort).map((g) => ({ slug: g.slug, nameTr: g.name_tr, color: g.color, sortOrder: g.sort_order })),
     categories: [...rows.categories].sort(bySort).map((c) => ({
-      slug: c.slug, nameTr: c.name_tr, group: groupSlug.get(c.group_id)!, defaultTemp: c.default_temp, defaultInSuggest: Boolean(c.default_in_suggest),
+      slug: c.slug, nameTr: c.name_tr, group: groupSlug.get(c.group_id)!, sortOrder: c.sort_order, isVisible: Boolean(c.is_visible),
+      defaultTemp: c.default_temp, defaultInSuggest: Boolean(c.default_in_suggest),
     })),
     products: [...rows.products].sort(bySort).map((p) => ({
       slug: p.slug,
@@ -34,11 +36,13 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
       isFeatured: Boolean(p.is_featured),
       isVisible: Boolean(p.is_visible),
       imageKey: p.image_key,
+      tags: rows.productTags.filter((link) => link.product_id === p.id).map((link) => tagName.get(link.tag_id)!).filter(Boolean),
     })),
     extras: [...rows.extras].sort(bySort).map((e) => ({
       slug: e.slug, nameTr: e.name_tr, priceKurus: e.price_kurus,
       categories: rows.extraCategories.filter((x) => x.extra_id === e.id).map((x) => catSlug.get(x.category_id)!),
     })),
+    tags: [...rows.tags].sort(bySort).map((tag) => tag.name_tr),
     settings: {
       wifiSsid: s.wifi_ssid, wifiUsername: s.wifi_username, wifiPassword: s.wifi_password, wifiNoteTr: s.wifi_note_tr,
       openingTime: s.opening_time, footerNoteTr: s.footer_note_tr, statsEnabled: Boolean(s.stats_enabled), menuUpdatedAt: iso(s.menu_updated_at),

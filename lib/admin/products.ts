@@ -4,13 +4,19 @@ import type { MenuVariant, VariantKey } from "@/lib/menu/types";
 import type { ProductRow, VariantRow } from "@/lib/db/rows";
 import { normalizeForSearch } from "@/lib/text/normalize";
 import { priceChanges, sizeSetOf, type ProductInput } from "./productInput";
+import { undoCatalogChange } from "./catalog";
 
 /** Ürünün geçmişe yazılan tam hali: satır + boylar (spec 4.4: geri alınan ürün eksik dönmez). */
-interface ProductSnapshot { product: Omit<ProductRow, "sold_out_until"> & { sold_out_until: string | null }; variants: Omit<VariantRow, "id">[] }
+interface ProductSnapshot {
+  product: Omit<ProductRow, "sold_out_until"> & { sold_out_until: string | null };
+  variants: Omit<VariantRow, "id">[];
+  tagIds: number[];
+}
 interface OrderSnapshot { products: { id: number; sortOrder: number }[] }
 
 export interface AdminProduct { id: number; name: string; categoryId: number; isVisible: boolean; soldOutUntil: string | null; variants: MenuVariant[] }
 export interface AdminCategory { id: number; name: string; groupName: string }
+export interface AdminTag { id: number; name: string }
 
 type Rows = RowDataPacket[];
 
@@ -46,27 +52,43 @@ export async function loadProductForm(pool: Pool, id: number): Promise<Record<st
     id: String(p.id), name: p.name, categoryId: String(p.category_id), descTr: p.desc_tr ?? "", ingredientsTr: p.ingredients_tr ?? "",
     temp: p.temp ?? "", inSuggest: tri(p.in_suggest), isNew: p.is_new ? "on" : "", isFeatured: p.is_featured ? "on" : "", isVisible: p.is_visible ? "on" : "",
     sizes: sizeSetOf(vs.map((v) => ({ key: v.label_key }))), price0: vs[0] ? lira(vs[0].price_kurus) : "", price1: vs[1] ? lira(vs[1].price_kurus) : "",
+    tagIds: snap.tagIds.join(","),
   };
+}
+
+export async function adminTags(pool: Pool): Promise<AdminTag[]> {
+  const [rows] = await pool.query<Rows>("SELECT id, name_tr FROM tags ORDER BY sort_order, id");
+  return rows.map((row) => ({ id: row.id, name: row.name_tr }));
 }
 
 async function snapshot(db: Pool | PoolConnection, id: number, lock = false): Promise<ProductSnapshot | null> {
   const [[p]] = await db.query<Rows>(`SELECT * FROM products WHERE id = ?${lock ? " FOR UPDATE" : ""}`, [id]);
   if (!p) return null;
   const [vs] = await db.query<Rows>("SELECT product_id, label_key, price_kurus, sort_order FROM product_variants WHERE product_id = ? ORDER BY sort_order, id", [id]);
+  const [tags] = await db.query<Rows>("SELECT tag_id FROM product_tags WHERE product_id = ? ORDER BY tag_id", [id]);
   const { updated_at: _u, ...rest } = p;
   return {
     product: { ...(rest as ProductRow), sold_out_until: p.sold_out_until ? new Date(p.sold_out_until).toISOString() : null },
     variants: vs as Omit<VariantRow, "id">[],
+    tagIds: tags.map((row) => row.tag_id),
   };
 }
 
-async function writeProduct(conn: PoolConnection, id: number, cols: Record<string, unknown>, variants: Omit<VariantRow, "id" | "product_id">[]): Promise<void> {
+async function writeProduct(
+  conn: PoolConnection,
+  id: number,
+  cols: Record<string, unknown>,
+  variants: Omit<VariantRow, "id" | "product_id">[],
+  tagIds: number[],
+): Promise<void> {
   const keys = Object.keys(cols);
   await conn.query(`UPDATE products SET ${keys.map((k) => `${k} = ?`).join(", ")} WHERE id = ?`, [...keys.map((k) => cols[k]), id]);
   await conn.query("DELETE FROM product_variants WHERE product_id = ?", [id]);
   await conn.query("INSERT INTO product_variants (product_id, label_key, price_kurus, sort_order) VALUES ?", [
     variants.map((v) => [id, v.label_key, v.price_kurus, v.sort_order]),
   ]);
+  await conn.query("DELETE FROM product_tags WHERE product_id = ?", [id]);
+  if (tagIds.length) await conn.query("INSERT INTO product_tags (product_id, tag_id) VALUES ?", [tagIds.map((tagId) => [id, tagId])]);
 }
 
 async function restoreProduct(conn: PoolConnection, value: ProductSnapshot): Promise<void> {
@@ -78,6 +100,7 @@ async function restoreProduct(conn: PoolConnection, value: ProductSnapshot): Pro
       value.variants.map((variant) => [product.id, variant.label_key, variant.price_kurus, variant.sort_order]),
     ]);
   }
+  if (value.tagIds?.length) await conn.query("INSERT INTO product_tags (product_id, tag_id) VALUES ?", [value.tagIds.map((tagId) => [product.id, tagId])]);
 }
 
 async function inTx<T>(pool: Pool, fn: (c: PoolConnection) => Promise<T>): Promise<T> {
@@ -106,9 +129,16 @@ async function audit(
   before: unknown,
   after: unknown,
 ): Promise<void> {
+  await c.query("DELETE FROM audit_undo_secrets");
   await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, 'product', ?, ?, ?, ?, ?)", [
     adminId, entityId, action, summary.slice(0, 255), before === null ? null : JSON.stringify(before), after === null ? null : JSON.stringify(after),
   ]);
+}
+
+async function validateTags(c: PoolConnection, tagIds: number[]): Promise<void> {
+  if (!tagIds.length) return;
+  const [tags] = await c.query<Rows>("SELECT id FROM tags WHERE id IN (?)", [tagIds]);
+  if (tags.length !== tagIds.length) throw new Error("Etiket bulunamadı.");
 }
 
 const bool = (value: boolean | null) => (value === null ? null : value ? 1 : 0);
@@ -134,12 +164,13 @@ async function uniqueSlug(c: PoolConnection, name: string): Promise<string> {
 
 async function menuSnapshotData(c: PoolConnection): Promise<Record<string, unknown[]>> {
   const query = async (sql: string) => (await c.query<Rows>(sql))[0];
-  const [groups, categories, products, variants, extras, extraCategories, settings] = await Promise.all([
+  const [groups, categories, products, variants, extras, extraCategories, tags, productTags, settings] = await Promise.all([
     query("SELECT * FROM menu_groups"), query("SELECT * FROM categories"), query("SELECT * FROM products"),
     query("SELECT * FROM product_variants"), query("SELECT * FROM extras"), query("SELECT * FROM extra_categories"),
+    query("SELECT * FROM tags"), query("SELECT * FROM product_tags"),
     query("SELECT id, wifi_ssid, wifi_username, wifi_note_tr, wifi_note_en, wifi_note_ar, opening_time, footer_note_tr, footer_note_en, footer_note_ar, stats_enabled, menu_updated_at, last_backup_at FROM settings WHERE id = 1"),
   ]);
-  return { groups, categories, products, variants, extras, extraCategories, settings };
+  return { groups, categories, products, variants, extras, extraCategories, tags, productTags, settings };
 }
 
 function withBoundedSuffix(value: string, suffix: string, maxLength: number): string {
@@ -170,16 +201,16 @@ export async function saveProduct(pool: Pool, adminId: number, id: number, input
     if (!before) throw new Error("Ürün bulunamadı.");
     const [[cat]] = await c.query<Rows>("SELECT id FROM categories WHERE id = ?", [input.categoryId]);
     if (!cat) throw new Error("Kategori bulunamadı.");
+    await validateTags(c, input.tagIds);
     await writeProduct(
       c, id,
       inputColumns(input),
       input.variants.map((v, i) => ({ label_key: v.key, price_kurus: v.priceKurus, sort_order: i })),
+      input.tagIds,
     );
     const after = await snapshot(c, id);
     const summary = summarize(before, input);
-    await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, 'product', ?, 'update', ?, ?, ?)", [
-      adminId, id, summary, JSON.stringify(before), JSON.stringify(after),
-    ]);
+    await audit(c, adminId, id, "update", summary, before, after);
     await touchMenu(c);
     return { summary };
   });
@@ -190,6 +221,7 @@ export async function createProduct(pool: Pool, adminId: number, input: ProductI
   return inTx(pool, async (c) => {
     const [[category]] = await c.query<Rows>("SELECT id FROM categories WHERE id = ? FOR UPDATE", [input.categoryId]);
     if (!category) throw new Error("Kategori bulunamadı.");
+    await validateTags(c, input.tagIds);
     const slug = await uniqueSlug(c, input.name);
     const [[order]] = await c.query<Rows>("SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order FROM products WHERE category_id = ?", [input.categoryId]);
     const columns = { slug, ...inputColumns(input), sort_order: Number(order.next_order) };
@@ -199,6 +231,7 @@ export async function createProduct(pool: Pool, adminId: number, input: ProductI
     await c.query("INSERT INTO product_variants (product_id, label_key, price_kurus, sort_order) VALUES ?", [
       input.variants.map((variant, index) => [id, variant.key, variant.priceKurus, index]),
     ]);
+    if (input.tagIds.length) await c.query("INSERT INTO product_tags (product_id, tag_id) VALUES ?", [input.tagIds.map((tagId) => [id, tagId])]);
     const after = await snapshot(c, id);
     await audit(c, adminId, id, "create", `${input.name}: eklendi`, null, after);
     await touchMenu(c);
@@ -221,6 +254,7 @@ export async function duplicateProduct(pool: Pool, adminId: number, id: number):
     await c.query("INSERT INTO product_variants (product_id, label_key, price_kurus, sort_order) VALUES ?", [
       source.variants.map((variant) => [copyId, variant.label_key, variant.price_kurus, variant.sort_order]),
     ]);
+    if (source.tagIds.length) await c.query("INSERT INTO product_tags (product_id, tag_id) VALUES ?", [source.tagIds.map((tagId) => [copyId, tagId])]);
     const after = await snapshot(c, copyId);
     await audit(c, adminId, copyId, "duplicate", `${name}: çoğaltıldı`, null, after);
     await touchMenu(c);
@@ -300,32 +334,41 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
   return inTx(pool, async (c) => {
     const [[top]] = await c.query<Rows>("SELECT * FROM audit_log ORDER BY id DESC LIMIT 1 FOR UPDATE");
     if (!top || top.action === "undo" || top.undone_by !== null) throw new Error("Geri alınacak işlem yok.");
-    if (top.entity !== "product") throw new Error("Bu işlem geri alınamıyor.");
-    if (["update", "sold_out", "visibility"].includes(top.action)) {
-      const before = JSON.parse(top.before_json) as ProductSnapshot;
-      const { id, ...cols } = before.product;
-      await writeProduct(c, id, { ...cols, sold_out_until: cols.sold_out_until ? new Date(cols.sold_out_until) : null }, before.variants.map(({ product_id: _p, ...variant }) => variant));
-    } else if (top.action === "create") {
-      await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
-    } else if (top.action === "duplicate") {
-      const after = JSON.parse(top.after_json) as ProductSnapshot;
-      await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
-      await c.query("UPDATE products SET sort_order = sort_order - 1 WHERE category_id = ? AND sort_order > ?", [after.product.category_id, after.product.sort_order]);
-    } else if (top.action === "delete") {
-      const before = JSON.parse(top.before_json) as ProductSnapshot;
-      await c.query("UPDATE products SET sort_order = sort_order + 1 WHERE category_id = ? AND sort_order >= ?", [
-        before.product.category_id,
-        before.product.sort_order,
-      ]);
-      await restoreProduct(c, before);
-    } else if (top.action === "reorder") {
-      const before = JSON.parse(top.before_json) as OrderSnapshot;
-      for (const product of before.products) await c.query("UPDATE products SET sort_order = ? WHERE id = ?", [product.sortOrder, product.id]);
+    if (top.entity === "product") {
+      if (["update", "sold_out", "visibility"].includes(top.action)) {
+        const before = JSON.parse(top.before_json) as ProductSnapshot;
+        const { id, ...cols } = before.product;
+        await writeProduct(
+          c,
+          id,
+          { ...cols, sold_out_until: cols.sold_out_until ? new Date(cols.sold_out_until) : null },
+          before.variants.map(({ product_id: _p, ...variant }) => variant),
+          before.tagIds ?? [],
+        );
+      } else if (top.action === "create") {
+        await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
+      } else if (top.action === "duplicate") {
+        const after = JSON.parse(top.after_json) as ProductSnapshot;
+        await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
+        await c.query("UPDATE products SET sort_order = sort_order - 1 WHERE category_id = ? AND sort_order > ?", [after.product.category_id, after.product.sort_order]);
+      } else if (top.action === "delete") {
+        const before = JSON.parse(top.before_json) as ProductSnapshot;
+        await c.query("UPDATE products SET sort_order = sort_order + 1 WHERE category_id = ? AND sort_order >= ?", [
+          before.product.category_id,
+          before.product.sort_order,
+        ]);
+        await restoreProduct(c, before);
+      } else if (top.action === "reorder") {
+        const before = JSON.parse(top.before_json) as OrderSnapshot;
+        for (const product of before.products) await c.query("UPDATE products SET sort_order = ? WHERE id = ?", [product.sortOrder, product.id]);
+      } else {
+        throw new Error("Bu işlem geri alınamıyor.");
+      }
     } else {
-      throw new Error("Bu işlem geri alınamıyor.");
+      await undoCatalogChange(c, top);
     }
     const summary = `Geri alındı: ${top.summary}`.slice(0, 255);
-    const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, 'product', ?, 'undo', ?)", [adminId, top.entity_id, summary]);
+    const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, ?, ?, 'undo', ?)", [adminId, top.entity, top.entity_id, summary]);
     await c.query("UPDATE audit_log SET undone_by = ? WHERE id = ?", [(res as { insertId: number }).insertId, top.id]);
     await touchMenu(c);
     return { summary };
