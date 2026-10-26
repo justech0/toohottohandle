@@ -41,6 +41,13 @@ export function MenuClient({ products, settings }: { products: CardProduct[]; se
     };
   }, []);
 
+  // Açık katman varken vitrin durur (HeroSlides html[data-overlay]'i izler).
+  useEffect(() => {
+    const html = document.documentElement;
+    if (panel || sheet) html.dataset.overlay = panel ?? "sheet";
+    else delete html.dataset.overlay;
+  }, [panel, sheet]);
+
   const sheetProduct = sheet ? products.find((p) => p.slug === sheet) : undefined;
 
   return (

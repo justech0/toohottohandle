@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { pickSuggestions } from "@/lib/menu/suggest";
 import { imageSrc } from "@/lib/menu/image";
 import { BrandIcon } from "./BrandIcon";
-import { NeIcsemSquare } from "./GroupTiles";
 import { CloseIcon } from "./Icons";
 import type { CardProduct } from "./clientTypes";
 
@@ -22,7 +21,20 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   const [picks, setPicks] = useState<CardProduct[]>([]);
   const [phase, setPhase] = useState<"idle" | "reset" | "spin" | "done">("idle");
   const timers = useRef<number[]>([]);
+  const lastPicks = useRef<CardProduct[]>([]);
+  const squareRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef(false);
   const spinning = phase === "reset" || phase === "spin";
+
+  // Açılınca odak panele (Kapat), kapanınca kareye döner.
+  useEffect(() => {
+    if (open) closeRef.current?.focus();
+    else if (returnFocus.current) {
+      returnFocus.current = false;
+      squareRef.current?.focus();
+    }
+  }, [open]);
 
   const clear = () => {
     timers.current.forEach((t) => window.clearTimeout(t));
@@ -33,7 +45,9 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   const spin = () => {
     if (spinning) return;
     clear();
-    setPicks(pickSuggestions(pool, 3, Math.random));
+    const next = pickSuggestions(pool, 3, Math.random, lastPicks.current);
+    lastPicks.current = next;
+    setPicks(next);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPhase("done");
       return;
@@ -46,6 +60,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   if (!open) {
     return (
       <NeIcsemSquare
+        ref={squareRef}
         onClick={() => {
           setOpen(true);
           spin();
@@ -60,10 +75,12 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
         <BrandIcon name="rabbit" className="ne-open__rabbit" />
         <p className="ne-open__title">Ne içsem?</p>
         <button
+          ref={closeRef}
           type="button"
           className="icon-btn ne-open__close"
           aria-label="Kapat"
           onClick={() => {
+            returnFocus.current = true;
             clear();
             setPhase("idle");
             setOpen(false);
@@ -90,7 +107,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     className="ne-reel"
                     data-testid="neicsem-reel"
                     data-open-product={phase === "done" ? p.slug : undefined}
-                    aria-label={phase === "done" ? p.name : "Dönüyor"}
+                    aria-label={phase === "done" ? `${p.name}, ${p.full}` : `${k + 1}. kutu dönüyor`}
                     aria-disabled={phase !== "done"}
                   >
                     <span className="ne-strip" style={style}>
@@ -115,7 +132,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     </span>
                   </button>
                   {phase === "done" ? (
-                    <div className="ne-result">
+                    <div className="ne-result" aria-hidden="true">
                       <p className="ne-result__name" data-testid="neicsem-name">{p.name}</p>
                       <p className="ne-result__price">{p.full}</p>
                     </div>
@@ -124,11 +141,24 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
               );
             })}
           </div>
+          <p className="sr-only" aria-live="polite" data-testid="neicsem-live">
+            {phase === "done" ? `Önerilerimiz: ${picks.map((p) => p.name).join(", ")}` : ""}
+          </p>
           <button type="button" className="ne-again" onClick={spin} aria-disabled={spinning}>
             Tekrar çevir
           </button>
         </>
       )}
     </div>
+  );
+}
+
+/** Ne içsem karesinin kapalı hali: tavşanlı sarı kare (spec v3 3.2). */
+function NeIcsemSquare({ onClick, ref }: { onClick: () => void; ref: React.Ref<HTMLButtonElement> }) {
+  return (
+    <button ref={ref} type="button" className="ne-tile" data-testid="neicsem-tile" onClick={onClick} aria-expanded={false}>
+      <span className="ne-tile__disc"><BrandIcon name="rabbit" className="ne-rabbit" /></span>
+      <span className="ne-tile__label">Ne içsem?</span>
+    </button>
   );
 }

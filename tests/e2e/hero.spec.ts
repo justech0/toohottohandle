@@ -83,4 +83,8 @@ test("pauses while search is open over it", async ({ page }) => {
   await expect(page.getByTestId("search-panel")).toBeVisible();
   await page.clock.runFor(9000);
   await expect(title(page)).toHaveText("HOT & FAST");
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("search-panel")).toHaveCount(0);
+  await page.clock.runFor(4100);
+  await expect(title(page)).toHaveText("HOT & FREE");
 });

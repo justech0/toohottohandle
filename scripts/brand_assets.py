@@ -77,15 +77,17 @@ save_webp(ig_open(12), os.path.join(OUT, "hero", "shine.webp"), 780, 120)
 
 # Grup afişleri
 TL = (0, 0, 0.5, 0.45)
+# Ube fotoğrafında "TOO HOT" ve "UBE" yazıları yanlarda; ortadaki şerit yazısız (spec v3 2)
+UBE = (0.3, 0, 0.81, 1)
 save_webp(ig_open(34), os.path.join(OUT, "groups", "kahve.webp"), 600, 70)
-save_webp(ig_open(33), os.path.join(OUT, "groups", "spesiyal.webp"), 600, 70)
+save_webp(ig_open(33, UBE), os.path.join(OUT, "groups", "spesiyal.webp"), 600, 70)
 save_webp(ig_open(7, TL), os.path.join(OUT, "groups", "yiyecek.webp"), 600, 70)
 save_webp(ig_open(22), os.path.join(OUT, "groups", "tatli.webp"), 600, 70)
 save_webp(ig_open(38, (0, 0, 1, 0.75)), os.path.join(OUT, "groups", "paket.webp"), 600, 70)
 
 # Örnek ürün fotoğrafları (yalnızca THTH_SAMPLE_PHOTOS=1)
 SAMPLES = {
-    "ube-latte": (33, None),
+    "ube-latte": (33, UBE),
     "ube-vanilya-matcha-latte": (4, (0, 0.22, 1, 1)),
     "caramel-frappe": (12, None),
     "morning-sando": (8, TL),

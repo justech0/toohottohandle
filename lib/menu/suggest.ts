@@ -16,9 +16,14 @@ function shuffle<T>(xs: T[], rand: () => number): T[] {
   return a;
 }
 
-/** Birbirinden farklı en fazla n öneri; önce fotoğraflılar. */
-export function pickSuggestions<T extends { imageKey: string | null }>(pool: T[], n: number, rand: () => number): T[] {
-  const withPhoto = shuffle(pool.filter((p) => p.imageKey), rand);
-  const without = shuffle(pool.filter((p) => !p.imageKey), rand);
+/**
+ * Birbirinden farklı en fazla n öneri; önce fotoğraflılar.
+ * Havuzda yeterince başka ürün varsa bir önceki önerileri (exclude) tekrar etmez.
+ */
+export function pickSuggestions<T extends { imageKey: string | null }>(pool: T[], n: number, rand: () => number, exclude: readonly T[] = []): T[] {
+  const fresh = pool.filter((p) => !exclude.includes(p));
+  const base = fresh.length >= n ? fresh : pool;
+  const withPhoto = shuffle(base.filter((p) => p.imageKey), rand);
+  const without = shuffle(base.filter((p) => !p.imageKey), rand);
   return [...withPhoto, ...without].slice(0, n);
 }

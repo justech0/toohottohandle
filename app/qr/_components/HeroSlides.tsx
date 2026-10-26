@@ -10,6 +10,8 @@ import { BrandIcon } from "./BrandIcon";
  */
 export function HeroSlides() {
   const [index, setIndex] = useState(0);
+  // Kendi kendine dönerken ekran okuyucuya duyurulmaz; ziyaretçi bir slayt seçince duyurulur (WCAG 2.2.2).
+  const [announce, setAnnounce] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const slide = HERO_SLIDES[index];
 
@@ -19,11 +21,13 @@ export function HeroSlides() {
     const html = document.documentElement;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let visible = true;
+    let focused = false;
     let timer = 0;
     const sync = () => {
       window.clearInterval(timer);
       timer = 0;
-      if (!reduced && visible && !document.hidden) {
+      // Arama, WiFi ya da ürün detayı açıkken (html[data-overlay]) ve odak vitrindeyken durur.
+      if (!reduced && visible && !focused && !document.hidden && !html.dataset.overlay) {
         timer = window.setInterval(() => setIndex((i) => (i + 1) % HERO_SLIDES.length), HERO_INTERVAL_MS);
       }
     };
@@ -36,10 +40,26 @@ export function HeroSlides() {
       { threshold: [0, 0.3, 1] },
     );
     io.observe(root);
+    const mo = new MutationObserver(sync);
+    mo.observe(html, { attributes: true, attributeFilter: ["data-overlay"] });
+    const onFocusIn = () => {
+      focused = true;
+      sync();
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (root.contains(e.relatedTarget as Node | null)) return;
+      focused = false;
+      sync();
+    };
+    root.addEventListener("focusin", onFocusIn);
+    root.addEventListener("focusout", onFocusOut);
     document.addEventListener("visibilitychange", sync);
     sync();
     return () => {
       io.disconnect();
+      mo.disconnect();
+      root.removeEventListener("focusin", onFocusIn);
+      root.removeEventListener("focusout", onFocusOut);
       document.removeEventListener("visibilitychange", sync);
       window.clearInterval(timer);
       delete html.dataset.heroVisible;
@@ -65,7 +85,7 @@ export function HeroSlides() {
       <BrandIcon name={slide.icon} className="hero__icon" />
       <div className="hero__text">
         <p className="hero__menu">MENÜ</p>
-        <p className="hero__title" data-testid="hero-title" aria-live="polite">{slide.title}</p>
+        <p className="hero__title" data-testid="hero-title" aria-live={announce ? "polite" : "off"}>{slide.title}</p>
       </div>
       <div className="hero__dots">
         {HERO_SLIDES.map((s, k) => (
@@ -75,7 +95,10 @@ export function HeroSlides() {
             className="hero__dot"
             aria-label={`${k + 1}. slayt`}
             aria-current={k === index ? "true" : undefined}
-            onClick={() => setIndex(k)}
+            onClick={() => {
+              setAnnounce(true);
+              setIndex(k);
+            }}
           />
         ))}
       </div>

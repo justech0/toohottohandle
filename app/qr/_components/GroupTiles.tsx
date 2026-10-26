@@ -26,13 +26,3 @@ export function GroupTiles({ groups, firstCategoryOf, neIcsem }: { groups: MenuG
     </nav>
   );
 }
-
-/** Ne içsem karesinin durağan hali (Task 6'da NeIcsem bileşeni kullanır). */
-export function NeIcsemSquare({ onClick, expanded }: { onClick?: () => void; expanded?: boolean }) {
-  return (
-    <button type="button" className="ne-tile" data-testid="neicsem-tile" onClick={onClick} aria-expanded={expanded}>
-      <span className="ne-tile__disc"><BrandIcon name="rabbit" className="ne-rabbit" /></span>
-      <span className="ne-tile__label">Ne içsem?</span>
-    </button>
-  );
-}
