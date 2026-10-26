@@ -12,14 +12,14 @@ describe.skipIf(!url)("veritabanı (MariaDB/MySQL)", () => {
 
   beforeAll(async () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z", multipleStatements: false });
-    for (const t of ["audit_log", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
+    for (const t of ["audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
       await pool.query(`DROP TABLE IF EXISTS ${t}`);
     }
   });
   afterAll(async () => pool?.end());
 
   it("applies the schema once", async () => {
-    expect(await migrate(pool)).toEqual(["001_menu", "002_auth", "003_audit"]);
+    expect(await migrate(pool)).toEqual(["001_menu", "002_auth", "003_audit", "004_snapshots"]);
     expect(await migrate(pool)).toEqual([]);
   });
 
@@ -40,5 +40,11 @@ describe.skipIf(!url)("veritabanı (MariaDB/MySQL)", () => {
 
   it("refuses a second settings row", async () => {
     await expect(pool.query("INSERT INTO settings (id, wifi_ssid, wifi_username, wifi_password, wifi_note_tr, opening_time, footer_note_tr, menu_updated_at) VALUES (2,'a','b','c','d','08:00','e',NOW())")).rejects.toThrow();
+  });
+
+  it("creates the menu snapshot archive", async () => {
+    await pool.query("INSERT INTO menu_snapshots (reason, data) VALUES ('silme öncesi', '{}')");
+    const [rows] = await pool.query("SELECT reason, data FROM menu_snapshots");
+    expect(rows).toEqual([{ reason: "silme öncesi", data: "{}" }]);
   });
 });
