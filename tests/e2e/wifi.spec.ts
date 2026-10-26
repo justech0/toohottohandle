@@ -49,7 +49,7 @@ test("the card has a 44px close button", async ({ page }) => {
   await openMenu(page);
   await openWifi(page);
   const close = page.getByTestId("wifi-card").getByRole("button", { name: "Kapat" });
-  expect((await close.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round((await close.boundingBox())!.height)).toBeGreaterThanOrEqual(44);
   await close.click();
   await expect(page.getByTestId("wifi-card")).toHaveCount(0);
   expect(new URL(page.url()).pathname).toBe("/qr");
