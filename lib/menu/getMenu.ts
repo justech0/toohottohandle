@@ -1,5 +1,6 @@
 import seed from "@/db/seed/menu.json";
 import samplePhotos from "@/db/seed/sample-photos.json";
+import photos from "@/db/seed/photos.json";
 import type { MenuData, MenuProduct } from "./types";
 
 type SeedProduct = Omit<MenuProduct, "descTr" | "soldOutUntil" | "isNew" | "isFeatured" | "isVisible" | "imageKey">;
@@ -15,7 +16,8 @@ export async function getMenu(): Promise<MenuData> {
     isNew: false,
     isFeatured: false,
     isVisible: true,
-    imageKey: samples[p.slug] ?? null,
+    // Gerçek fotoğraf her zaman önce gelir; örnekler yalnızca önizlemede boşlukları doldurur.
+    imageKey: (photos as Record<string, string>)[p.slug] ?? samples[p.slug] ?? null,
   }));
   return {
     groups: seed.groups as MenuData["groups"],

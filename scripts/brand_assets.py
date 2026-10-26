@@ -85,17 +85,23 @@ save_webp(ig_open(7, TL), os.path.join(OUT, "groups", "yiyecek.webp"), 600, 70)
 save_webp(ig_open(22), os.path.join(OUT, "groups", "tatli.webp"), 600, 70)
 save_webp(ig_open(38, (0, 0, 1, 0.75)), os.path.join(OUT, "groups", "paket.webp"), 600, 70)
 
-# Örnek ürün fotoğrafları (yalnızca THTH_SAMPLE_PHOTOS=1)
-SAMPLES = {
-    "ube-latte": (33, UBE),
-    "ube-vanilya-matcha-latte": (4, (0, 0.22, 1, 1)),
-    "caramel-frappe": (12, None),
+# Gerçek ürün fotoğrafları (markanın paylaşımlarından; ürün adı gönderide yazıyor) — her zaman açık
+REAL = {
+    "ton-balikli-sandvic": (7, TL),
     "morning-sando": (8, TL),
     "italy-sando": (9, TL),
-    "ton-balikli-sandvic": (7, TL),
+    "hindi-fume-sandvic": (10, TL),
     "karisik-sarkuteri-sandvic": (13, (0.1, 0.3, 0.9, 0.75)),
+    "ube-latte": (33, UBE),
+    "kola": (16, None),
 }
-for slug, (i, box) in SAMPLES.items():
-    im = ig_open(i, box)
-    for w, kb in ((320, 30), (720, 90), (1280, 400)):
-        save_webp(im, os.path.join(OUT, "img", f"ornek-{slug}-{w}.webp"), w, kb)
+# Örnek ürün fotoğrafları (yalnızca THTH_SAMPLE_PHOTOS=1, önizleme)
+SAMPLES = {
+    "ube-vanilya-matcha-latte": (4, (0, 0.22, 1, 1)),
+    "caramel-frappe": (12, None),
+}
+for prefix, table in (("urun", REAL), ("ornek", SAMPLES)):
+    for slug, (i, box) in table.items():
+        im = ig_open(i, box)
+        for w, kb in ((320, 30), (720, 90), (1280, 400)):
+            save_webp(im, os.path.join(OUT, "img", f"{prefix}-{slug}-{w}.webp"), w, kb)
