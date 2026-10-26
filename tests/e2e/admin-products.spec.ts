@@ -142,4 +142,13 @@ test("delete uses an in-page dialog and undo restores the copied product", async
   await expect(page.getByRole("status")).toContainText("geri alındı");
   await page.goto("/qr/admin/urunler");
   await expect(page.locator(`[data-product-id="${id}"]`)).toContainText("175 ₺");
+
+  await page.getByTestId(`product-delete-${id}`).click();
+  await page.getByRole("dialog", { name: "Test Kakaosu Kopya silinsin mi?" }).getByRole("button", { name: "Evet, sil" }).click();
+  await expect(page.locator(`[data-product-id="${id}"]`)).toHaveCount(0);
+
+  const originalId = await rowId(page, "Test Kakaosu");
+  await page.getByTestId(`product-delete-${originalId}`).click();
+  await page.getByRole("dialog", { name: "Test Kakaosu silinsin mi?" }).getByRole("button", { name: "Evet, sil" }).click();
+  await expect(page.locator(`[data-product-id="${originalId}"]`)).toHaveCount(0);
 });
