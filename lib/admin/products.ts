@@ -14,12 +14,13 @@ export interface AdminCategory { id: number; name: string; groupName: string }
 
 type Rows = RowDataPacket[];
 
-export async function adminProductList(pool: Pool): Promise<{ categories: AdminCategory[]; products: AdminProduct[] }> {
+export async function adminProductList(pool: Pool): Promise<{ categories: AdminCategory[]; products: AdminProduct[]; openingTime: string }> {
   const [cats] = await pool.query<Rows>(
     "SELECT c.id, c.name_tr, g.name_tr AS group_name FROM categories c JOIN menu_groups g ON g.id = c.group_id ORDER BY g.sort_order, c.sort_order, c.id",
   );
   const [prods] = await pool.query<Rows>("SELECT id, name, category_id, is_visible, sold_out_until FROM products ORDER BY sort_order, id");
   const [vars] = await pool.query<Rows>("SELECT product_id, label_key, price_kurus FROM product_variants ORDER BY sort_order, id");
+  const [[settings]] = await pool.query<Rows>("SELECT opening_time FROM settings WHERE id = 1");
   const byProduct = new Map<number, MenuVariant[]>();
   for (const v of vars) byProduct.set(v.product_id, [...(byProduct.get(v.product_id) ?? []), { key: v.label_key as VariantKey, priceKurus: v.price_kurus }]);
   return {
@@ -28,6 +29,7 @@ export async function adminProductList(pool: Pool): Promise<{ categories: AdminC
       id: p.id, name: p.name, categoryId: p.category_id, isVisible: Boolean(p.is_visible),
       soldOutUntil: p.sold_out_until ? new Date(p.sold_out_until).toISOString() : null, variants: byProduct.get(p.id) ?? [],
     })),
+    openingTime: String(settings.opening_time),
   };
 }
 
