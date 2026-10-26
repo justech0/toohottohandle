@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import fs from "node:fs";
+import { ADMIN_EMAIL as EMAIL, ADMIN_PW as PW, setupCode } from "./helpers/admin";
 
 /**
  * Yalnızca veritabanlı sunucuda koşar: E2E_DB=1 ve sunucu kaydının yolu E2E_SERVER_LOG.
@@ -8,12 +8,6 @@ import fs from "node:fs";
 test.skip(!process.env.E2E_DB, "veritabanlı sunucu gerekli");
 test.describe.configure({ mode: "serial" });
 
-const EMAIL = "admin@test.kafe";
-const PW = `Test-${Date.now()}-sifre`;
-const setupCode = () => {
-  const log = fs.readFileSync(process.env.E2E_SERVER_LOG!, "utf8");
-  return [...log.matchAll(/Kurulum kodu: ([A-Z2-9-]{14})/g)].pop()![1];
-};
 
 test("first visit leads to setup; bad code and short password are refused", async ({ page }) => {
   await page.goto("/qr/admin");
