@@ -56,8 +56,15 @@ test("390px product controls keep accessible contrast, targets, and keyboard foc
   await expect(crumb).toBeFocused();
   expect(await crumb.evaluate((element) => {
     const style = getComputedStyle(element);
-    return [style.outlineWidth, style.outlineStyle, style.outlineOffset];
-  })).toEqual(["2px", "solid", "2px"]);
+    return [style.outlineWidth, style.outlineStyle, style.outlineOffset, style.outlineColor];
+  })).toEqual(["2px", "solid", "2px", "rgb(42, 21, 20)"]);
+
+  await add.focus();
+  await expect(add).toBeFocused();
+  expect(await add.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return [style.outlineWidth, style.outlineStyle, style.outlineOffset, style.outlineColor];
+  })).toEqual(["2px", "solid", "2px", "rgb(255, 255, 255)"]);
 });
 
 test("search narrows the admin list", async ({ page }) => {
