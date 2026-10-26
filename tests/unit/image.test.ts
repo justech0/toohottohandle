@@ -20,13 +20,20 @@ describe("sample photos", () => {
   it("are off by default", async () => {
     expect(await key("cappuccino")).toBeNull();
   });
-  it("attach to eleven products when THTH_SAMPLE_PHOTOS=1", async () => {
+  it("real product photos are always on", async () => {
+    expect(await key("ton-balikli-sandvic")).toBe("urun-ton-balikli-sandvic");
+    expect(await key("hindi-fume-sandvic")).toBe("urun-hindi-fume-sandvic");
+    expect(await key("kola")).toBe("urun-kola");
+    expect(await key("ube-latte")).toBe("urun-ube-latte");
+    expect((await getMenu()).products.filter((p) => p.imageKey).length).toBe(7);
+  });
+  it("samples fill the rest when THTH_SAMPLE_PHOTOS=1, real photos win", async () => {
     process.env.THTH_SAMPLE_PHOTOS = "1";
     expect(await key("cappuccino")).toBe("ornek-cappuccino");
     expect(await key("cheesecake")).toBe("ornek-cheesecake");
-    expect(await key("ube-latte")).toBe("ornek-ube-latte");
-    expect(await key("morning-sando")).toBe("ornek-morning-sando");
+    expect(await key("ube-latte")).toBe("urun-ube-latte");
+    expect(await key("morning-sando")).toBe("urun-morning-sando");
     expect(await key("cortado")).toBeNull();
-    expect((await getMenu()).products.filter((p) => p.imageKey).length).toBe(11);
+    expect((await getMenu()).products.filter((p) => p.imageKey).length).toBe(13);
   });
 });

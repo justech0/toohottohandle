@@ -23,10 +23,10 @@ test("a product without a photo shows the group icon instead", async ({ page }) 
   await expect(row(page, "cortado").locator(".brand-icon")).toHaveCount(1);
 });
 
-test("only sample-photo products get photo cards", async ({ page }) => {
+test("only products with real or sample photos get photo cards", async ({ page }) => {
   await openMenu(page);
-  await expect(page.locator("main .card--photo")).toHaveCount(11);
-  await expect(page.locator("main .card--plain")).toHaveCount(118);
+  await expect(page.locator("main .card--photo")).toHaveCount(13);
+  await expect(page.locator("main .card--plain")).toHaveCount(116);
 });
 
 test("the detail sheet shows the large photo", async ({ page }) => {
