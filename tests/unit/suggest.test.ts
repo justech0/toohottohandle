@@ -27,6 +27,19 @@ describe("pickSuggestions", () => {
     expect(r.slice(0, 2).map((x) => x.id).sort()).toEqual(["p0", "p1"]);
     expect(r[2].imageKey).toBeNull();
   });
+  it("does not repeat the previous picks when the pool has enough others", () => {
+    const pool = items(5, 5);
+    const r = seq();
+    const first = pickSuggestions(pool, 3, r);
+    const second = pickSuggestions(pool, 3, r, first);
+    expect(second.filter((x) => first.includes(x))).toEqual([]);
+    expect(second.filter((x) => x.imageKey)).toHaveLength(2);
+  });
+  it("allows repeats when the pool is too small", () => {
+    const pool = items(2, 2);
+    const first = pickSuggestions(pool, 3, seq());
+    expect(pickSuggestions(pool, 3, seq(), first)).toHaveLength(3);
+  });
   it("is deterministic for the same random source", () => {
     expect(pickSuggestions(items(3, 6), 3, seq())).toEqual(pickSuggestions(items(3, 6), 3, seq()));
   });

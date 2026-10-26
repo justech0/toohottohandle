@@ -69,3 +69,18 @@ test("topbar is transparent over the hero and solid after scrolling", async ({ p
   await expect(page.getByRole("button", { name: "WiFi", exact: true })).toBeVisible();
   await expect(page.getByRole("img", { name: "Too Hot To Handle" }).first()).toBeVisible();
 });
+
+test("the rotating title is only announced after the visitor picks a slide", async ({ page }) => {
+  await openMenu(page);
+  await expect(title(page)).toHaveAttribute("aria-live", "off");
+  await page.getByRole("button", { name: "2. slayt" }).click();
+  await expect(title(page)).toHaveAttribute("aria-live", "polite");
+});
+
+test("pauses while search is open over it", async ({ page }) => {
+  await openMenu(page);
+  await page.getByRole("button", { name: "Ara", exact: true }).click();
+  await expect(page.getByTestId("search-panel")).toBeVisible();
+  await page.clock.runFor(9000);
+  await expect(title(page)).toHaveText("HOT & FAST");
+});
