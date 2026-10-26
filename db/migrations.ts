@@ -112,4 +112,23 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "003_audit",
+    statements: [
+      // Her kayıt: kim, ne zaman, ne, önce/sonra (spec 4.4). WiFi şifresi yazılmadan önce maskelenir.
+      `CREATE TABLE audit_log (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        admin_id INT NULL,
+        at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        entity VARCHAR(32) NOT NULL,
+        entity_id INT NULL,
+        action VARCHAR(32) NOT NULL,
+        summary VARCHAR(255) NOT NULL,
+        before_json LONGTEXT NULL,
+        after_json LONGTEXT NULL,
+        undone_by INT NULL,
+        INDEX (at)
+      ) ${T}`,
+    ],
+  },
 ];
