@@ -12,7 +12,7 @@ Son güncelleme: 2026-10-27. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- `a2-4-catalog`: kategori, grup, ekstra, etiket ve ayar yönetimi; ürün etiketleri; WiFi geçmiş maskelemesi ve test WiFi uyarısı. PR açılacak.
+- PR #8 (`a2-4-catalog`): kategori, grup, ekstra, etiket ve ayar yönetimi; ürün etiketleri; WiFi geçmiş maskelemesi ve test WiFi uyarısı.
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı var; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
