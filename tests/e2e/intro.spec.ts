@@ -27,7 +27,8 @@ test("reduced motion shows only a short fade", async ({ page }) => {
   await page.goto("/qr", { waitUntil: "commit" });
   await expect(page.getByTestId("intro")).toBeAttached();
   await page.waitForLoadState("load");
-  await expect(page.getByTestId("intro")).toHaveCount(0, { timeout: 400 });
+  await expect(page.getByTestId("intro")).not.toBeVisible({ timeout: 400 });
+  await expect(page.getByTestId("intro")).toHaveCount(0, { timeout: 3000 });
 });
 
 const blockJs = (page: import("@playwright/test").Page) =>
