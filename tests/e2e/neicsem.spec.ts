@@ -2,36 +2,42 @@ import { test, expect } from "@playwright/test";
 import { openMenu } from "./helpers/menu";
 
 const names = (page: import("@playwright/test").Page) => page.getByTestId("neicsem-name");
+const reels = (page: import("@playwright/test").Page) => page.getByTestId("neicsem-reel");
 
-test("opens in place, spins the three icons and lands on three different drinks", async ({ page }) => {
+test("opens in place and all three boxes land on the same drink", async ({ page }) => {
   await openMenu(page);
   const before = await page.evaluate(() => history.length);
   await page.getByTestId("neicsem-tile").click();
   await expect(page.getByTestId("neicsem-open")).toBeVisible();
   expect(new URL(page.url()).pathname).toBe("/qr");
   expect(await page.evaluate(() => history.length)).toBe(before);
-  await expect(page.getByTestId("neicsem-reel")).toHaveCount(3);
-  await expect(page.getByTestId("neicsem-reel").first().locator(".brand-icon").first()).toBeAttached();
-  await expect(names(page)).toHaveCount(3, { timeout: 4000 });
-  const texts = await names(page).allTextContents();
-  expect(new Set(texts).size).toBe(3);
+  await expect(reels(page)).toHaveCount(3);
+  await expect(reels(page).first().locator(".brand-icon").first()).toBeAttached();
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
+  const name = (await names(page).textContent())!;
+  const labels = await reels(page).evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")));
+  expect(new Set(labels).size).toBe(1);
+  expect(labels[0]).toContain(name);
+  const slugs = await reels(page).evaluateAll((els) => els.map((e) => e.getAttribute("data-open-product")));
+  expect(new Set(slugs).size).toBe(1);
 });
 
-test("tapping a result opens its detail", async ({ page }) => {
+test("tapping a box opens the chosen drink", async ({ page }) => {
   await openMenu(page);
   await page.getByTestId("neicsem-tile").click();
-  await expect(names(page)).toHaveCount(3, { timeout: 4000 });
-  const first = (await names(page).first().textContent())!;
-  await page.getByTestId("neicsem-reel").first().click();
-  await expect(page.getByTestId("product-sheet").getByRole("heading")).toHaveText(first);
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
+  const name = (await names(page).textContent())!;
+  await reels(page).nth(1).click();
+  await expect(page.getByTestId("product-sheet").getByRole("heading")).toHaveText(name);
 });
 
-test("spin again ignores taps while spinning", async ({ page }) => {
+test("spin again ignores taps while spinning and picks a different drink", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await openMenu(page);
   await page.getByTestId("neicsem-tile").click();
-  await expect(names(page)).toHaveCount(3, { timeout: 4000 });
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
+  const firstPick = await names(page).textContent();
   const again = page.getByRole("button", { name: "Tekrar çevir" });
   const t0 = Date.now();
   await again.click();
@@ -39,11 +45,12 @@ test("spin again ignores taps while spinning", async ({ page }) => {
   await again.click({ force: true });
   await page.waitForTimeout(40);
   await again.click({ force: true });
-  await expect(names(page)).toHaveCount(3, { timeout: 4000 });
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
   expect(Date.now() - t0).toBeLessThan(3600);
-  const first = await names(page).allTextContents();
+  const second = await names(page).textContent();
+  expect(second).not.toBe(firstPick);
   await page.waitForTimeout(1500);
-  expect(await names(page).allTextContents()).toEqual(first);
+  expect(await names(page).textContent()).toBe(second);
   expect(errors).toEqual([]);
 });
 
@@ -56,14 +63,14 @@ test("moves focus into the panel and back to the square", async ({ page }) => {
   await expect(page.getByTestId("neicsem-tile")).toBeFocused();
 });
 
-test("announces the suggestions and labels each box with its price", async ({ page }) => {
+test("announces the suggestion and labels each box with its price", async ({ page }) => {
   await openMenu(page);
   await page.getByTestId("neicsem-tile").click();
-  await expect(names(page)).toHaveCount(3, { timeout: 4000 });
-  const n = await names(page).allTextContents();
-  await expect(page.getByTestId("neicsem-live")).toHaveText(`Önerilerimiz: ${n.join(", ")}`);
-  const price = await page.getByTestId("neicsem-open").locator(".ne-result__price").first().textContent();
-  await expect(page.getByTestId("neicsem-reel").first()).toHaveAttribute("aria-label", `${n[0]}, ${price}`);
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
+  const name = await names(page).textContent();
+  await expect(page.getByTestId("neicsem-live")).toHaveText(`Önerimiz: ${name}`);
+  const price = await page.getByTestId("neicsem-open").locator(".ne-result__price").textContent();
+  await expect(reels(page).first()).toHaveAttribute("aria-label", `${name}, ${price}`);
 });
 
 test("close returns the square", async ({ page }) => {
@@ -74,16 +81,16 @@ test("close returns the square", async ({ page }) => {
   await expect(page.getByTestId("neicsem-open")).toHaveCount(0);
 });
 
-test("reduced motion shows results without spinning", async ({ page }) => {
+test("reduced motion shows the suggestion without spinning", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openMenu(page);
   await page.getByTestId("neicsem-tile").click();
-  await expect(names(page)).toHaveCount(3, { timeout: 400 });
+  await expect(names(page)).toHaveCount(1, { timeout: 400 });
 });
 
 test("works when photos fail to load", async ({ page }) => {
   await page.route("**/qr/img/**", (r) => r.abort());
   await openMenu(page);
   await page.getByTestId("neicsem-tile").click();
-  await expect(names(page)).toHaveCount(3, { timeout: 4000 });
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
 });
