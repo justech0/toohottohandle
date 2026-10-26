@@ -2,10 +2,12 @@ import type { Pool, PoolConnection, RowDataPacket } from "mysql2/promise";
 import { formatPrice } from "@/lib/format/price";
 import type { MenuVariant, VariantKey } from "@/lib/menu/types";
 import type { ProductRow, VariantRow } from "@/lib/db/rows";
+import { normalizeForSearch } from "@/lib/text/normalize";
 import { priceChanges, sizeSetOf, type ProductInput } from "./productInput";
 
 /** Ürünün geçmişe yazılan tam hali: satır + boylar (spec 4.4: geri alınan ürün eksik dönmez). */
 interface ProductSnapshot { product: Omit<ProductRow, "sold_out_until"> & { sold_out_until: string | null }; variants: Omit<VariantRow, "id">[] }
+interface OrderSnapshot { products: { id: number; sortOrder: number }[] }
 
 export interface AdminProduct { id: number; name: string; categoryId: number; isVisible: boolean; soldOutUntil: string | null; variants: MenuVariant[] }
 export interface AdminCategory { id: number; name: string; groupName: string }
@@ -65,6 +67,17 @@ async function writeProduct(conn: PoolConnection, id: number, cols: Record<strin
   ]);
 }
 
+async function restoreProduct(conn: PoolConnection, value: ProductSnapshot): Promise<void> {
+  const product = { ...value.product, sold_out_until: value.product.sold_out_until ? new Date(value.product.sold_out_until) : null };
+  const keys = Object.keys(product);
+  await conn.query(`INSERT INTO products (${keys.join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`, keys.map((key) => product[key as keyof typeof product]));
+  if (value.variants.length) {
+    await conn.query("INSERT INTO product_variants (product_id, label_key, price_kurus, sort_order) VALUES ?", [
+      value.variants.map((variant) => [product.id, variant.label_key, variant.price_kurus, variant.sort_order]),
+    ]);
+  }
+}
+
 async function inTx<T>(pool: Pool, fn: (c: PoolConnection) => Promise<T>): Promise<T> {
   const conn = await pool.getConnection();
   try {
@@ -81,6 +94,56 @@ async function inTx<T>(pool: Pool, fn: (c: PoolConnection) => Promise<T>): Promi
 }
 
 const touchMenu = (c: PoolConnection) => c.query("UPDATE settings SET menu_updated_at = CURRENT_TIMESTAMP(3) WHERE id = 1");
+
+async function audit(
+  c: PoolConnection,
+  adminId: number,
+  entityId: number,
+  action: string,
+  summary: string,
+  before: unknown,
+  after: unknown,
+): Promise<void> {
+  await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, 'product', ?, ?, ?, ?, ?)", [
+    adminId, entityId, action, summary.slice(0, 255), before === null ? null : JSON.stringify(before), after === null ? null : JSON.stringify(after),
+  ]);
+}
+
+const bool = (value: boolean | null) => (value === null ? null : value ? 1 : 0);
+
+function inputColumns(input: ProductInput): Record<string, unknown> {
+  return {
+    name: input.name, category_id: input.categoryId, desc_tr: input.descTr, ingredients_tr: input.ingredientsTr, temp: input.temp,
+    in_suggest: bool(input.inSuggest), is_new: bool(input.isNew), is_featured: bool(input.isFeatured), is_visible: bool(input.isVisible),
+  };
+}
+
+async function uniqueSlug(c: PoolConnection, name: string): Promise<string> {
+  const stem = normalizeForSearch(name).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 88) || "urun";
+  const [rows] = await c.query<Rows>("SELECT slug FROM products WHERE slug = ? OR slug LIKE ?", [stem, `${stem}-%`]);
+  const used = new Set(rows.map((row) => String(row.slug)));
+  if (!used.has(stem)) return stem;
+  for (let suffix = 2; suffix < 10000; suffix++) {
+    const candidate = `${stem}-${suffix}`;
+    if (!used.has(candidate)) return candidate;
+  }
+  throw new Error("Ürün adı için benzersiz adres oluşturulamadı.");
+}
+
+async function menuSnapshotData(c: PoolConnection): Promise<Record<string, unknown[]>> {
+  const query = async (sql: string) => (await c.query<Rows>(sql))[0];
+  const [groups, categories, products, variants, extras, extraCategories, settings] = await Promise.all([
+    query("SELECT * FROM menu_groups"), query("SELECT * FROM categories"), query("SELECT * FROM products"),
+    query("SELECT * FROM product_variants"), query("SELECT * FROM extras"), query("SELECT * FROM extra_categories"),
+    query("SELECT id, wifi_ssid, wifi_username, wifi_note_tr, wifi_note_en, wifi_note_ar, opening_time, footer_note_tr, footer_note_en, footer_note_ar, stats_enabled, menu_updated_at, last_backup_at FROM settings WHERE id = 1"),
+  ]);
+  return { groups, categories, products, variants, extras, extraCategories, settings };
+}
+
+async function snapshotMenuBeforeDelete(c: PoolConnection, productName: string): Promise<void> {
+  await c.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [`${productName} silme öncesi`, JSON.stringify(await menuSnapshotData(c))]);
+  await c.query("DELETE FROM menu_snapshots WHERE id NOT IN (SELECT id FROM (SELECT id FROM menu_snapshots ORDER BY id DESC LIMIT 25) AS kept)");
+}
 
 function summarize(before: ProductSnapshot, input: ProductInput): string {
   const changes = priceChanges(
@@ -99,13 +162,9 @@ export async function saveProduct(pool: Pool, adminId: number, id: number, input
     if (!before) throw new Error("Ürün bulunamadı.");
     const [[cat]] = await c.query<Rows>("SELECT id FROM categories WHERE id = ?", [input.categoryId]);
     if (!cat) throw new Error("Kategori bulunamadı.");
-    const b = (v: boolean | null) => (v === null ? null : v ? 1 : 0);
     await writeProduct(
       c, id,
-      {
-        name: input.name, category_id: input.categoryId, desc_tr: input.descTr, ingredients_tr: input.ingredientsTr, temp: input.temp,
-        in_suggest: b(input.inSuggest), is_new: b(input.isNew), is_featured: b(input.isFeatured), is_visible: b(input.isVisible),
-      },
+      inputColumns(input),
       input.variants.map((v, i) => ({ label_key: v.key, price_kurus: v.priceKurus, sort_order: i })),
     );
     const after = await snapshot(c, id);
@@ -115,6 +174,104 @@ export async function saveProduct(pool: Pool, adminId: number, id: number, input
     ]);
     await touchMenu(c);
     return { summary };
+  });
+}
+
+/** Ürünü kategori sonuna ekler. */
+export async function createProduct(pool: Pool, adminId: number, input: ProductInput): Promise<{ id: number; slug: string }> {
+  return inTx(pool, async (c) => {
+    const [[category]] = await c.query<Rows>("SELECT id FROM categories WHERE id = ? FOR UPDATE", [input.categoryId]);
+    if (!category) throw new Error("Kategori bulunamadı.");
+    const slug = await uniqueSlug(c, input.name);
+    const [[order]] = await c.query<Rows>("SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order FROM products WHERE category_id = ?", [input.categoryId]);
+    const columns = { slug, ...inputColumns(input), sort_order: Number(order.next_order) };
+    const keys = Object.keys(columns);
+    const [result] = await c.query(`INSERT INTO products (${keys.join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`, keys.map((key) => columns[key as keyof typeof columns]));
+    const id = (result as { insertId: number }).insertId;
+    await c.query("INSERT INTO product_variants (product_id, label_key, price_kurus, sort_order) VALUES ?", [
+      input.variants.map((variant, index) => [id, variant.key, variant.priceKurus, index]),
+    ]);
+    const after = await snapshot(c, id);
+    await audit(c, adminId, id, "create", `${input.name}: eklendi`, null, after);
+    await touchMenu(c);
+    return { id, slug };
+  });
+}
+
+/** Ürünü tüm alanları, boyları ve fotoğraf anahtarıyla çoğaltır. */
+export async function duplicateProduct(pool: Pool, adminId: number, id: number): Promise<{ id: number }> {
+  return inTx(pool, async (c) => {
+    const source = await snapshot(c, id, true);
+    if (!source) throw new Error("Ürün bulunamadı.");
+    const name = `${source.product.name} Kopya`;
+    const slug = await uniqueSlug(c, name);
+    await c.query("UPDATE products SET sort_order = sort_order + 1 WHERE category_id = ? AND sort_order > ?", [source.product.category_id, source.product.sort_order]);
+    const product = { ...source.product, id: undefined, slug, name, sort_order: source.product.sort_order + 1, sold_out_until: source.product.sold_out_until ? new Date(source.product.sold_out_until) : null };
+    const keys = Object.keys(product).filter((key) => key !== "id");
+    const [result] = await c.query(`INSERT INTO products (${keys.join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`, keys.map((key) => product[key as keyof typeof product]));
+    const copyId = (result as { insertId: number }).insertId;
+    await c.query("INSERT INTO product_variants (product_id, label_key, price_kurus, sort_order) VALUES ?", [
+      source.variants.map((variant) => [copyId, variant.label_key, variant.price_kurus, variant.sort_order]),
+    ]);
+    const after = await snapshot(c, copyId);
+    await audit(c, adminId, copyId, "duplicate", `${name}: çoğaltıldı`, null, after);
+    await touchMenu(c);
+    return { id: copyId };
+  });
+}
+
+export async function setProductSoldOut(pool: Pool, adminId: number, id: number, until: string | null): Promise<void> {
+  await inTx(pool, async (c) => {
+    const before = await snapshot(c, id, true);
+    if (!before) throw new Error("Ürün bulunamadı.");
+    const target = until === null ? null : new Date(until);
+    if (target && Number.isNaN(target.getTime())) throw new Error("Tükendi süresi geçersiz.");
+    await c.query("UPDATE products SET sold_out_until = ? WHERE id = ?", [target, id]);
+    const after = await snapshot(c, id);
+    await audit(c, adminId, id, "sold_out", `${before.product.name}: ${target ? "tükendi" : "tekrar satışta"}`, before, after);
+    await touchMenu(c);
+  });
+}
+
+export async function setProductVisibility(pool: Pool, adminId: number, id: number, visible: boolean): Promise<void> {
+  await inTx(pool, async (c) => {
+    const before = await snapshot(c, id, true);
+    if (!before) throw new Error("Ürün bulunamadı.");
+    await c.query("UPDATE products SET is_visible = ? WHERE id = ?", [visible ? 1 : 0, id]);
+    const after = await snapshot(c, id);
+    await audit(c, adminId, id, "visibility", `${before.product.name}: ${visible ? "görünür" : "gizli"}`, before, after);
+    await touchMenu(c);
+  });
+}
+
+export async function deleteProduct(pool: Pool, adminId: number, id: number): Promise<void> {
+  await inTx(pool, async (c) => {
+    const before = await snapshot(c, id, true);
+    if (!before) throw new Error("Ürün bulunamadı.");
+    await snapshotMenuBeforeDelete(c, before.product.name);
+    await c.query("DELETE FROM products WHERE id = ?", [id]);
+    await audit(c, adminId, id, "delete", `${before.product.name}: silindi`, before, null);
+    await touchMenu(c);
+  });
+}
+
+export async function moveProduct(pool: Pool, adminId: number, id: number, direction: "up" | "down"): Promise<void> {
+  await inTx(pool, async (c) => {
+    const beforeProduct = await snapshot(c, id, true);
+    if (!beforeProduct) throw new Error("Ürün bulunamadı.");
+    const operator = direction === "up" ? "<" : ">";
+    const order = direction === "up" ? "DESC" : "ASC";
+    const [[neighbor]] = await c.query<Rows>(
+      `SELECT id, sort_order FROM products WHERE category_id = ? AND (sort_order ${operator} ? OR (sort_order = ? AND id ${operator} ?)) ORDER BY sort_order ${order}, id ${order} LIMIT 1 FOR UPDATE`,
+      [beforeProduct.product.category_id, beforeProduct.product.sort_order, beforeProduct.product.sort_order, id],
+    );
+    if (!neighbor) throw new Error(direction === "up" ? "Ürün zaten ilk sırada." : "Ürün zaten son sırada.");
+    const before: OrderSnapshot = { products: [{ id, sortOrder: beforeProduct.product.sort_order }, { id: neighbor.id, sortOrder: neighbor.sort_order }] };
+    await c.query("UPDATE products SET sort_order = ? WHERE id = ?", [neighbor.sort_order, id]);
+    await c.query("UPDATE products SET sort_order = ? WHERE id = ?", [beforeProduct.product.sort_order, neighbor.id]);
+    const after: OrderSnapshot = { products: [{ id, sortOrder: neighbor.sort_order }, { id: neighbor.id, sortOrder: beforeProduct.product.sort_order }] };
+    await audit(c, adminId, id, "reorder", `${beforeProduct.product.name}: ${direction === "up" ? "yukarı" : "aşağı"} taşındı`, before, after);
+    await touchMenu(c);
   });
 }
 
@@ -131,16 +288,27 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
   return inTx(pool, async (c) => {
     const [[top]] = await c.query<Rows>("SELECT * FROM audit_log ORDER BY id DESC LIMIT 1 FOR UPDATE");
     if (!top || top.action === "undo" || top.undone_by !== null) throw new Error("Geri alınacak işlem yok.");
-    if (top.entity !== "product" || top.action !== "update") throw new Error("Bu işlem geri alınamıyor.");
-    const before = JSON.parse(top.before_json) as ProductSnapshot;
-    const { id, slug: _s, image_key: _i, image_focus_x: _x, image_focus_y: _y, sort_order: _o, ...cols } = before.product;
-    await writeProduct(
-      c, id,
-      { ...cols, sold_out_until: cols.sold_out_until ? new Date(cols.sold_out_until) : null },
-      before.variants.map(({ product_id: _p, ...v }) => v),
-    );
+    if (top.entity !== "product") throw new Error("Bu işlem geri alınamıyor.");
+    if (["update", "sold_out", "visibility"].includes(top.action)) {
+      const before = JSON.parse(top.before_json) as ProductSnapshot;
+      const { id, ...cols } = before.product;
+      await writeProduct(c, id, { ...cols, sold_out_until: cols.sold_out_until ? new Date(cols.sold_out_until) : null }, before.variants.map(({ product_id: _p, ...variant }) => variant));
+    } else if (top.action === "create") {
+      await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
+    } else if (top.action === "duplicate") {
+      const after = JSON.parse(top.after_json) as ProductSnapshot;
+      await c.query("DELETE FROM products WHERE id = ?", [top.entity_id]);
+      await c.query("UPDATE products SET sort_order = sort_order - 1 WHERE category_id = ? AND sort_order > ?", [after.product.category_id, after.product.sort_order]);
+    } else if (top.action === "delete") {
+      await restoreProduct(c, JSON.parse(top.before_json) as ProductSnapshot);
+    } else if (top.action === "reorder") {
+      const before = JSON.parse(top.before_json) as OrderSnapshot;
+      for (const product of before.products) await c.query("UPDATE products SET sort_order = ? WHERE id = ?", [product.sortOrder, product.id]);
+    } else {
+      throw new Error("Bu işlem geri alınamıyor.");
+    }
     const summary = `Geri alındı: ${top.summary}`.slice(0, 255);
-    const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, 'product', ?, 'undo', ?)", [adminId, id, summary]);
+    const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, 'product', ?, 'undo', ?)", [adminId, top.entity_id, summary]);
     await c.query("UPDATE audit_log SET undone_by = ? WHERE id = ?", [(res as { insertId: number }).insertId, top.id]);
     await touchMenu(c);
     return { summary };
