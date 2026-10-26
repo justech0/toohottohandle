@@ -1,15 +1,15 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { countAdmins } from "@/lib/auth/core";
 import { getPool, hasDb } from "@/lib/db/client";
 import { setup } from "../actions";
 import { AuthForm } from "../_components/AuthForm";
 
-/** İlk admin hesabı. Admin varsa sayfa yoktur (404). Kod yalnızca sunucu kaydındadır. */
+/** İlk admin hesabı. Admin varsa giriş sayfasına gider. Kod yalnızca sunucu kaydındadır. */
 async function Content() {
   await connection();
-  if (!hasDb() || (await countAdmins(getPool())) > 0) notFound();
+  if (!hasDb() || (await countAdmins(getPool())) > 0) redirect("/qr/admin/giris");
   return (
     <AuthForm
       action={setup}

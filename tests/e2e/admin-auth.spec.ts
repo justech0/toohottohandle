@@ -43,8 +43,11 @@ test("setup with the logged code creates the admin and signs in", async ({ page 
   await page.getByRole("button", { name: "Hesabı oluştur" }).click();
   await expect(page).toHaveURL(/\/qr\/admin$/);
   await expect(page.getByTestId("admin-email")).toHaveText(EMAIL);
-  const res = await page.request.get("/qr/admin/kurulum");
-  expect(res.status()).toBe(404);
+  // Admin varken kurulum ve kodsuz sıfırlama sayfası açılmaz.
+  await page.goto("/qr/admin/kurulum");
+  await expect(page).toHaveURL(/\/qr\/admin$/);
+  await page.goto("/qr/admin/sifirla");
+  await expect(page).toHaveURL(/\/qr\/admin$/);
 });
 
 test("wrong password is refused, right one signs in, logout signs out", async ({ page }) => {

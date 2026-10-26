@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { hasCode } from "@/lib/auth/oneTimeCode";
 import { resetPassword } from "../actions";
 import { AuthForm } from "../_components/AuthForm";
@@ -8,7 +8,7 @@ import { AuthForm } from "../_components/AuthForm";
 /** Yalnızca sunucu bir sıfırlama kodu ürettiyse açılır (lib/auth/resetFlag.ts). */
 async function Content() {
   await connection();
-  if (!hasCode("reset")) notFound();
+  if (!hasCode("reset")) redirect("/qr/admin/giris");
   return (
     <AuthForm
       action={resetPassword}
