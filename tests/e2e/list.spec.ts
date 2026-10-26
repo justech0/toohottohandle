@@ -8,6 +8,18 @@ test("two-size price is read out in full", async ({ page }) => {
   await expect(row(page, "caramel-macchiato").getByTestId("price-full")).toHaveText("Normal 210 ₺ · Büyük 230 ₺");
 });
 
+test("prices sit in clean chips, not starburst stickers", async ({ page }) => {
+  await openMenu(page);
+  await expect(page.locator("main .star")).toHaveCount(0);
+  const chips = row(page, "cappuccino").locator(".chip");
+  await expect(chips).toHaveCount(2);
+  await expect(chips.nth(0)).toContainText("Normal");
+  await expect(chips.nth(0)).toContainText("180 ₺");
+  await expect(chips.nth(1)).toContainText("Büyük");
+  await expect(row(page, "ton-balikli-sandvic").locator(".chip")).toHaveText("370 ₺");
+  await expect(row(page, "cortado").locator(".chip")).toHaveText("170 ₺");
+});
+
 test("photo-less cards use the group color", async ({ page }) => {
   await openMenu(page);
   const card = row(page, "cortado").locator("button");

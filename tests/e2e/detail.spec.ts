@@ -54,10 +54,11 @@ test("size buttons highlight the tapped size", async ({ page }) => {
   await expect(sizes.nth(0)).toHaveAttribute("aria-pressed", "false");
 });
 
-test("a single price sits in the big star", async ({ page }) => {
+test("a single price shows plainly, without a starburst", async ({ page }) => {
   await openMenu(page);
   await openRow(page, "cortado");
   await expect(page.getByTestId("sheet-price")).toHaveText("170 ₺");
+  await expect(page.locator(".sheet__star, .star__bg")).toHaveCount(0);
   await expect(page.getByTestId("sheet-size")).toHaveCount(0);
 });
 

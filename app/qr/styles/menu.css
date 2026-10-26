@@ -68,29 +68,21 @@ html[data-hero-visible="false"] .topbar .icon-btn { color: var(--c-ink); backgro
   border-radius: 18px; font-family: var(--f-text); }
 .card--photo { min-height: 236px; padding: 0 0 14px; background: var(--c-white); color: var(--c-ink); }
 .card__img { width: 100%; height: 156px; object-fit: cover; border-radius: 18px 18px 0 0; display: block; background: var(--c-line); }
-.card--photo .card__name { padding: 12px 12px 0; padding-right: 60px; font: 600 14px/1.2 var(--f-text); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: anywhere; }
+.card--photo .card__name { padding: 12px 12px 0; font: 600 14px/1.2 var(--f-text); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: anywhere; }
 .card__cat { padding: 4px 12px 0; font: 600 10px/1.2 var(--f-text); letter-spacing: .14em; text-transform: uppercase; color: var(--c-ink-soft); }
 .card--plain { min-height: 132px; padding: 12px 12px 12px; gap: 10px; justify-content: space-between; background: var(--gc); color: var(--gt); }
 .card__icon { height: 30px; }
 .card--plain .card__name { font: 800 16px/1.1 var(--f-display); overflow-wrap: anywhere; hyphens: auto; }
-.card__price { display: flex; flex-wrap: wrap; gap: 2px 8px; font: 600 14px/1.2 var(--f-text); font-variant-numeric: tabular-nums; }
-.card__price bdi { white-space: nowrap; }
 .card__out { margin-top: auto; padding: 6px 10px; border-radius: 8px; background: var(--c-ink); color: var(--c-paper); font: 600 13px/1 var(--f-text); }
 .card--photo .card__out { margin: 10px 12px 0; }
 .card--out .card__img { filter: grayscale(1); }
 
-/* Yıldız fiyat rozeti (resmi yıldız maskesi) */
-.stars { position: absolute; right: -4px; top: 118px; display: flex; flex-direction: column; align-items: center; gap: 0; }
-.star { position: relative; display: grid; place-items: center; }
-.star--main { width: 66px; height: 66px; color: var(--c-white); }
-.star--alt { width: 52px; height: 52px; margin-top: -10px; color: var(--c-ink); }
-.star__bg { position: absolute; inset: 0; -webkit-mask: url(/qr/brand/star.png) center / contain no-repeat; mask: url(/qr/brand/star.png) center / contain no-repeat; }
-.star--main .star__bg { background: var(--c-red); }
-.star--alt .star__bg { background: var(--c-yellow); }
-.star__txt { position: relative; display: flex; flex-direction: column; align-items: center; line-height: 1; font-variant-numeric: tabular-nums; }
-.star--main .star__txt { font: 600 13px/1 var(--f-text); }
-.star--alt .star__txt { font: 600 11px/1 var(--f-text); }
-.star__txt small { font-size: 9px; letter-spacing: .08em; margin-bottom: 1px; }
+/* Sade fiyat kutucukları */
+.card__prices { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.card--photo .card__prices { padding: 10px 12px 0; }
+.chip { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 7px 10px 6px; border-radius: 10px;
+  background: var(--c-paper); color: var(--c-ink); font: 600 14px/1 var(--f-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip small { font: 600 9.5px/1 var(--f-text); letter-spacing: .12em; text-transform: uppercase; color: var(--c-ink-soft); }
 
 .extras { margin: 10px 4px 0; font: 500 13.5px/1.45 var(--f-text); color: var(--c-ink-soft); }
 
@@ -125,11 +117,9 @@ html[data-hero-visible="false"] .topbar .icon-btn { color: var(--c-ink); backgro
 .sheet__cat { margin: 0 0 8px; font: 600 12px/1.2 var(--f-text); text-transform: uppercase; letter-spacing: .16em; }
 .sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .sheet__title { margin: 0; font: 800 clamp(26px, 8vw, 34px)/1 var(--f-display); text-transform: uppercase; letter-spacing: -.01em; overflow-wrap: anywhere; }
-.sheet__star { position: relative; flex: none; width: 96px; height: 96px; display: grid; place-items: center; margin-top: -58px; color: var(--c-red-text); }
-.sheet__star .star__bg { position: absolute; inset: 0; background: var(--c-white); -webkit-mask: url(/qr/brand/star.png) center / contain no-repeat; mask: url(/qr/brand/star.png) center / contain no-repeat; }
-.sheet__panel--full .sheet__star { margin-top: -8px; }
-.sheet__star-txt { position: relative; display: flex; flex-direction: column; align-items: center; font: 800 17px/1 var(--f-display); }
-.sheet__star-txt small { font: 600 10px/1.2 var(--f-text); letter-spacing: .08em; }
+.sheet__tag { flex: none; display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; padding: 10px 14px; border-radius: 14px;
+  background: var(--c-paper); color: var(--c-ink); font: 800 22px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.sheet__tag small { font: 600 10px/1 var(--f-text); letter-spacing: .12em; text-transform: uppercase; color: var(--c-ink-soft); }
 .sheet__sizes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 20px; }
 .sheet__size { min-height: 56px; border-radius: 16px; border: 2px solid currentColor; background: none; color: inherit; font: 600 16px/1.2 var(--f-text); cursor: pointer; }
 .sheet__size[aria-pressed="true"] { background: var(--c-white); color: var(--c-ink); border-color: var(--c-white); }
@@ -217,8 +207,8 @@ html.intro-seen .intro { display: none; }
 .ne-frame__icon { height: 48%; }
 .ne-frame--result { background: var(--gc); color: var(--gt); }
 .ne-frame--result img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ne-result { padding: 6px 2px 0; animation: fade .3s ease; }
-.ne-result__name { margin: 0; font: 600 13px/1.2 var(--f-text); overflow-wrap: anywhere; }
-.ne-result__price { margin: 2px 0 0; font: 600 12px/1.2 var(--f-text); color: var(--c-ink-soft); }
+.ne-result { padding: 10px 2px 0; text-align: center; animation: fade .3s ease; }
+.ne-result__name { margin: 0; font: 800 18px/1.15 var(--f-display); text-transform: uppercase; overflow-wrap: break-word; }
+.ne-result__price { margin: 4px 0 0; font: 600 14px/1.2 var(--f-text); color: var(--c-ink-soft); }
 .ne-again { display: block; width: 100%; min-height: var(--tap); margin-top: 12px; border: 0; border-radius: 999px; background: var(--c-ink); color: var(--c-paper); font: 600 15px/1 var(--f-text); cursor: pointer; }
 .ne-again[aria-disabled="true"] { opacity: .55; }

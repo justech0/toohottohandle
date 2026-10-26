@@ -45,7 +45,8 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   const spin = () => {
     if (spinning) return;
     clear();
-    const next = pickSuggestions(pool, 3, Math.random, lastPicks.current);
+    // Tek öneri: üç kutu da aynı içecekte hizalanır (Enes, 2026-10-26).
+    const next = pickSuggestions(pool, 1, Math.random, lastPicks.current);
     lastPicks.current = next;
     setPicks(next);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -94,7 +95,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
       ) : (
         <>
           <div className="ne-reels">
-            {picks.map((p, k) => {
+            {(picks[0] ? [0, 1, 2].map(() => picks[0]) : []).map((p, k) => {
               const y = phase === "reset" ? 0 : -((FRAMES - 1) / FRAMES) * 100;
               const style = {
                 transform: `translateY(${y}%)`,
@@ -131,18 +132,18 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                       </span>
                     </span>
                   </button>
-                  {phase === "done" ? (
-                    <div className="ne-result" aria-hidden="true">
-                      <p className="ne-result__name" data-testid="neicsem-name">{p.name}</p>
-                      <p className="ne-result__price">{p.full}</p>
-                    </div>
-                  ) : null}
                 </div>
               );
             })}
           </div>
+          {phase === "done" && picks[0] ? (
+            <div className="ne-result" aria-hidden="true">
+              <p className="ne-result__name" data-testid="neicsem-name">{picks[0].name}</p>
+              <p className="ne-result__price">{picks[0].full}</p>
+            </div>
+          ) : null}
           <p className="sr-only" aria-live="polite" data-testid="neicsem-live">
-            {phase === "done" ? `Önerilerimiz: ${picks.map((p) => p.name).join(", ")}` : ""}
+            {phase === "done" && picks[0] ? `Önerimiz: ${picks[0].name}` : ""}
           </p>
           <button type="button" className="ne-again" onClick={spin} aria-disabled={spinning}>
             Tekrar çevir
