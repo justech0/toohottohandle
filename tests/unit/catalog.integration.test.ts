@@ -26,7 +26,7 @@ describe.skipIf(!url)("catalog management (MariaDB)", () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z" });
     for (const table of [
       "audit_undo_secrets", "product_tags", "tags", "audit_log", "sessions", "login_attempts", "admins",
-      "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations",
+      "menu_snapshots", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations",
     ]) await pool.query(`DROP TABLE IF EXISTS ${table}`);
     await migrate(pool);
     await seedIfEmpty(pool);
