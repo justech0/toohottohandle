@@ -176,6 +176,44 @@ Yükleme koşulları, 45 ms kare süresi koruması, SVG'ye düşüş, görünmez
 Bitince Gemini (prompt 2) gerçek telefon görünümünde akıcılığı ve düşüşü raporlasın.
 ```
 
+## 12 · Codex — Geri bildirim (yalnızca admin görür) · dilim 5'ten (fotoğraf) sonra
+
+HVK'daki geri bildirimin THTH uyarlaması. Yorumlar menüde **hiç görünmez**, yalnızca admin'de okunur.
+
+```
+AGENTS.md'yi oku. main'den a2-feedback dalı. Kaynak fikir: HVK projesindeki geri bildirim
+(menüde form, admin'de liste); kod kopyalanmaz, bu repodaki kalıplarla yeniden yazılır.
+
+Menü (/qr):
+- Menünün sonunda, alt bilginin üstünde marka afişi gibi bir kart: "Nasıldı? Bize yaz" (resmi tavşan ikonu,
+  BrandIcon). Dokununca ürün detayı gibi alttan açılan sayfa; geri tuşu davranışı lib/ui/historySheet ile aynı.
+- Alanlar: konu (Lezzet ve kalite / Hizmet hızı / Personel / Hijyen / Diğer, zorunlu), puan 1-5 (yıldız ikonuyla,
+  erişilebilir radio grubu, zorunlu), mesaj (zorunlu, en fazla 1000 karakter), adın (isteğe bağlı, boşsa "Misafir"),
+  iletişim (isteğe bağlı, telefon ya da e-posta; altında "Yalnızca sana dönüş yapmak için kullanılır."),
+  fotoğraf (isteğe bağlı, tek; dilim 5'teki tarayıcıda küçültme ve sunucu doğrulaması aynen).
+- Gönderince: "Teşekkürler, ekibimize ulaştı." Hata metinleri Türkçe, role="alert". Form hata sonrası yazılanı korur.
+- Kötüye kullanım: gizli tuzak alan (honeypot), IP başına saatte en fazla 5 gönderim (bellekte, lib/auth/clientIp),
+  aynı mesaj 10 dk içinde ikinci kez kabul edilmez. Reddedilen isteğe nedenini söyleme, kısa genel mesaj ver.
+- Gönderim Server Action ile (requireAdmin YOK, ama girdi zod-benzeri elle doğrulanır). updateTag gerekmez.
+
+Veri: migration 00X_feedback → feedbacks (id, created_at, topic ENUM, rating TINYINT CHECK 1-5, message TEXT,
+name VARCHAR(80) NULL, contact VARCHAR(120) NULL, image_key VARCHAR(96) NULL, is_read TINYINT DEFAULT 0, lang CHAR(2)).
+IP saklanmaz. Fotoğraf THTH_UPLOAD_DIR/feedback altında; yalnızca admin oturumuyla verilir
+(GET /qr/api/admin/feedback-image/[key], requireAdmin), menüdeki /qr/foto yolundan ERİŞİLEMEZ.
+
+Admin:
+- /qr/admin/geri-bildirim: en yeni üstte kartlar (tarih Europe/Istanbul, yıldız, konu, ad, iletişim, mesaj, fotoğraf
+  küçük resmi → tıklayınca büyük). Filtre: konu, puan, okunmamış. Okundu işaretle. Sil (sayfa içi <dialog> ile onay,
+  native confirm yok; fotoğraf dosyası da silinir). Sayfalama 30'ar.
+- Admin ana sayfası: "Geri bildirim" kartı: okunmamış sayısı + son 3 mesajın ilk satırı + ortalama puan (son 30 gün).
+- Geri bildirimler audit_log/undo dışında (menü verisi değil); silme kalıcıdır, onay metni bunu söyler.
+- Yedek ZIP'e (dilim 7) girmez.
+
+Test önce: birim (doğrulama, oran sınırı, honeypot), entegrasyon (kayıt, filtre, okundu, sil + dosya),
+e2e (menüden gönder → admin'de gör → okundu → sil; geri tuşu sayfayı kapatır; 390px'te taşma yok).
+Sonra Gemini incelemesi (prompt 2) bu ekranlar için. Bitti tanımı ve PR kuralları 3b ile aynı.
+```
+
 ## 11 · Claude — PR incelemesi (her PR'da)
 
 ```

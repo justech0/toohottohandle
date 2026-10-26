@@ -7,25 +7,26 @@ Son güncelleme: 2026-10-26. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 - `/` yakında sayfası, `/qr` menü (v1 "Afiş" tasarımı: vitrin, grup afişleri, Ne içsem, fiyat çipleri, arama, WiFi, detay).
 - MySQL veritabanı: açılışta şema + seed (19 kategori, 129 ürün, 4 ekstra). Menü veritabanından, önbellekli.
 - Foto klasörü `THTH_UPLOAD_DIR` deploy sonrası kalıcı (doğrulandı).
-- Admin: kurulum (kayıttaki kodla), giriş, kilit, sıfırlama, çıkış (PR #4).
+- Admin: kurulum (kayıttaki kodla), giriş, kilit, sıfırlama, çıkış (PR #4); ürün listesi/düzenleme, fiyat onayı, geçmiş, son işlemi geri al (PR #5).
 - DNS hâlâ Vercel'i gösteriyor; alan adı bağlanınca SSL + HTTPS yönlendirmesi açılacak.
 
 ## Bekleyen PR
 
-- #5 `a2-3-products`: ürün listesi, ürün düzenleme, fiyat onayı, geçmiş, son işlemi geri al.
+- Yok.
 
 ## Sıradaki (sırayla)
 
 1. 3b — tükendi, görünür anahtarı, ekle / çoğalt / sil (kopya ile) / sıralama
 2. 4 — kategoriler, gruplar, ekstralar, etiketler, ayarlar (WiFi, açılış saati, alt not)
 3. 5 — fotoğraf yükleme
-4. 6 — toplu fiyat + menü kopyaları
-5. 7 — ZIP yedek / geri yükleme
-6. 8 — istatistik + logolu QR
-7. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
-8. EN + AR (RTL)
-9. 3D (A3)
-10. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
+4. Geri bildirim (HVK uyarlaması, yalnızca admin görür) — prompt 12
+5. 6 — toplu fiyat + menü kopyaları
+6. 7 — ZIP yedek / geri yükleme
+7. 8 — istatistik + logolu QR
+8. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
+9. EN + AR (RTL)
+10. 3D (A3)
+11. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
 
 ## Açık konular
 
