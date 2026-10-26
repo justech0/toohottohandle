@@ -153,6 +153,14 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     expect(restoredOrder).toEqual(beforeOrder);
   });
 
+  it("keeps the Kopya suffix when a maximum-length product name is duplicated", async () => {
+    const created = await createProduct(pool, adminId, input({ name: "A".repeat(160), price0: "175" }));
+    const copy = await duplicateProduct(pool, adminId, created.id);
+    const [[row]] = (await pool.query("SELECT name FROM products WHERE id = ?", [copy.id])) as unknown as [[{ name: string }]];
+    expect(row.name).toHaveLength(160);
+    expect(row.name.endsWith(" Kopya")).toBe(true);
+  });
+
   it("deletes after a complete menu snapshot, keeps 25 snapshots, and undo restores variants", async () => {
     const pid = await id("espresso");
     const beforeAudit = await auditCount();
@@ -169,6 +177,14 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     await expectMenuTouched();
     await undoLast(pool, adminId);
     expect((await menuProduct("espresso")).variants).toEqual([{ key: "tek", priceKurus: 11000 }, { key: "duble", priceKurus: 15000 }]);
+  });
+
+  it("deletes a maximum-length product while keeping the snapshot reason within its column", async () => {
+    const created = await createProduct(pool, adminId, input({ name: "B".repeat(160), price0: "175" }));
+    await deleteProduct(pool, adminId, created.id);
+    const [[latest]] = (await pool.query("SELECT reason FROM menu_snapshots ORDER BY id DESC LIMIT 1")) as unknown as [[{ reason: string }]];
+    expect(latest.reason.length).toBeLessThanOrEqual(120);
+    expect(latest.reason.endsWith(" silme öncesi")).toBe(true);
   });
 
   it("moves only inside the category with one audit row and undo restores the order", async () => {

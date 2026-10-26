@@ -22,6 +22,17 @@ export type SaveState = { error: string | null };
 export type OperationState = { error: string | null };
 
 const FIELDS = ["name", "categoryId", "descTr", "ingredientsTr", "temp", "inSuggest", "isNew", "isFeatured", "isVisible", "sizes", "price0", "price1"];
+const USER_ERRORS = new Set([
+  "Ürün bulunamadı.",
+  "Kategori bulunamadı.",
+  "Ürün adı için benzersiz adres oluşturulamadı.",
+  "Tükendi süresi geçersiz.",
+  "Ürün zaten ilk sırada.",
+  "Ürün zaten son sırada.",
+]);
+
+const safeError = (error: unknown, fallback: string) =>
+  error instanceof Error && USER_ERRORS.has(error.message) ? error.message : fallback;
 
 /** Kayıt doğrudan yayına çıkar; menü önbelleği aynı işlemde boşalır (spec 4.4, 5.2). */
 export async function saveProductAction(_: SaveState, f: FormData): Promise<SaveState> {
@@ -38,7 +49,7 @@ export async function saveProductAction(_: SaveState, f: FormData): Promise<Save
     if (creating) savedId = (await createProduct(getPool(), admin.adminId, parsed.value)).id;
     else await saveProduct(getPool(), admin.adminId, id, parsed.value);
   } catch (e) {
-    return { error: (e as Error).message || "Kaydedilemedi. Tekrar dene." };
+    return { error: safeError(e, "Kaydedilemedi. Tekrar dene.") };
   }
   updateTag("menu");
   redirect(`/qr/admin/urunler?kaydedildi=${savedId}${creating ? "&islem=eklendi" : ""}#p-${savedId}`);
@@ -87,7 +98,7 @@ export async function productOperationAction(_: OperationState, f: FormData): Pr
       return { error: "İşlem geçersiz." };
     }
   } catch (error) {
-    return { error: (error as Error).message || "İşlem tamamlanamadı. Tekrar dene." };
+    return { error: safeError(error, "İşlem tamamlanamadı. Tekrar dene.") };
   }
   updateTag("menu");
   redirect(`/qr/admin/urunler?islem=${result}#p-${targetId}`);

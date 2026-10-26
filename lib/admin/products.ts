@@ -142,8 +142,14 @@ async function menuSnapshotData(c: PoolConnection): Promise<Record<string, unkno
   return { groups, categories, products, variants, extras, extraCategories, settings };
 }
 
+function withBoundedSuffix(value: string, suffix: string, maxLength: number): string {
+  const suffixCharacters = [...suffix];
+  return [...value].slice(0, maxLength - suffixCharacters.length).join("") + suffix;
+}
+
 async function snapshotMenuBeforeDelete(c: PoolConnection, productName: string): Promise<void> {
-  await c.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [`${productName} silme öncesi`, JSON.stringify(await menuSnapshotData(c))]);
+  const reason = withBoundedSuffix(productName, " silme öncesi", 120);
+  await c.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [reason, JSON.stringify(await menuSnapshotData(c))]);
   await c.query("DELETE FROM menu_snapshots WHERE id NOT IN (SELECT id FROM (SELECT id FROM menu_snapshots ORDER BY id DESC LIMIT 25) AS kept)");
 }
 
@@ -205,7 +211,7 @@ export async function duplicateProduct(pool: Pool, adminId: number, id: number):
   return inTx(pool, async (c) => {
     const source = await snapshot(c, id, true);
     if (!source) throw new Error("Ürün bulunamadı.");
-    const name = `${source.product.name} Kopya`;
+    const name = withBoundedSuffix(source.product.name, " Kopya", 160);
     const slug = await uniqueSlug(c, name);
     await c.query("UPDATE products SET sort_order = sort_order + 1 WHERE category_id = ? AND sort_order > ?", [source.product.category_id, source.product.sort_order]);
     const product = { ...source.product, id: undefined, slug, name, sort_order: source.product.sort_order + 1, sold_out_until: source.product.sold_out_until ? new Date(source.product.sold_out_until) : null };
