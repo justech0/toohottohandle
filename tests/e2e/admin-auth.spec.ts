@@ -24,6 +24,10 @@ test("first visit leads to setup; bad code and short password are refused", asyn
   await page.getByLabel("Şifre (tekrar)").fill("kisa");
   await page.getByRole("button", { name: "Hesabı oluştur" }).click();
   await expect(page.getByTestId("form-error")).toHaveText("Şifre en az 10 karakter olmalı.");
+  // Hata sonrası e-posta ve kod kalır, şifreler boşalır.
+  await expect(page.getByLabel("E-posta")).toHaveValue(EMAIL);
+  await expect(page.getByLabel("Kurulum kodu")).toHaveValue("AAAA-BBBB-CCCC");
+  await expect(page.getByLabel("Şifre (tekrar)")).toHaveValue("");
   await page.getByLabel("Şifre (en az 10 karakter)").fill(PW);
   await page.getByLabel("Şifre (tekrar)").fill(PW);
   await page.getByRole("button", { name: "Hesabı oluştur" }).click();

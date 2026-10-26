@@ -11,7 +11,8 @@ import { takeCode } from "@/lib/auth/oneTimeCode";
 import { clearResetRequest } from "@/lib/auth/resetFlag";
 import { clearSessionCookie, requireAdmin, sessionToken, setSessionCookie } from "@/lib/auth/session";
 
-export type FormState = { error: string | null };
+/** Hata olunca e-posta ve kod geri gelir; şifreler asla geri gönderilmez. */
+export type FormState = { error: string | null; values?: Record<string, string> };
 
 const text = (f: FormData, k: string) => String(f.get(k) ?? "");
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,10 +32,11 @@ async function startSession(adminId: number): Promise<void> {
 export async function login(_: FormState, f: FormData): Promise<FormState> {
   const email = text(f, "email");
   const password = text(f, "password");
-  if (!email || !password) return { error: "E-posta ve şifreyi yaz." };
+  const values = { email };
+  if (!email || !password) return { error: "E-posta ve şifreyi yaz.", values };
   const r = await attemptLogin(getPool(), { ip: clientIp(await headers()), email, password: password.slice(0, 200) });
   if (!r.ok) {
-    return { error: r.reason === "locked" ? `Çok fazla yanlış deneme. ${r.minutes} dakika sonra tekrar dene.` : "E-posta ya da şifre yanlış." };
+    return { error: r.reason === "locked" ? `Çok fazla yanlış deneme. ${r.minutes} dakika sonra tekrar dene.` : "E-posta ya da şifre yanlış.", values };
   }
   await startSession(r.adminId);
   redirect("/qr/admin");
@@ -42,20 +44,22 @@ export async function login(_: FormState, f: FormData): Promise<FormState> {
 
 export async function setup(_: FormState, f: FormData): Promise<FormState> {
   const email = text(f, "email").trim();
-  if (!EMAIL.test(email)) return { error: "Geçerli bir e-posta yaz." };
+  const values = { email, code: text(f, "code") };
+  if (!EMAIL.test(email)) return { error: "Geçerli bir e-posta yaz.", values };
   const bad = checkNewPassword(text(f, "password"), text(f, "password2"));
-  if (bad) return { error: bad };
+  if (bad) return { error: bad, values };
   if ((await countAdmins(getPool())) > 0) return { error: "Admin hesabı zaten var. Giriş sayfasını kullan." };
-  if (!takeCode("setup", text(f, "code"))) return { error: "Kurulum kodu geçersiz. Sunucu kaydındaki son kodu kullan." };
+  if (!takeCode("setup", text(f, "code"))) return { error: "Kurulum kodu geçersiz. Sunucu kaydındaki son kodu kullan.", values };
   const id = await createFirstAdmin(getPool(), email, text(f, "password"));
   await startSession(id);
   redirect("/qr/admin");
 }
 
 export async function resetPassword(_: FormState, f: FormData): Promise<FormState> {
+  const values = { code: text(f, "code") };
   const bad = checkNewPassword(text(f, "password"), text(f, "password2"));
-  if (bad) return { error: bad };
-  if (!takeCode("reset", text(f, "code"))) return { error: "Sıfırlama kodu geçersiz. Sunucu kaydındaki son kodu kullan." };
+  if (bad) return { error: bad, values };
+  if (!takeCode("reset", text(f, "code"))) return { error: "Sıfırlama kodu geçersiz. Sunucu kaydındaki son kodu kullan.", values };
   await resetOnlyAdminPassword(getPool(), text(f, "password"));
   await clearResetRequest();
   await clearSessionCookie();

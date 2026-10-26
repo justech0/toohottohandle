@@ -23,7 +23,15 @@ export function AuthForm({ action, fields, submit }: { action: (s: FormState, f:
       {fields.map((f) => (
         <label key={f.name} className="adm-field">
           {f.label}
-          <input name={f.name} type={f.type} autoComplete={f.autoComplete} required spellCheck={false} autoCapitalize="off" />
+          <input
+            name={f.name}
+            type={f.type}
+            autoComplete={f.autoComplete}
+            defaultValue={f.type === "password" ? undefined : state.values?.[f.name]}
+            required
+            spellCheck={false}
+            autoCapitalize="off"
+          />
           {f.hint ? <span className="adm-note">{f.hint}</span> : null}
         </label>
       ))}
