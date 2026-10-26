@@ -5,12 +5,12 @@ import { clearStaleNav, closeNav, navFromState, pushNav, type Overlay } from "@/
 import { ProductSheet } from "./ProductSheet";
 import { WifiCard } from "./WifiCard";
 import type { MenuSettings } from "@/lib/menu/types";
-import type { ClientProduct } from "./clientTypes";
+import type { CardProduct } from "./clientTypes";
 import { SearchOverlay } from "./SearchOverlay";
 import { SearchIcon, WifiIcon } from "./Icons";
 
 /** Üst bardaki düğmeler ve açılan paneller. Liste sunucuda üretilir, burası yalnızca etkileşimi yönetir. */
-export function MenuClient({ products, settings }: { products: ClientProduct[]; settings: MenuSettings }) {
+export function MenuClient({ products, settings }: { products: CardProduct[]; settings: MenuSettings }) {
   const [panel, setPanel] = useState<Overlay | null>(null);
   const [sheet, setSheet] = useState<string | null>(null);
   const close = useCallback(() => closeNav(), []);

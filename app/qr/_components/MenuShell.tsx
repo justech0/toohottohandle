@@ -3,13 +3,16 @@ import { BrandIcon } from "./BrandIcon";
 import { HeroSlides } from "./HeroSlides";
 import { GroupTiles, NeIcsemSquare } from "./GroupTiles";
 import { Footer } from "./Footer";
-import { ProductRow } from "./ProductRow";
+import { ProductCard } from "./ProductCard";
+import { CategoryPoster } from "./CategoryPoster";
 import { ExtrasLine } from "./ExtrasLine";
 import { CategoryStrip } from "./CategoryStrip";
 import { MenuClient } from "./MenuClient";
 import { Intro } from "./Intro";
-import type { ClientProduct } from "./clientTypes";
+import type { CardProduct } from "./clientTypes";
 import { priceLabel } from "@/lib/menu/soldout";
+import { priceBadges } from "@/lib/menu/badges";
+import { groupStyle } from "@/lib/brand/groups";
 
 export function MenuShell({ menu }: { menu: MenuData }) {
   const visible = menu.products.filter((p) => p.isVisible);
@@ -19,12 +22,27 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       .map((c) => ({ group: g, category: c, items: visible.filter((p) => p.category === c.slug) }))
       .filter((s) => s.items.length > 0),
   );
-  const clientProducts: ClientProduct[] = sections.flatMap(({ category, items }) =>
-    items.map((p) => {
-      const price = priceLabel(p, menu.serverNow);
-      return { slug: p.slug, name: p.name, descTr: p.descTr, categoryName: category.nameTr, parts: price.parts, soldOut: price.soldOut, imageKey: p.imageKey };
-    }),
-  );
+  const cards: Record<string, CardProduct> = {};
+  for (const { group, category, items } of sections) {
+    for (const p of items) {
+      const badges = priceBadges(p, menu.serverNow);
+      cards[p.slug] = {
+        slug: p.slug,
+        name: p.name,
+        descTr: p.descTr,
+        categoryName: category.nameTr,
+        groupColor: group.color,
+        groupIcon: groupStyle(group.slug).icon,
+        imageKey: p.imageKey,
+        soldOut: badges.soldOut,
+        full: badges.full,
+        stars: badges.stars,
+        sizes: priceLabel(p, menu.serverNow).parts,
+        inSuggest: category.defaultInSuggest,
+      };
+    }
+  }
+  const clientProducts = Object.values(cards);
   const groupsWithItems = menu.groups.filter((g) => sections.some((s) => s.group.slug === g.slug));
 
   return (
@@ -49,10 +67,10 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       <main className="list">
         {sections.map(({ group, category, items }) => (
           <section key={category.slug} id={`cat-${category.slug}`} className="cat" data-color={group.color}>
-            <h2 className="cat__title">{category.nameTr}</h2>
-            <ul className="cat__list">
+            <CategoryPoster name={category.nameTr} color={group.color} icon={groupStyle(group.slug).icon} />
+            <ul className="cards">
               {items.map((p) => (
-                <ProductRow key={p.slug} product={p} serverNow={menu.serverNow} />
+                <ProductCard key={p.slug} p={cards[p.slug]} />
               ))}
             </ul>
             <ExtrasLine extras={menu.extras.filter((e) => e.categories.includes(category.slug))} />

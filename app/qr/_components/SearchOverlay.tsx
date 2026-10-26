@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { searchProducts } from "@/lib/menu/search";
-import type { ClientProduct } from "./clientTypes";
-import { ClientRow } from "./ClientRow";
+import type { CardProduct } from "./clientTypes";
+import { ProductCard } from "./ProductCard";
 import { CloseIcon, SearchIcon } from "./Icons";
 
-export function SearchOverlay({ products, onClose, paused = false }: { products: ClientProduct[]; onClose: () => void; paused?: boolean }) {
+export function SearchOverlay({ products, onClose, paused = false }: { products: CardProduct[]; onClose: () => void; paused?: boolean }) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const pausedRef = useRef(paused);
@@ -53,8 +53,8 @@ export function SearchOverlay({ products, onClose, paused = false }: { products:
             </button>
           </div>
         ) : (
-          <ul className="cat__list search__list">
-            {results.map((p) => <ClientRow key={p.slug} product={p} />)}
+          <ul className="cards search__list">
+            {results.map((p) => <ProductCard key={p.slug} p={p} />)}
           </ul>
         )}
       </div>

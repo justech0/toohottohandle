@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import type { ClientProduct } from "./clientTypes";
+import type { CardProduct } from "./clientTypes";
 import { CloseIcon } from "./Icons";
 import { useDialogFocus } from "./useDialogFocus";
 import { imageSrc, imageSrcSet } from "@/lib/menu/image";
 
-export function ProductSheet({ product, onClose }: { product: ClientProduct; onClose: () => void }) {
+export function ProductSheet({ product, onClose }: { product: CardProduct; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useDialogFocus(ref, onClose);
   return (
@@ -31,7 +31,7 @@ export function ProductSheet({ product, onClose }: { product: ClientProduct; onC
         <h2 id="sheet-title" className="sheet__title">{product.name}</h2>
         {product.descTr ? <p className="sheet__desc" data-testid="sheet-desc">{product.descTr}</p> : null}
         <ul className="sheet__prices">
-          {product.parts.map((p) => (
+          {product.sizes.map((p) => (
             <li key={p} className={product.soldOut ? "sheet__price price--out" : "sheet__price"}><bdi>{p}</bdi></li>
           ))}
         </ul>
