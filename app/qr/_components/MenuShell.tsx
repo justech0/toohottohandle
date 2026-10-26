@@ -1,7 +1,9 @@
 import type { MenuData } from "@/lib/menu/types";
 import { BrandIcon } from "./BrandIcon";
 import { HeroSlides } from "./HeroSlides";
-import { GroupTiles, NeIcsemSquare } from "./GroupTiles";
+import { GroupTiles } from "./GroupTiles";
+import { NeIcsem } from "./NeIcsem";
+import { suggestPool } from "@/lib/menu/suggest";
 import { Footer } from "./Footer";
 import { ProductCard } from "./ProductCard";
 import { CategoryPoster } from "./CategoryPoster";
@@ -56,7 +58,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       <GroupTiles
         groups={groupsWithItems}
         firstCategoryOf={Object.fromEntries(groupsWithItems.map((g) => [g.slug, sections.find((x) => x.group.slug === g.slug)!.category.slug]))}
-        neIcsem={<NeIcsemSquare />}
+        neIcsem={<NeIcsem pool={suggestPool(visible, menu.categories, menu.serverNow).map((p) => cards[p.slug]).filter(Boolean)} />}
       />
       <div className="sticky">
         <CategoryStrip
