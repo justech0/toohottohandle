@@ -207,8 +207,8 @@ html.intro-seen .intro { display: none; }
 .ne-frame__icon { height: 48%; }
 .ne-frame--result { background: var(--gc); color: var(--gt); }
 .ne-frame--result img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ne-result { padding: 6px 2px 0; animation: fade .3s ease; }
-.ne-result__name { margin: 0; font: 600 13px/1.2 var(--f-text); overflow-wrap: anywhere; }
-.ne-result__price { margin: 2px 0 0; font: 600 12px/1.2 var(--f-text); color: var(--c-ink-soft); }
+.ne-result { padding: 10px 2px 0; text-align: center; animation: fade .3s ease; }
+.ne-result__name { margin: 0; font: 800 18px/1.15 var(--f-display); text-transform: uppercase; overflow-wrap: break-word; }
+.ne-result__price { margin: 4px 0 0; font: 600 14px/1.2 var(--f-text); color: var(--c-ink-soft); }
 .ne-again { display: block; width: 100%; min-height: var(--tap); margin-top: 12px; border: 0; border-radius: 999px; background: var(--c-ink); color: var(--c-paper); font: 600 15px/1 var(--f-text); cursor: pointer; }
 .ne-again[aria-disabled="true"] { opacity: .55; }
