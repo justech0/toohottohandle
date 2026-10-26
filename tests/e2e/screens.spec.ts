@@ -19,6 +19,13 @@ for (const s of sizes) {
   });
 }
 
+test("screens Ne içsem 390", async ({ page }) => {
+  await openMenu(page);
+  await page.getByTestId("neicsem-tile").click();
+  await page.getByTestId("neicsem-name").first().waitFor({ timeout: 4000 });
+  await page.screenshot({ path: "screens/neicsem-390.png" });
+});
+
 test("screens wifi and intro 390", async ({ page }) => {
   await openMenu(page);
   await page.getByRole("button", { name: "WiFi", exact: true }).click();
