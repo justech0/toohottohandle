@@ -19,6 +19,47 @@ const rowId = async (page: import("@playwright/test").Page, name: string) => {
   return value;
 };
 
+test("390px product controls keep accessible contrast, targets, and keyboard focus", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+
+  const add = page.getByTestId("product-add");
+  const contrast = await add.evaluate((element) => {
+    const rgb = (value: string) => value.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+    const luminance = (value: string) => {
+      const channels = rgb(value).map((channel) => {
+        const normalized = channel / 255;
+        return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const style = getComputedStyle(element);
+    const lighter = Math.max(luminance(style.color), luminance(style.backgroundColor));
+    const darker = Math.min(luminance(style.color), luminance(style.backgroundColor));
+    return (lighter + 0.05) / (darker + 0.05);
+  });
+  expect(contrast).toBeGreaterThanOrEqual(4.5);
+  expect((await add.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+
+  const operationButtons = page.locator(".adm-op");
+  await expect(operationButtons.first()).toBeVisible();
+  const operationHeights = await operationButtons.filter({ visible: true }).evaluateAll((buttons) =>
+    buttons.map((button) => button.getBoundingClientRect().height),
+  );
+  expect(operationHeights.length).toBeGreaterThan(0);
+  expect(Math.min(...operationHeights)).toBeGreaterThanOrEqual(44);
+
+  const crumb = page.locator(".adm-crumb a");
+  expect((await crumb.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await crumb.focus();
+  await expect(crumb).toBeFocused();
+  expect(await crumb.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return [style.outlineWidth, style.outlineStyle, style.outlineOffset];
+  })).toEqual(["2px", "solid", "2px"]);
+});
+
 test("search narrows the admin list", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Ürünler ve fiyatlar" }).click();
