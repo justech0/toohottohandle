@@ -86,4 +86,30 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "002_auth",
+    statements: [
+      `CREATE TABLE admins (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        email VARCHAR(190) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        last_login_at DATETIME(3) NULL
+      ) ${T}`,
+      `CREATE TABLE sessions (
+        id_hash CHAR(64) PRIMARY KEY,
+        admin_id INT NOT NULL,
+        created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        expires_at DATETIME(3) NOT NULL,
+        INDEX (admin_id),
+        CONSTRAINT fk_sess_admin FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+      ) ${T}`,
+      `CREATE TABLE login_attempts (
+        key_hash CHAR(64) PRIMARY KEY,
+        fail_count INT NOT NULL DEFAULT 0,
+        window_started_at DATETIME(3) NOT NULL,
+        locked_until DATETIME(3) NULL
+      ) ${T}`,
+    ],
+  },
 ];
