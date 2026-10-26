@@ -12,14 +12,14 @@ describe.skipIf(!url)("veritabanı (MariaDB/MySQL)", () => {
 
   beforeAll(async () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z", multipleStatements: false });
-    for (const t of ["extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
+    for (const t of ["sessions", "login_attempts", "admins", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
       await pool.query(`DROP TABLE IF EXISTS ${t}`);
     }
   });
   afterAll(async () => pool?.end());
 
   it("applies the schema once", async () => {
-    expect(await migrate(pool)).toEqual(["001_menu"]);
+    expect(await migrate(pool)).toEqual(["001_menu", "002_auth"]);
     expect(await migrate(pool)).toEqual([]);
   });
 
