@@ -20,6 +20,5 @@ export interface CardProduct {
   stars: PriceStar[];
   /** Detay için boy-fiyat çiftleri: ["Normal 210 ₺", "Büyük 230 ₺"]; tükendiyse ["Tükendi"] */
   sizes: string[];
-  inSuggest: boolean;
   tags: string[];
 }

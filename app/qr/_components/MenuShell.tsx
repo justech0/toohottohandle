@@ -43,7 +43,6 @@ export function MenuShell({ menu }: { menu: MenuData }) {
         full: badges.full,
         stars: badges.stars,
         sizes: priceLabel(p, menu.serverNow).parts,
-        inSuggest: category.defaultInSuggest,
         tags: p.tags,
       };
     }
