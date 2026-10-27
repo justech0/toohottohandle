@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#DC2524", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
-const PRE_HYDRATE_CHECK = `try{if(sessionStorage.getItem("thth-intro-seen"))document.documentElement.classList.add("intro-seen");if(window.scrollY>80)document.documentElement.dataset.heroVisible="false";window.addEventListener("scroll",function s(){if(window.scrollY>80){document.documentElement.dataset.heroVisible="false"}else if(window.scrollY<=20){document.documentElement.dataset.heroVisible="true"}},{passive:true})}catch(e){}`;
+const PRE_HYDRATE_CHECK = `try{var l=localStorage.getItem("thth-lang");if(l==="ar"){document.documentElement.dir="rtl";document.documentElement.lang="ar"}else if(l==="en"){document.documentElement.dir="ltr";document.documentElement.lang="en"}else{document.documentElement.dir="ltr";document.documentElement.lang="tr"}if(sessionStorage.getItem("thth-intro-seen"))document.documentElement.classList.add("intro-seen");if(window.scrollY>80)document.documentElement.dataset.heroVisible="false";window.addEventListener("scroll",function s(){if(window.scrollY>80){document.documentElement.dataset.heroVisible="false"}else if(window.scrollY<=20){document.documentElement.dataset.heroVisible="true"}},{passive:true})}catch(e){}`;
 
 export default function QrLayout({ children }: { children: React.ReactNode }) {
   return (

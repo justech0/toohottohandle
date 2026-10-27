@@ -11,7 +11,7 @@ describe("catalog input", () => {
   it("accepts only the six group colors", () => {
     expect(parseGroupInput({ name: "Kahve", color: "red", sortOrder: "2" })).toEqual({
       ok: true,
-      value: { name: "Kahve", color: "red", sortOrder: 2 },
+      value: { name: "Kahve", nameEn: null, nameAr: null, color: "red", sortOrder: 2 },
     });
     expect(parseGroupInput({ name: "Kahve", color: "purple", sortOrder: "2" })).toEqual({
       ok: false,
@@ -22,14 +22,14 @@ describe("catalog input", () => {
   it("reads category defaults", () => {
     expect(parseCategoryInput({ name: "Yaz", groupId: "3", sortOrder: "4", isVisible: "on", defaultInSuggest: "on", defaultTemp: "cold" })).toEqual({
       ok: true,
-      value: { name: "Yaz", groupId: 3, sortOrder: 4, isVisible: true, defaultInSuggest: true, defaultTemp: "cold" },
+      value: { name: "Yaz", nameEn: null, nameAr: null, groupId: 3, sortOrder: 4, isVisible: true, defaultInSuggest: true, defaultTemp: "cold" },
     });
   });
 
   it("reads extra price in lira and unique category ids", () => {
     expect(parseExtraInput({ name: "Shot", price: "75,50", categoryIds: ["2", "2", "4"] })).toEqual({
       ok: true,
-      value: { name: "Shot", priceKurus: 7550, categoryIds: [2, 4] },
+      value: { name: "Shot", nameEn: null, nameAr: null, priceKurus: 7550, categoryIds: [2, 4] },
     });
   });
 
@@ -45,8 +45,11 @@ describe("catalog input", () => {
     })).toEqual({
       ok: true,
       value: {
-        wifiSsid: "Cafe", wifiUsername: "guest", wifiPassword: null, wifiNoteTr: "Bağlanın.",
-        openingTime: "08:30", footerNoteTr: "Self servis", statsEnabled: true,
+        wifiSsid: "Cafe", wifiUsername: "guest", wifiPassword: null,
+        wifiNoteTr: "Bağlanın.", wifiNoteEn: null, wifiNoteAr: null,
+        openingTime: "08:30",
+        footerNoteTr: "Self servis", footerNoteEn: null, footerNoteAr: null,
+        statsEnabled: true,
       },
     });
     expect(parseSettingsInput({ wifiSsid: "x", wifiUsername: "x", wifiNoteTr: "x", footerNoteTr: "x", openingTime: "25:00" })).toEqual({

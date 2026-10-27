@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { HERO_INTERVAL_MS, HERO_SLIDES } from "@/lib/brand/hero";
 import { BrandIcon } from "./BrandIcon";
+import { useLanguage } from "@/lib/i18n/context";
 
 /**
  * Vitrin (spec v3 3.1). Yalnızca ekranda, sekme önde ve hareket azaltma kapalıyken döner.
  * Görünürlüğü html[data-hero-visible] ile üst bara bildirir (saydam / dolu bar).
  */
 export function HeroSlides() {
+  const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   // Kendi kendine dönerken ekran okuyucuya duyurulmaz; ziyaretçi bir slayt seçince duyurulur (WCAG 2.2.2).
   const [announce, setAnnounce] = useState(false);
@@ -89,7 +91,7 @@ export function HeroSlides() {
       <div className="hero__shade" aria-hidden="true" />
       <BrandIcon name={slide.icon} className="hero__icon" />
       <div className="hero__text">
-        <p className="hero__menu">MENÜ</p>
+        <p className="hero__menu">{t.hero.menu}</p>
         <p className="hero__title" data-testid="hero-title" aria-live={announce ? "polite" : "off"}>{slide.title}</p>
       </div>
       <div className="hero__dots">

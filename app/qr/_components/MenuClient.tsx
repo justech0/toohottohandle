@@ -8,6 +8,8 @@ import type { MenuSettings } from "@/lib/menu/types";
 import type { CardProduct } from "./clientTypes";
 import { SearchOverlay } from "./SearchOverlay";
 import { SearchIcon, WifiIcon } from "./Icons";
+import { useLanguage } from "@/lib/i18n/context";
+import { LanguageModal } from "./LanguageModal";
 
 /** Üst bardaki düğmeler ve açılan paneller. Liste sunucuda üretilir, burası yalnızca etkileşimi yönetir. */
 export function MenuClient({ products, settings }: { products: CardProduct[]; settings: MenuSettings }) {
@@ -82,18 +84,30 @@ export function MenuClient({ products, settings }: { products: CardProduct[]; se
 
   const sheetProduct = sheet ? products.find((p) => p.slug === sheet) : undefined;
 
+  const { lang, t } = useLanguage();
+
   return (
     <>
       <div className="topbar__actions">
-        <button type="button" className="icon-btn" aria-label="Ara" onClick={() => open("search")}>
+        <button
+          type="button"
+          className="icon-btn topbar__lang"
+          data-testid="lang-trigger"
+          aria-label={t.nav.langSelect}
+          onClick={() => (panel === "lang" ? close() : open("lang"))}
+        >
+          <span className="lang-code">{lang.toUpperCase()}</span>
+        </button>
+        <button type="button" className="icon-btn" aria-label={t.nav.search} onClick={() => open("search")}>
           <SearchIcon />
         </button>
         {settings.wifiSsid ? (
-          <button type="button" className="icon-btn" aria-label="WiFi" onClick={() => (panel === "wifi" ? close() : open("wifi"))}>
+          <button type="button" className="icon-btn" aria-label={t.nav.wifi} onClick={() => (panel === "wifi" ? close() : open("wifi"))}>
             <WifiIcon />
           </button>
         ) : null}
       </div>
+      {panel === "lang" ? <LanguageModal onClose={close} /> : null}
       {panel === "search" ? <SearchOverlay products={products} onClose={close} paused={Boolean(sheetProduct)} /> : null}
       {panel === "wifi" ? <WifiCard settings={settings} onClose={close} /> : null}
       {sheetProduct ? <ProductSheet product={sheetProduct} onClose={close} /> : null}

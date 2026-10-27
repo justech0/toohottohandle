@@ -47,7 +47,11 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
           <article className="adm-card" id={`group-${group.id}`} key={group.id}>
             <ActionForm action={saveGroupAction} testId={`group-form-${group.id}`}>
               <input type="hidden" name="id" value={group.id} />
-              <label className="adm-field">Grup adı<input name="name" defaultValue={group.name} maxLength={120} required /></label>
+              <label className="adm-field">Grup adı (TR)<input name="name" defaultValue={group.name} maxLength={120} required /></label>
+              <div className="adm-row">
+                <label className="adm-field">İngilizce ad (EN)<input name="nameEn" defaultValue={group.nameEn ?? ""} maxLength={120} placeholder="Boşsa TR gösterilir" /></label>
+                <label className="adm-field">Arapça ad (AR)<input name="nameAr" defaultValue={group.nameAr ?? ""} maxLength={120} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+              </div>
               <div className="adm-row">
                 <label className="adm-field">Renk<select name="color" defaultValue={group.color}>{COLORS.map((color) => <option key={color}>{color}</option>)}</select></label>
                 <label className="adm-field">Sıra<input name="sortOrder" type="number" min="0" max="10000" defaultValue={group.sortOrder} /></label>
@@ -60,7 +64,11 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
         <article className="adm-card">
           <h3 className="adm-subtitle">Yeni grup</h3>
           <ActionForm action={saveGroupAction}>
-            <label className="adm-field">Grup adı<input name="name" maxLength={120} required /></label>
+            <label className="adm-field">Grup adı (TR)<input name="name" maxLength={120} required /></label>
+            <div className="adm-row">
+              <label className="adm-field">İngilizce ad (EN)<input name="nameEn" maxLength={120} placeholder="Boşsa TR gösterilir" /></label>
+              <label className="adm-field">Arapça ad (AR)<input name="nameAr" maxLength={120} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+            </div>
             <div className="adm-row">
               <label className="adm-field">Renk<select name="color" defaultValue="red">{COLORS.map((color) => <option key={color}>{color}</option>)}</select></label>
               <label className="adm-field">Sıra<input name="sortOrder" type="number" min="0" max="10000" defaultValue={data.groups.length} /></label>
@@ -76,7 +84,11 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
           <article className="adm-card" id={`category-${category.id}`} key={category.id}>
             <ActionForm action={saveCategoryAction}>
               <input type="hidden" name="id" value={category.id} />
-              <label className="adm-field">Kategori adı<input name="name" defaultValue={category.name} maxLength={120} required /></label>
+              <label className="adm-field">Kategori adı (TR)<input name="name" defaultValue={category.name} maxLength={120} required /></label>
+              <div className="adm-row">
+                <label className="adm-field">İngilizce ad (EN)<input name="nameEn" defaultValue={category.nameEn ?? ""} maxLength={120} placeholder="Boşsa TR gösterilir" /></label>
+                <label className="adm-field">Arapça ad (AR)<input name="nameAr" defaultValue={category.nameAr ?? ""} maxLength={120} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+              </div>
               <div className="adm-row">
                 <label className="adm-field">Grup<select name="groupId" defaultValue={category.groupId}>{data.groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>
                 <label className="adm-field">Sıra<input name="sortOrder" type="number" min="0" max="10000" defaultValue={category.sortOrder} /></label>
@@ -94,7 +106,11 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
         <article className="adm-card">
           <h3 className="adm-subtitle">Yeni kategori</h3>
           <ActionForm action={saveCategoryAction}>
-            <label className="adm-field">Kategori adı<input name="name" maxLength={120} required /></label>
+            <label className="adm-field">Kategori adı (TR)<input name="name" maxLength={120} required /></label>
+            <div className="adm-row">
+              <label className="adm-field">İngilizce ad (EN)<input name="nameEn" maxLength={120} placeholder="Boşsa TR gösterilir" /></label>
+              <label className="adm-field">Arapça ad (AR)<input name="nameAr" maxLength={120} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+            </div>
             <div className="adm-row">
               <label className="adm-field">Grup<select name="groupId">{data.groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}</select></label>
               <label className="adm-field">Sıra<input name="sortOrder" type="number" min="0" max="10000" defaultValue={data.categories.length} /></label>
@@ -113,8 +129,12 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
             <ActionForm action={saveExtraAction}>
               <input type="hidden" name="id" value={extra.id} />
               <div className="adm-row">
-                <label className="adm-field">Ekstra adı<input name="name" defaultValue={extra.name} maxLength={120} required /></label>
+                <label className="adm-field">Ekstra adı (TR)<input name="name" defaultValue={extra.name} maxLength={120} required /></label>
                 <label className="adm-field">Fiyat (₺)<input name="price" inputMode="decimal" defaultValue={(extra.priceKurus / 100).toLocaleString("tr-TR", { maximumFractionDigits: 2 })} /></label>
+              </div>
+              <div className="adm-row">
+                <label className="adm-field">İngilizce ad (EN)<input name="nameEn" defaultValue={extra.nameEn ?? ""} maxLength={120} placeholder="Boşsa TR gösterilir" /></label>
+                <label className="adm-field">Arapça ad (AR)<input name="nameAr" defaultValue={extra.nameAr ?? ""} maxLength={120} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
               </div>
               <CategoryChecks categories={data.categories} selected={extra.categoryIds} />
               <SaveButton>Ekstrayı kaydet</SaveButton>
@@ -125,7 +145,14 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
         <article className="adm-card">
           <h3 className="adm-subtitle">Yeni ekstra</h3>
           <ActionForm action={saveExtraAction}>
-            <div className="adm-row"><label className="adm-field">Ekstra adı<input name="name" maxLength={120} required /></label><label className="adm-field">Fiyat (₺)<input name="price" inputMode="decimal" /></label></div>
+            <div className="adm-row">
+              <label className="adm-field">Ekstra adı (TR)<input name="name" maxLength={120} required /></label>
+              <label className="adm-field">Fiyat (₺)<input name="price" inputMode="decimal" /></label>
+            </div>
+            <div className="adm-row">
+              <label className="adm-field">İngilizce ad (EN)<input name="nameEn" maxLength={120} placeholder="Boşsa TR gösterilir" /></label>
+              <label className="adm-field">Arapça ad (AR)<input name="nameAr" maxLength={120} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+            </div>
             <CategoryChecks categories={data.categories} selected={[]} />
             <SaveButton>Ekstra ekle</SaveButton>
           </ActionForm>
@@ -147,8 +174,19 @@ export function CatalogEditor({ data }: { data: CatalogData }) {
           <div className="adm-row"><label className="adm-field">Ağ adı<input name="wifiSsid" defaultValue={data.settings.wifiSsid} maxLength={120} /></label><label className="adm-field">Kullanıcı adı<input name="wifiUsername" defaultValue={data.settings.wifiUsername} maxLength={120} /></label></div>
           <label className="adm-field">Yeni WiFi şifresi<input name="wifiPassword" type="password" maxLength={255} autoComplete="new-password" aria-describedby="wifi-password-note" /></label>
           <p id="wifi-password-note" className="adm-note">Değiştirmeyecekseniz boş bırakın. Mevcut şifre gösterilmez.</p>
-          <label className="adm-field">WiFi yönergesi<textarea name="wifiNoteTr" defaultValue={data.settings.wifiNoteTr} maxLength={2000} rows={3} /></label>
-          <div className="adm-row"><label className="adm-field">Açılış saati<input name="openingTime" type="time" defaultValue={data.settings.openingTime} /></label><label className="adm-field">Alt bilgi notu<input name="footerNoteTr" defaultValue={data.settings.footerNoteTr} maxLength={255} /></label></div>
+          <label className="adm-field">WiFi yönergesi (TR)<textarea name="wifiNoteTr" defaultValue={data.settings.wifiNoteTr} maxLength={2000} rows={2} /></label>
+          <div className="adm-row">
+            <label className="adm-field">İngilizce WiFi yönergesi (EN)<textarea name="wifiNoteEn" defaultValue={data.settings.wifiNoteEn ?? ""} maxLength={2000} rows={2} placeholder="Boşsa TR gösterilir" /></label>
+            <label className="adm-field">Arapça WiFi yönergesi (AR)<textarea name="wifiNoteAr" defaultValue={data.settings.wifiNoteAr ?? ""} maxLength={2000} rows={2} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+          </div>
+          <div className="adm-row">
+            <label className="adm-field">Açılış saati<input name="openingTime" type="time" defaultValue={data.settings.openingTime} /></label>
+            <label className="adm-field">Alt bilgi notu (TR)<input name="footerNoteTr" defaultValue={data.settings.footerNoteTr} maxLength={255} /></label>
+          </div>
+          <div className="adm-row">
+            <label className="adm-field">İngilizce alt bilgi notu (EN)<input name="footerNoteEn" defaultValue={data.settings.footerNoteEn ?? ""} maxLength={255} placeholder="Boşsa TR gösterilir" /></label>
+            <label className="adm-field">Arapça alt bilgi notu (AR)<input name="footerNoteAr" defaultValue={data.settings.footerNoteAr ?? ""} maxLength={255} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+          </div>
           <div className="adm-checks"><label><input name="statsEnabled" type="checkbox" defaultChecked={data.settings.statsEnabled} /> İstatistik açık</label></div>
           <SaveButton>Ayarları kaydet</SaveButton>
         </ActionForm>

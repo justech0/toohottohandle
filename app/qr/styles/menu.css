@@ -227,3 +227,41 @@ html.intro-seen .intro { display: none; }
 .ne-again[aria-disabled="true"] { opacity: .55; }
 .sheet__labels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .sheet__labels span { padding: 5px 8px; border: 1px solid currentColor; border-radius: 8px; font: 800 10px/1 var(--f-display); }
+
+/* RTL ve Çoklu Dil Kuralları (Spec 3.9) */
+html[dir="rtl"] .topbar__logo,
+html[dir="rtl"] .brand-icon--logo {
+  transform: none !important;
+}
+html[dir="rtl"] .card__prices,
+html[dir="rtl"] .sheet__tag,
+html[dir="rtl"] .sheet__sizes,
+html[dir="rtl"] .ne-result__price,
+html[dir="rtl"] .extras,
+html[dir="rtl"] .wifi__value,
+html[dir="rtl"] .wifi__line strong {
+  direction: ltr !important;
+  unicode-bidi: isolate;
+}
+html[dir="rtl"] .card__prices {
+  text-align: left;
+}
+
+/* Dil seçici buton ve modal */
+.topbar__lang { font: 700 13px/1 var(--f-display); letter-spacing: .05em; text-transform: uppercase; }
+.lang-modal { max-width: 320px; }
+.lang-modal__title { margin: 0 0 14px; font: 800 18px/1 var(--f-display); text-transform: uppercase; }
+.lang-modal__list { display: flex; flex-direction: column; gap: 8px; }
+.lang-option { display: flex; align-items: center; gap: 12px; width: 100%; min-height: var(--tap); padding: 10px 14px; border: 1.5px solid var(--c-line); border-radius: 12px; background: var(--c-paper); color: var(--c-ink); font: 600 15px/1 var(--f-text); cursor: pointer; text-align: start; transition: background .15s, border-color .15s; }
+.lang-option:hover, .lang-option:focus-visible { border-color: var(--c-ink); background: var(--c-white); }
+.lang-option--active { border-color: var(--c-red); background: var(--c-white); color: var(--c-red-text); font-weight: 700; }
+.lang-option__code { font: 800 12px/1 var(--f-display); padding: 3px 6px; border-radius: 6px; background: rgba(42, 21, 20, .08); }
+.lang-option--active .lang-option__code { background: var(--c-red); color: var(--c-white); }
+.lang-option__name { flex: 1; }
+.lang-option__check { font-weight: 800; font-size: 16px; color: var(--c-red); }
+
+/* Alt bilgi dil seçimi */
+.menu-footer { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.menu-footer__langs { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.footer-lang-btn { min-width: var(--tap); min-height: var(--tap); padding: 4px 10px; border: 1px solid var(--c-line); border-radius: 8px; background: none; color: var(--c-ink); font: 700 12px/1 var(--f-display); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.footer-lang-btn--active { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }

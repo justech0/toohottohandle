@@ -53,7 +53,10 @@ export async function loadProductForm(pool: Pool, id: number): Promise<Record<st
   const tri = (v: number | null) => (v === null ? "" : v ? "yes" : "no");
   const vs = snap.variants;
   return {
-    id: String(p.id), name: p.name, categoryId: String(p.category_id), descTr: p.desc_tr ?? "", ingredientsTr: p.ingredients_tr ?? "",
+    id: String(p.id), name: p.name, nameEn: p.name_en ?? "", nameAr: p.name_ar ?? "",
+    categoryId: String(p.category_id),
+    descTr: p.desc_tr ?? "", descEn: p.desc_en ?? "", descAr: p.desc_ar ?? "",
+    ingredientsTr: p.ingredients_tr ?? "", ingredientsEn: p.ingredients_en ?? "", ingredientsAr: p.ingredients_ar ?? "",
     temp: p.temp ?? "", inSuggest: tri(p.in_suggest), isNew: p.is_new ? "on" : "", isFeatured: p.is_featured ? "on" : "", isVisible: p.is_visible ? "on" : "",
     imageKey: p.image_key ?? "", imageFocusX: String(p.image_focus_x), imageFocusY: String(p.image_focus_y),
     sizes: sizeSetOf(vs.map((v) => ({ key: v.label_key }))), price0: vs[0] ? lira(vs[0].price_kurus) : "", price1: vs[1] ? lira(vs[1].price_kurus) : "",
@@ -150,7 +153,11 @@ const bool = (value: boolean | null) => (value === null ? null : value ? 1 : 0);
 
 function inputColumns(input: ProductInput): Record<string, unknown> {
   return {
-    name: input.name, category_id: input.categoryId, desc_tr: input.descTr, ingredients_tr: input.ingredientsTr, temp: input.temp,
+    name: input.name, name_en: input.nameEn, name_ar: input.nameAr,
+    category_id: input.categoryId,
+    desc_tr: input.descTr, desc_en: input.descEn, desc_ar: input.descAr,
+    ingredients_tr: input.ingredientsTr, ingredients_en: input.ingredientsEn, ingredients_ar: input.ingredientsAr,
+    temp: input.temp,
     in_suggest: bool(input.inSuggest), is_new: bool(input.isNew), is_featured: bool(input.isFeatured), is_visible: bool(input.isVisible),
     image_key: input.imageKey, image_focus_x: input.imageFocusX, image_focus_y: input.imageFocusY,
   };

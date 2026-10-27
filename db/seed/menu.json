@@ -165,6 +165,8 @@
   {
    "slug": "espresso",
    "name": "Espresso",
+   "nameEn": "Espresso",
+   "nameAr": "إسبريسو",
    "category": "sicak-kahveler",
    "temp": "hot",
    "variants": [
