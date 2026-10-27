@@ -22,7 +22,8 @@ export type SaveState = { error: string | null };
 export type OperationState = { error: string | null };
 
 const FIELDS = [
-  "name", "categoryId", "descTr", "ingredientsTr", "temp", "inSuggest", "isNew", "isFeatured", "isVisible", "sizes", "price0", "price1",
+  "name", "nameEn", "nameAr", "categoryId", "descTr", "descEn", "descAr", "ingredientsTr", "ingredientsEn", "ingredientsAr",
+  "temp", "inSuggest", "isNew", "isFeatured", "isVisible", "sizes", "price0", "price1",
   "imageKey", "imageFocusX", "imageFocusY",
 ];
 const USER_ERRORS = new Set([
