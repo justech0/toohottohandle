@@ -13,6 +13,7 @@ async function Content() {
   const initial = {
     id: "", name: "", categoryId: String(categories[0]?.id ?? ""), descTr: "", ingredientsTr: "",
     temp: "", inSuggest: "", isNew: "", isFeatured: "", isVisible: "on", sizes: "none", price0: "", price1: "",
+    imageKey: "", imageFocusX: "0.5", imageFocusY: "0.5",
   };
   return <ProductForm initial={initial} categories={categories} tags={tags} />;
 }

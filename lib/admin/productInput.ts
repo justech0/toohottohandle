@@ -13,6 +13,9 @@ export interface ProductInput {
   isFeatured: boolean;
   isVisible: boolean;
   tagIds: number[];
+  imageKey: string | null;
+  imageFocusX: number;
+  imageFocusY: number;
   variants: MenuVariant[];
 }
 
@@ -76,12 +79,19 @@ export function parseProductInput(raw: Raw): Result {
   const temp = raw.temp === "hot" || raw.temp === "cold" ? raw.temp : null;
   const tagIds = [...new Set((raw.tagIds ?? "").split(",").map(Number).filter((id) => Number.isInteger(id) && id > 0))];
   if (tagIds.length > 3) return { ok: false, error: "Bir ürüne en fazla 3 etiket seçilebilir." };
+  const imageKey = (raw.imageKey ?? "").trim() || null;
+  if (imageKey && !/^(?:[a-f0-9]{64}|(?:urun|ornek)-[a-z0-9-]+)$/.test(imageKey)) return { ok: false, error: "Fotoğraf anahtarı geçersiz." };
+  const imageFocusX = Number(raw.imageFocusX ?? "0.5");
+  const imageFocusY = Number(raw.imageFocusY ?? "0.5");
+  if (![imageFocusX, imageFocusY].every((value) => Number.isFinite(value) && value >= 0 && value <= 1)) {
+    return { ok: false, error: "Fotoğraf odağı geçersiz." };
+  }
   return {
     ok: true,
     value: {
       name, categoryId, descTr, ingredientsTr, temp, inSuggest: tri(raw.inSuggest),
-      isNew: raw.isNew === "on", isFeatured: raw.isFeatured === "on", isVisible: raw.isVisible === "on", variants,
-      tagIds,
+      isNew: raw.isNew === "on", isFeatured: raw.isFeatured === "on", isVisible: raw.isVisible === "on",
+      tagIds, imageKey, imageFocusX, imageFocusY, variants,
     },
   };
 }

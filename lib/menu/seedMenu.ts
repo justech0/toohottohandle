@@ -3,7 +3,7 @@ import photos from "@/db/seed/photos.json";
 import type { MenuData, MenuProduct } from "./types";
 import { READY_TAGS } from "./tags";
 
-type SeedProduct = Omit<MenuProduct, "descTr" | "soldOutUntil" | "isNew" | "isFeatured" | "isVisible" | "imageKey" | "tags">;
+type SeedProduct = Omit<MenuProduct, "descTr" | "soldOutUntil" | "isNew" | "isFeatured" | "isVisible" | "imageKey" | "imageFocusX" | "imageFocusY" | "tags">;
 
 /** Veritabanı yokken (testler, önizleme) menü seed dosyasından gelir. samples: önizleme fotoğrafları. */
 export function seedMenu(samples: Record<string, string>): Omit<MenuData, "serverNow"> {
@@ -17,10 +17,12 @@ export function seedMenu(samples: Record<string, string>): Omit<MenuData, "serve
     // Gerçek fotoğraf her zaman önce gelir; örnekler yalnızca önizlemede boşlukları doldurur.
     imageKey: (photos as Record<string, string>)[p.slug] ?? samples[p.slug] ?? null,
     tags: [],
+    imageFocusX: 0.5,
+    imageFocusY: 0.5,
   }));
   return {
-    groups: seed.groups.map((group, sortOrder) => ({ ...group, sortOrder })) as MenuData["groups"],
-    categories: seed.categories.map((category, sortOrder) => ({ ...category, sortOrder, isVisible: true })) as MenuData["categories"],
+    groups: seed.groups.map((group, sortOrder) => ({ ...group, sortOrder, imageKey: null, imageFocusX: 0.5, imageFocusY: 0.5 })) as MenuData["groups"],
+    categories: seed.categories.map((category, sortOrder) => ({ ...category, sortOrder, isVisible: true, imageKey: null, imageFocusX: 0.5, imageFocusY: 0.5 })) as MenuData["categories"],
     products,
     extras: seed.extras,
     tags: [...READY_TAGS],

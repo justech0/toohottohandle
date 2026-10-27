@@ -3,10 +3,14 @@ import type { GroupColor, VariantKey } from "@/lib/menu/types";
 
 type Bool = 0 | 1;
 
-export interface GroupRow { id: number; slug: string; name_tr: string; name_en: string | null; name_ar: string | null; color: GroupColor; sort_order: number }
+export interface GroupRow {
+  id: number; slug: string; name_tr: string; name_en: string | null; name_ar: string | null; color: GroupColor; sort_order: number;
+  image_key: string | null; image_focus_x: number; image_focus_y: number;
+}
 export interface CategoryRow {
   id: number; slug: string; group_id: number; name_tr: string; name_en: string | null; name_ar: string | null;
   sort_order: number; is_visible: Bool; default_in_suggest: Bool; default_temp: "hot" | "cold" | null;
+  image_key: string | null; image_focus_x: number; image_focus_y: number;
 }
 export interface ProductRow {
   id: number; slug: string; category_id: number; name: string; name_en: string | null; name_ar: string | null;

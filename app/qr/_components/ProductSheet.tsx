@@ -30,6 +30,7 @@ export function ProductSheet({ product, onClose }: { product: CardProduct; onClo
             srcSet={imageSrcSet(photo)}
             sizes="(min-width: 640px) 600px, 100vw"
             alt={product.name}
+            style={{ objectPosition: `${product.imageFocusX * 100}% ${product.imageFocusY * 100}%` }}
             decoding="async"
           />
         ) : null}

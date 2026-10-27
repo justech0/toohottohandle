@@ -1,4 +1,5 @@
 import type { Pool, PoolConnection, RowDataPacket } from "mysql2/promise";
+import { refreshObjectUsage } from "@/lib/storage/images";
 import type { CategoryInput, ExtraInput, GroupInput, SettingsInput, TagInput } from "./catalogInput";
 
 type Rows = RowDataPacket[];
@@ -123,6 +124,7 @@ export async function deleteGroup(pool: Pool, adminId: number, id: number): Prom
     const [[child]] = await connection.query<Rows>("SELECT id FROM categories WHERE group_id = ? LIMIT 1", [id]);
     if (child) throw new Error("Bu grupta kategori var. Önce kategorileri taşıyın veya silin.");
     await connection.query("DELETE FROM menu_groups WHERE id = ?", [id]);
+    await refreshObjectUsage(connection, [row.image_key]);
     await audit(connection, adminId, "group", id, "delete", `${row.name_tr} grubu silindi`, row, null);
     await touchMenu(connection);
   });
@@ -167,6 +169,7 @@ export async function deleteCategory(pool: Pool, adminId: number, id: number): P
     if (product) throw new Error("Bu kategoride ürün var. Önce ürünleri taşıyın veya silin.");
     const [extraLinks] = await connection.query<Rows>("SELECT extra_id FROM extra_categories WHERE category_id = ? ORDER BY extra_id", [id]);
     await connection.query("DELETE FROM categories WHERE id = ?", [id]);
+    await refreshObjectUsage(connection, [row.image_key]);
     await audit(connection, adminId, "category", id, "delete", `${row.name_tr} kategorisi silindi`, {
       category: row,
       extraIds: extraLinks.map((link) => link.extra_id),
@@ -277,7 +280,10 @@ export async function undoCatalogChange(connection: PoolConnection, top: RowData
   const before = top.before_json ? JSON.parse(top.before_json) : null;
   if (top.entity === "group") {
     if (top.action === "create") await connection.query("DELETE FROM menu_groups WHERE id = ?", [top.entity_id]);
-    else await setRow(connection, "menu_groups", before);
+    else {
+      await setRow(connection, "menu_groups", before);
+      await refreshObjectUsage(connection, [before.image_key]);
+    }
     return;
   }
   if (top.entity === "category") {
@@ -285,6 +291,7 @@ export async function undoCatalogChange(connection: PoolConnection, top: RowData
     else if (top.action === "delete") {
       await setRow(connection, "categories", before.category);
       if (before.extraIds.length) await connection.query("INSERT INTO extra_categories (extra_id, category_id) VALUES ?", [before.extraIds.map((id: number) => [id, top.entity_id])]);
+      await refreshObjectUsage(connection, [before.category.image_key]);
     } else await setRow(connection, "categories", before);
     return;
   }

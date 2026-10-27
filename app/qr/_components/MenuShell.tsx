@@ -36,6 +36,8 @@ export function MenuShell({ menu }: { menu: MenuData }) {
         groupColor: group.color,
         groupIcon: groupStyle(group.slug).icon,
         imageKey: p.imageKey,
+        imageFocusX: p.imageFocusX,
+        imageFocusY: p.imageFocusY,
         soldOut: badges.soldOut,
         full: badges.full,
         stars: badges.stars,
@@ -70,7 +72,8 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       <main className="list">
         {sections.map(({ group, category, items }) => (
           <section key={category.slug} id={`cat-${category.slug}`} className="cat" data-color={group.color}>
-            <CategoryPoster name={category.nameTr} color={group.color} icon={groupStyle(group.slug).icon} />
+            <CategoryPoster name={category.nameTr} color={group.color} icon={groupStyle(group.slug).icon}
+              imageKey={category.imageKey} focusX={category.imageFocusX} focusY={category.imageFocusY} />
             <ul className="cards">
               {items.map((p) => (
                 <ProductCard key={p.slug} p={cards[p.slug]} />

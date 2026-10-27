@@ -6,8 +6,12 @@ describe("image urls", () => {
   it("builds one size", () => {
     expect(imageSrc("ornek-cappuccino", 320)).toBe("/qr/img/ornek-cappuccino-320.webp");
   });
+  it("sends uploaded SHA-256 keys to protected disk storage", () => {
+    const key = "a".repeat(64);
+    expect(imageSrc(key, 320)).toBe(`/qr/foto/${key}-320.webp`);
+  });
   it("builds the detail srcset", () => {
-    expect(imageSrcSet("k")).toBe("/qr/img/k-720.webp 720w, /qr/img/k-1280.webp 1280w");
+    expect(imageSrcSet("k")).toBe("/qr/foto/k-720.webp 720w, /qr/foto/k-1280.webp 1280w");
   });
 });
 

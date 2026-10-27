@@ -21,11 +21,15 @@ import {
 export type SaveState = { error: string | null };
 export type OperationState = { error: string | null };
 
-const FIELDS = ["name", "categoryId", "descTr", "ingredientsTr", "temp", "inSuggest", "isNew", "isFeatured", "isVisible", "sizes", "price0", "price1"];
+const FIELDS = [
+  "name", "categoryId", "descTr", "ingredientsTr", "temp", "inSuggest", "isNew", "isFeatured", "isVisible", "sizes", "price0", "price1",
+  "imageKey", "imageFocusX", "imageFocusY",
+];
 const USER_ERRORS = new Set([
   "Ürün bulunamadı.",
   "Kategori bulunamadı.",
   "Ürün adı için benzersiz adres oluşturulamadı.",
+  "Fotoğraf bulunamadı. Tekrar yükle.",
   "Tükendi süresi geçersiz.",
   "Ürün zaten ilk sırada.",
   "Ürün zaten son sırada.",
