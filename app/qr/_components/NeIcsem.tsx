@@ -21,6 +21,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   const [picks, setPicks] = useState<CardProduct[]>([]);
   const [phase, setPhase] = useState<"idle" | "reset" | "spin" | "done">("idle");
   const timers = useRef<number[]>([]);
+  const rafRef = useRef<number>(0);
   const lastPicks = useRef<CardProduct[]>([]);
   const squareRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -39,6 +40,10 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   const clear = () => {
     timers.current.forEach((t) => window.clearTimeout(t));
     timers.current = [];
+    if (rafRef.current) {
+      window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
   };
   useEffect(() => clear, []);
 
@@ -54,8 +59,12 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
       return;
     }
     setPhase("reset");
-    timers.current.push(window.setTimeout(() => setPhase("spin"), 30));
-    timers.current.push(window.setTimeout(() => setPhase("done"), 30 + DURATIONS[DURATIONS.length - 1] + 80));
+    rafRef.current = window.requestAnimationFrame(() => {
+      rafRef.current = window.requestAnimationFrame(() => {
+        setPhase("spin");
+        timers.current.push(window.setTimeout(() => setPhase("done"), DURATIONS[DURATIONS.length - 1] + 80));
+      });
+    });
   };
 
   if (!open) {
@@ -121,7 +130,9 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                         <BrandIcon name={p.groupIcon} className="ne-frame__icon" />
                         {p.imageKey ? (
                           <img
-                            src={imageSrc(p.imageKey, 320)}
+                            src={imageSrc(p.imageKey, 720)}
+                            srcSet={`${imageSrc(p.imageKey, 320)} 320w, ${imageSrc(p.imageKey, 720)} 720w`}
+                            sizes="(min-width: 768px) 260px, 33vw"
                             style={{ objectPosition: `${p.imageFocusX * 100}% ${p.imageFocusY * 100}%` }}
                             alt=""
                             decoding="async"
@@ -137,8 +148,16 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
               );
             })}
           </div>
-          {phase === "done" && picks[0] ? (
-            <div className="ne-result" aria-hidden="true">
+          {picks[0] ? (
+            <div
+              className="ne-result"
+              aria-hidden="true"
+              style={{
+                visibility: phase === "done" ? "visible" : "hidden",
+                opacity: phase === "done" ? 1 : 0,
+                pointerEvents: phase === "done" ? "auto" : "none",
+              }}
+            >
               <p className="ne-result__name" data-testid="neicsem-name">{picks[0].name}</p>
               <p className="ne-result__price">{picks[0].full}</p>
             </div>

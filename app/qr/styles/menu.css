@@ -207,7 +207,7 @@ html.intro-seen .intro { display: none; }
 .ne-open__title { flex: 1; margin: 0; font: 800 18px/1 var(--f-display); text-transform: uppercase; }
 .ne-open__close { color: var(--c-ink); }
 .ne-open__empty { margin: 14px 4px 4px; font: 600 15px/1.45 var(--f-text); }
-.ne-reels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.ne-reels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; max-width: 520px; margin-inline: auto; }
 .ne-col { min-width: 0; }
 .ne-reel { position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 3px solid var(--c-ink); border-radius: 14px; overflow: hidden; background: var(--c-white); cursor: pointer; }
 .ne-reel[aria-disabled="true"] { cursor: default; }
