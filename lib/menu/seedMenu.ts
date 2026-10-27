@@ -3,12 +3,13 @@ import photos from "@/db/seed/photos.json";
 import type { MenuData, MenuProduct } from "./types";
 import { READY_TAGS } from "./tags";
 
-type SeedProduct = Omit<MenuProduct, "descTr" | "soldOutUntil" | "isNew" | "isFeatured" | "isVisible" | "imageKey" | "imageFocusX" | "imageFocusY" | "tags">;
+type SeedProduct = Omit<MenuProduct, "id" | "descTr" | "soldOutUntil" | "isNew" | "isFeatured" | "isVisible" | "imageKey" | "imageFocusX" | "imageFocusY" | "tags">;
 
 /** Veritabanı yokken (testler, önizleme) menü seed dosyasından gelir. samples: önizleme fotoğrafları. */
 export function seedMenu(samples: Record<string, string>): Omit<MenuData, "serverNow"> {
-  const products: MenuProduct[] = (seed.products as SeedProduct[]).map((p) => ({
+  const products: MenuProduct[] = (seed.products as SeedProduct[]).map((p, index) => ({
     ...p,
+    id: index + 1,
     descTr: null,
     soldOutUntil: null,
     isNew: false,

@@ -29,6 +29,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
     for (const p of items) {
       const badges = priceBadges(p, menu.serverNow);
       cards[p.slug] = {
+        id: p.id,
         slug: p.slug,
         name: p.name,
         descTr: p.descTr,

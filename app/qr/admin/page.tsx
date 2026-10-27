@@ -35,6 +35,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
         <Link href="/qr/admin/toplu-fiyat" className="adm-btn adm-btn--block">Toplu fiyat</Link>
         <Link href="/qr/admin/kopyalar" className="adm-btn adm-btn--block">Kopyalar</Link>
         <Link href="/qr/admin/yedek" className="adm-btn adm-btn--block">Yedek</Link>
+        <Link href="/qr/admin/istatistik" className="adm-btn adm-btn--block">İstatistik ve QR</Link>
       </nav>
 
       <section className="adm-card" aria-labelledby="last-title">

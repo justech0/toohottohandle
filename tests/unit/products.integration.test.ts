@@ -39,7 +39,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
 
   beforeAll(async () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z" });
-    for (const t of ["audit_undo_secrets", "storage_objects", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_tags", "tags", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
+    for (const t of ["stats_product", "stats_hourly", "stats_daily", "audit_undo_secrets", "storage_objects", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_tags", "tags", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
       await pool.query(`DROP TABLE IF EXISTS ${t}`);
     }
     await migrate(pool);

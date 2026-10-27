@@ -12,6 +12,7 @@ export interface MenuCategory {
 }
 export interface MenuVariant { key: VariantKey; priceKurus: number }
 export interface MenuProduct {
+  id: number;
   slug: string;
   name: string;
   category: string;
