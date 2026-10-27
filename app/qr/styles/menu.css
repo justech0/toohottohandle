@@ -123,6 +123,10 @@ html[data-hero-visible="false"] .topbar .icon-btn { color: var(--c-ink); backgro
   background: var(--gc); color: var(--gt); }
 .sheet__panel--full { margin-top: 0; border-radius: 24px 24px 0 0; padding-top: 64px; }
 .sheet__icon { height: 96px; margin-bottom: 18px; }
+.sheet__icon--watermark { position: absolute; right: 18px; top: 18px; height: 72px; opacity: .18; margin: 0; pointer-events: none; }
+.sheet__ingredients { margin-top: 18px; }
+.sheet__section-title { margin: 0 0 6px; font: 800 11px/1 var(--f-display); letter-spacing: .16em; opacity: .8; text-transform: uppercase; }
+.sheet__ingredients .sheet__desc { margin-top: 0; }
 .sheet__cat { margin: 0 0 8px; font: 600 12px/1.2 var(--f-text); text-transform: uppercase; letter-spacing: .16em; }
 .sheet__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .sheet__title { margin: 0; font: 800 clamp(26px, 8vw, 34px)/1 var(--f-display); text-transform: uppercase; letter-spacing: -.01em; overflow-wrap: anywhere; }

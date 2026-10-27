@@ -35,7 +35,11 @@ export function ProductSheet({ product, onClose }: { product: CardProduct; onClo
           />
         ) : null}
         <div className={photo ? "sheet__panel" : "sheet__panel sheet__panel--full"} data-testid="sheet-panel" data-color={product.groupColor}>
-          {photo ? null : <BrandIcon name={product.groupIcon} className="sheet__icon" />}
+          {photo ? (
+            <BrandIcon name={product.groupIcon} className="sheet__icon sheet__icon--watermark" />
+          ) : (
+            <BrandIcon name={product.groupIcon} className="sheet__icon" />
+          )}
           <p className="sheet__cat">{product.categoryName}</p>
           <div className="sheet__head">
             <h2 id="sheet-title" className="sheet__title">{product.name}</h2>
@@ -56,7 +60,12 @@ export function ProductSheet({ product, onClose }: { product: CardProduct; onClo
               ))}
             </div>
           ) : null}
-          {product.descTr ? <p className="sheet__desc" data-testid="sheet-desc">{product.descTr}</p> : null}
+          {product.descTr ? (
+            <div className="sheet__ingredients">
+              <h3 className="sheet__section-title">İÇİNDEKİLER</h3>
+              <p className="sheet__desc" data-testid="sheet-desc">{product.descTr}</p>
+            </div>
+          ) : null}
           {product.tags.length ? <div className="sheet__labels" data-testid="product-tags">{product.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div> : null}
           <p className="sheet__note">Alerjen bilgisi için ekibimize sorabilirsin.</p>
         </div>
