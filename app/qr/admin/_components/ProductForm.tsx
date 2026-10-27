@@ -5,6 +5,7 @@ import Link from "next/link";
 import { parseProductInput, priceChanges } from "@/lib/admin/productInput";
 import type { AdminCategory, AdminTag } from "@/lib/admin/products";
 import { saveProductAction, type SaveState } from "../urunler/actions";
+import { PhotoPicker } from "./PhotoPicker";
 
 const SIZE_OPTIONS: [string, string, string[]][] = [
   ["none", "Boy yok (tek fiyat)", ["Fiyat (₺)"]],
@@ -79,6 +80,8 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
           ))}
         </select>
       </label>
+
+      <PhotoPicker initialKey={initial.imageKey} initialFocusX={Number(initial.imageFocusX)} initialFocusY={Number(initial.imageFocusY)} label="Ürün fotoğrafı" />
 
       <fieldset className="adm-fieldset">
         <legend>Boy ve fiyat</legend>

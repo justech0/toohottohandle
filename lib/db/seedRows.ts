@@ -36,10 +36,14 @@ export function seedRows(seed: SeedFile, photos: Record<string, string>): MenuRo
 
   const s = seed.settings;
   return {
-    groups: seed.groups.map((g, i) => ({ id: i + 1, slug: g.slug, name_tr: g.nameTr, name_en: null, name_ar: null, color: g.color as never, sort_order: i })),
+    groups: seed.groups.map((g, i) => ({
+      id: i + 1, slug: g.slug, name_tr: g.nameTr, name_en: null, name_ar: null, color: g.color as never, sort_order: i,
+      image_key: null, image_focus_x: 0.5, image_focus_y: 0.5,
+    })),
     categories: seed.categories.map((c, i) => ({
       id: i + 1, slug: c.slug, group_id: need(groupId, c.group, "grup"), name_tr: c.nameTr, name_en: null, name_ar: null,
       sort_order: i, is_visible: 1, default_in_suggest: c.defaultInSuggest ? 1 : 0, default_temp: c.defaultTemp as "hot" | "cold" | null,
+      image_key: null, image_focus_x: 0.5, image_focus_y: 0.5,
     })),
     products,
     variants,

@@ -169,4 +169,18 @@ export const MIGRATIONS: Migration[] = [
         ('sicak','SICAK',3), ('soguk','SOĞUK',4), ('acili','ACILI',5)`,
     ],
   },
+  {
+    id: "006_photos",
+    statements: [
+      "ALTER TABLE menu_groups ADD COLUMN image_key VARCHAR(96) NULL, ADD COLUMN image_focus_x DOUBLE NOT NULL DEFAULT 0.5, ADD COLUMN image_focus_y DOUBLE NOT NULL DEFAULT 0.5",
+      "ALTER TABLE categories ADD COLUMN image_key VARCHAR(96) NULL, ADD COLUMN image_focus_x DOUBLE NOT NULL DEFAULT 0.5, ADD COLUMN image_focus_y DOUBLE NOT NULL DEFAULT 0.5",
+      `CREATE TABLE storage_objects (
+        \`key\` CHAR(64) PRIMARY KEY,
+        size INT UNSIGNED NOT NULL,
+        created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        orphaned_at DATETIME(3) NULL,
+        INDEX (orphaned_at)
+      ) ${T}`,
+    ],
+  },
 ];

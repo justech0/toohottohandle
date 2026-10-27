@@ -16,6 +16,7 @@ import {
   undoLast,
 } from "@/lib/admin/products";
 import { parseProductInput } from "@/lib/admin/productInput";
+import { savePosterPhoto } from "@/lib/admin/photos";
 
 const url = process.env.TEST_DATABASE_URL;
 
@@ -38,7 +39,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
 
   beforeAll(async () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z" });
-    for (const t of ["audit_undo_secrets", "product_tags", "tags", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
+    for (const t of ["audit_undo_secrets", "storage_objects", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_tags", "tags", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
       await pool.query(`DROP TABLE IF EXISTS ${t}`);
     }
     await migrate(pool);
@@ -58,6 +59,32 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
   it("loads a product into the form", async () => {
     const f = await loadProductForm(pool, await id("caramel-macchiato"));
     expect(f).toMatchObject({ name: "Caramel Macchiato", sizes: "normal-buyuk", price0: "210", price1: "230", isVisible: "on" });
+  });
+
+  it("links an uploaded image with focus, marks replacement orphaned, and undo restores it", async () => {
+    const key = "a".repeat(64);
+    await pool.query("INSERT INTO storage_objects (`key`, size, orphaned_at) VALUES (?, 100, NOW())", [key]);
+    const pid = await id("cortado");
+    await saveProduct(pool, adminId, pid, input({ imageKey: key, imageFocusX: "0.2", imageFocusY: "0.8" }));
+    expect(await menuProduct("cortado")).toMatchObject({ imageKey: key, imageFocusX: 0.2, imageFocusY: 0.8 });
+    let [[stored]] = (await pool.query("SELECT orphaned_at FROM storage_objects WHERE `key` = ?", [key])) as unknown as [[{ orphaned_at: Date | null }]];
+    expect(stored.orphaned_at).toBeNull();
+    await saveProduct(pool, adminId, pid, input({}));
+    [[stored]] = (await pool.query("SELECT orphaned_at FROM storage_objects WHERE `key` = ?", [key])) as unknown as [[{ orphaned_at: Date | null }]];
+    expect(stored.orphaned_at).not.toBeNull();
+    await undoLast(pool, adminId);
+    expect(await menuProduct("cortado")).toMatchObject({ imageKey: key, imageFocusX: 0.2, imageFocusY: 0.8 });
+  });
+
+  it("saves a group poster and undo restores the fixed default", async () => {
+    const key = "b".repeat(64);
+    await pool.query("INSERT INTO storage_objects (`key`, size, orphaned_at) VALUES (?, 100, NOW())", [key]);
+    await savePosterPhoto(pool, adminId, "group", 1, key, 0.3, 0.7);
+    let [[group]] = (await pool.query("SELECT image_key, image_focus_x, image_focus_y FROM menu_groups WHERE id = 1")) as unknown as [[{ image_key: string | null; image_focus_x: number; image_focus_y: number }]];
+    expect(group).toEqual({ image_key: key, image_focus_x: 0.3, image_focus_y: 0.7 });
+    await undoLast(pool, adminId);
+    [[group]] = (await pool.query("SELECT image_key, image_focus_x, image_focus_y FROM menu_groups WHERE id = 1")) as unknown as [[{ image_key: string | null; image_focus_x: number; image_focus_y: number }]];
+    expect(group).toEqual({ image_key: null, image_focus_x: 0.5, image_focus_y: 0.5 });
   });
 
   it("saves name, price and text; the menu shows it; history has one line", async () => {

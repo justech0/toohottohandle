@@ -17,6 +17,7 @@ export function ProductCard({ p }: { p: CardProduct }) {
             srcSet={`${imageSrc(p.imageKey!, 320)} 320w, ${imageSrc(p.imageKey!, 720)} 720w`}
             sizes="(min-width: 768px) 30vw, 50vw"
             alt=""
+            style={{ objectPosition: `${p.imageFocusX * 100}% ${p.imageFocusY * 100}%` }}
             loading="lazy"
             decoding="async"
           />

@@ -11,6 +11,8 @@ export interface CardProduct {
   groupColor: GroupColor;
   groupIcon: Exclude<BrandIconName, "logo">;
   imageKey: string | null;
+  imageFocusX: number;
+  imageFocusY: number;
   soldOut: boolean;
   /** Ekran okuyucu ve arama için tam fiyat: "Normal 210 ₺ · Büyük 230 ₺" */
   full: string;

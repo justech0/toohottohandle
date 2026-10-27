@@ -27,7 +27,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
       <nav className="adm-card" aria-label="Bölümler">
         <Link href="/qr/admin/urunler" className="adm-btn adm-btn--main adm-btn--block">Ürünler ve fiyatlar</Link>
         <Link href="/qr/admin/katalog" className="adm-btn adm-btn--block">Katalog ve ayarlar</Link>
-        <p className="adm-note">Fotoğraf ve toplu fiyat sıradaki adımlarda eklenecek.</p>
+        <Link href="/qr/admin/fotograflar" className="adm-btn adm-btn--block">Afiş fotoğrafları</Link>
+        <p className="adm-note">Toplu fiyat sıradaki adımda eklenecek.</p>
       </nav>
 
       <section className="adm-card" aria-labelledby="last-title">

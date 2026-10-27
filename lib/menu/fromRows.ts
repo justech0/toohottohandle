@@ -19,10 +19,14 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
   if (!s) throw new Error("settings satırı yok");
 
   return {
-    groups: [...rows.groups].sort(bySort).map((g) => ({ slug: g.slug, nameTr: g.name_tr, color: g.color, sortOrder: g.sort_order })),
+    groups: [...rows.groups].sort(bySort).map((g) => ({
+      slug: g.slug, nameTr: g.name_tr, color: g.color, sortOrder: g.sort_order,
+      imageKey: g.image_key, imageFocusX: g.image_focus_x, imageFocusY: g.image_focus_y,
+    })),
     categories: [...rows.categories].sort(bySort).map((c) => ({
       slug: c.slug, nameTr: c.name_tr, group: groupSlug.get(c.group_id)!, sortOrder: c.sort_order, isVisible: Boolean(c.is_visible),
       defaultTemp: c.default_temp, defaultInSuggest: Boolean(c.default_in_suggest),
+      imageKey: c.image_key, imageFocusX: c.image_focus_x, imageFocusY: c.image_focus_y,
     })),
     products: [...rows.products].sort(bySort).map((p) => ({
       slug: p.slug,
@@ -37,6 +41,8 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
       isVisible: Boolean(p.is_visible),
       imageKey: p.image_key,
       tags: rows.productTags.filter((link) => link.product_id === p.id).map((link) => tagName.get(link.tag_id)!).filter(Boolean),
+      imageFocusX: p.image_focus_x,
+      imageFocusY: p.image_focus_y,
     })),
     extras: [...rows.extras].sort(bySort).map((e) => ({
       slug: e.slug, nameTr: e.name_tr, priceKurus: e.price_kurus,

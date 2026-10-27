@@ -7,25 +7,24 @@ Son güncelleme: 2026-10-27. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 - `/` yakında sayfası, `/qr` menü (v1 "Afiş" tasarımı: vitrin, grup afişleri, Ne içsem, fiyat çipleri, arama, WiFi, detay).
 - MySQL veritabanı: açılışta şema + seed (19 kategori, 129 ürün, 4 ekstra). Menü veritabanından, önbellekli.
 - Foto klasörü `THTH_UPLOAD_DIR` deploy sonrası kalıcı (doğrulandı).
-- Admin: kurulum (kayıttaki kodla), giriş, kilit, sıfırlama, çıkış (PR #4); ürün listesi/düzenleme, fiyat onayı, geçmiş, son işlemi geri al (PR #5).
+- Admin: kurulum (PR #4); ürün düzenleme ve geçmiş (PR #5); ürün işlemleri (PR #7); kategori, grup, ekstra, etiket ve ayar yönetimi (PR #8).
 - DNS hâlâ Vercel'i gösteriyor; alan adı bağlanınca SSL + HTTPS yönlendirmesi açılacak.
 
 ## Bekleyen PR
 
-- PR #8 (`a2-4-catalog`): kategori, grup, ekstra, etiket ve ayar yönetimi; ürün etiketleri; WiFi geçmiş maskelemesi ve test WiFi uyarısı.
-- Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı var; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
+- `a2-5-photos`: güvenli fotoğraf yükleme, odak noktası, ürün/grup/kategori fotoğrafları ve yetim dosya temizliği. PR açılacak.
+- Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
 
-1. 5 — fotoğraf yükleme
-2. Geri bildirim (HVK uyarlaması, yalnızca admin görür) — prompt 12
-3. 6 — toplu fiyat + menü kopyaları
-4. 7 — ZIP yedek / geri yükleme
-5. 8 — istatistik + logolu QR
-6. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
-7. EN + AR (RTL)
-8. 3D (A3)
-9. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
+1. Geri bildirim (HVK uyarlaması, yalnızca admin görür) — prompt 12
+2. 6 — toplu fiyat + menü kopyaları
+3. 7 — ZIP yedek / geri yükleme
+4. 8 — istatistik + logolu QR
+5. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
+6. EN + AR (RTL)
+7. 3D (A3)
+8. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
 
 ## Açık konular
 

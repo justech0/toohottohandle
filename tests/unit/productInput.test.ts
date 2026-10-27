@@ -4,6 +4,7 @@ import { parseProductInput, priceChanges } from "@/lib/admin/productInput";
 const base = {
   name: "Cortado", categoryId: "1", descTr: "", ingredientsTr: "", temp: "", inSuggest: "",
   isNew: "", isFeatured: "", isVisible: "on", sizes: "none", price0: "170", price1: "",
+  imageKey: "", imageFocusX: "0.5", imageFocusY: "0.5",
 };
 
 describe("parseProductInput", () => {
@@ -41,6 +42,14 @@ describe("parseProductInput", () => {
   it("reads temperature and Ne içsem as category default / yes / no", () => {
     const r = parseProductInput({ ...base, temp: "cold", inSuggest: "no" });
     expect(r.ok && [r.value.temp, r.value.inSuggest]).toEqual(["cold", false]);
+  });
+
+  it("accepts an uploaded image key and bounded focus", () => {
+    const key = "a".repeat(64);
+    const r = parseProductInput({ ...base, imageKey: key, imageFocusX: "0.25", imageFocusY: "0.75" });
+    expect(r.ok && r.value).toMatchObject({ imageKey: key, imageFocusX: 0.25, imageFocusY: 0.75 });
+    expect(parseProductInput({ ...base, imageKey: "../x" })).toEqual({ ok: false, error: "Fotoğraf anahtarı geçersiz." });
+    expect(parseProductInput({ ...base, imageFocusX: "2" })).toEqual({ ok: false, error: "Fotoğraf odağı geçersiz." });
   });
 
   it("trims long texts and keeps them optional", () => {

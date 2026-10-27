@@ -122,6 +122,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                         {p.imageKey ? (
                           <img
                             src={imageSrc(p.imageKey, 320)}
+                            style={{ objectPosition: `${p.imageFocusX * 100}% ${p.imageFocusY * 100}%` }}
                             alt=""
                             decoding="async"
                             onError={(e) => {

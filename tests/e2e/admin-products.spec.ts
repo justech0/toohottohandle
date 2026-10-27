@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import path from "node:path";
+import sharp from "sharp";
 import { signIn } from "./helpers/admin";
 
 /** admin-auth.spec.ts'ten sonra koşar (admin hesabı orada açılır). Veritabanlı sunucu gerekir. */
@@ -84,6 +86,44 @@ test("a bad price shows an error and keeps what was typed", async ({ page }) => 
   await page.getByRole("button", { name: "Kaydet" }).click();
   await expect(page.getByTestId("form-error")).toHaveText("Fiyat bir sayı olmalı (ör. 180 ya da 176,50).");
   await expect(page.getByLabel("Ürün adı")).toHaveValue("Cortado Yeni");
+});
+
+test("uploads a JPEG, saves its focus, serves immutable WebP, then removes it", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/qr/admin/urunler");
+  await page.getByTestId("admin-product").filter({ hasText: "Cortado" }).click();
+  await page.getByLabel("Fotoğraf seç").setInputFiles(path.join(process.cwd(), "public/yakinda/assets/og.jpg"));
+  await expect(page.getByRole("status")).toContainText("Fotoğraf hazır");
+  const preview = page.getByTestId("photo-focus");
+  const box = (await preview.boundingBox())!;
+  await preview.click({ position: { x: box.width * 0.25, y: box.height * 0.7 } });
+  await page.getByRole("button", { name: "Kaydet" }).click();
+  await expect(page.getByRole("status")).toContainText("Kaydedildi");
+
+  await page.goto("/qr");
+  const image = page.locator('[data-testid="product-row"][data-slug="cortado"] .card__img');
+  const src = await image.getAttribute("src");
+  expect(src).toMatch(/^\/qr\/foto\/[a-f0-9]{64}-320\.webp$/);
+  expect(await image.evaluate((node) => getComputedStyle(node).objectPosition)).not.toBe("50% 50%");
+  const response = await page.request.get(src!);
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("image/webp");
+  expect(response.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");
+  const large = await page.request.get(src!.replace("-320.webp", "-1280.webp"));
+  const largeBytes = await large.body();
+  expect(largeBytes.byteLength).toBeLessThanOrEqual(400_000);
+  const metadata = await sharp(largeBytes).metadata();
+  expect(metadata).toMatchObject({ format: "webp" });
+  expect(Math.max(metadata.width!, metadata.height!)).toBeLessThanOrEqual(1280);
+  expect(metadata.exif).toBeUndefined();
+
+  await page.goto("/qr/admin/urunler");
+  await page.getByTestId("admin-product").filter({ hasText: "Cortado" }).click();
+  await page.getByRole("button", { name: "Fotoğrafı sil" }).click();
+  await page.getByRole("button", { name: "Kaydet" }).click();
+  await expect(page.getByRole("status")).toContainText("Kaydedildi");
+  await page.goto("/qr");
+  await expect(page.locator('[data-testid="product-row"][data-slug="cortado"] .card__img')).toHaveCount(0);
 });
 
 test("price change asks first, then shows on the public menu at once", async ({ page }) => {

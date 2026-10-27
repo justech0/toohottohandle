@@ -10,6 +10,7 @@ import {
 import { takeCode } from "@/lib/auth/oneTimeCode";
 import { clearResetRequest } from "@/lib/auth/resetFlag";
 import { clearSessionCookie, requireAdmin, sessionToken, setSessionCookie } from "@/lib/auth/session";
+import { cleanupOrphanedImages } from "@/lib/storage/images";
 
 /** Hata olunca e-posta ve kod geri gelir; şifreler asla geri gönderilmez. */
 export type FormState = { error: string | null; values?: Record<string, string> };
@@ -39,6 +40,7 @@ export async function login(_: FormState, f: FormData): Promise<FormState> {
     return { error: r.reason === "locked" ? `Çok fazla yanlış deneme. ${r.minutes} dakika sonra tekrar dene.` : "E-posta ya da şifre yanlış.", values };
   }
   await startSession(r.adminId);
+  await cleanupOrphanedImages(getPool()).catch((error) => console.error("[storage] yetim fotoğraf temizliği başarısız", (error as Error).message));
   redirect("/qr/admin");
 }
 

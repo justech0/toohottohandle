@@ -3,8 +3,10 @@ import { formatPrice } from "@/lib/format/price";
 import type { MenuVariant, VariantKey } from "@/lib/menu/types";
 import type { ProductRow, VariantRow } from "@/lib/db/rows";
 import { normalizeForSearch } from "@/lib/text/normalize";
+import { IMAGE_KEY, refreshObjectUsage } from "@/lib/storage/images";
 import { priceChanges, sizeSetOf, type ProductInput } from "./productInput";
 import { undoCatalogChange } from "./catalog";
+import { undoPosterPhoto } from "./photos";
 
 /** Ürünün geçmişe yazılan tam hali: satır + boylar (spec 4.4: geri alınan ürün eksik dönmez). */
 interface ProductSnapshot {
@@ -51,6 +53,7 @@ export async function loadProductForm(pool: Pool, id: number): Promise<Record<st
   return {
     id: String(p.id), name: p.name, categoryId: String(p.category_id), descTr: p.desc_tr ?? "", ingredientsTr: p.ingredients_tr ?? "",
     temp: p.temp ?? "", inSuggest: tri(p.in_suggest), isNew: p.is_new ? "on" : "", isFeatured: p.is_featured ? "on" : "", isVisible: p.is_visible ? "on" : "",
+    imageKey: p.image_key ?? "", imageFocusX: String(p.image_focus_x), imageFocusY: String(p.image_focus_y),
     sizes: sizeSetOf(vs.map((v) => ({ key: v.label_key }))), price0: vs[0] ? lira(vs[0].price_kurus) : "", price1: vs[1] ? lira(vs[1].price_kurus) : "",
     tagIds: snap.tagIds.join(","),
   };
@@ -147,7 +150,14 @@ function inputColumns(input: ProductInput): Record<string, unknown> {
   return {
     name: input.name, category_id: input.categoryId, desc_tr: input.descTr, ingredients_tr: input.ingredientsTr, temp: input.temp,
     in_suggest: bool(input.inSuggest), is_new: bool(input.isNew), is_featured: bool(input.isFeatured), is_visible: bool(input.isVisible),
+    image_key: input.imageKey, image_focus_x: input.imageFocusX, image_focus_y: input.imageFocusY,
   };
+}
+
+async function validateImageKey(c: PoolConnection, key: string | null): Promise<void> {
+  if (!key || !IMAGE_KEY.test(key)) return;
+  const [[row]] = await c.query<Rows>("SELECT `key` FROM storage_objects WHERE `key` = ?", [key]);
+  if (!row) throw new Error("Fotoğraf bulunamadı. Tekrar yükle.");
 }
 
 async function uniqueSlug(c: PoolConnection, name: string): Promise<string> {
@@ -202,6 +212,7 @@ export async function saveProduct(pool: Pool, adminId: number, id: number, input
     const [[cat]] = await c.query<Rows>("SELECT id FROM categories WHERE id = ?", [input.categoryId]);
     if (!cat) throw new Error("Kategori bulunamadı.");
     await validateTags(c, input.tagIds);
+    await validateImageKey(c, input.imageKey);
     await writeProduct(
       c, id,
       inputColumns(input),
@@ -209,6 +220,7 @@ export async function saveProduct(pool: Pool, adminId: number, id: number, input
       input.tagIds,
     );
     const after = await snapshot(c, id);
+    await refreshObjectUsage(c, [before.product.image_key, input.imageKey]);
     const summary = summarize(before, input);
     await audit(c, adminId, id, "update", summary, before, after);
     await touchMenu(c);
@@ -222,6 +234,7 @@ export async function createProduct(pool: Pool, adminId: number, input: ProductI
     const [[category]] = await c.query<Rows>("SELECT id FROM categories WHERE id = ? FOR UPDATE", [input.categoryId]);
     if (!category) throw new Error("Kategori bulunamadı.");
     await validateTags(c, input.tagIds);
+    await validateImageKey(c, input.imageKey);
     const slug = await uniqueSlug(c, input.name);
     const [[order]] = await c.query<Rows>("SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_order FROM products WHERE category_id = ?", [input.categoryId]);
     const columns = { slug, ...inputColumns(input), sort_order: Number(order.next_order) };
@@ -233,6 +246,7 @@ export async function createProduct(pool: Pool, adminId: number, input: ProductI
     ]);
     if (input.tagIds.length) await c.query("INSERT INTO product_tags (product_id, tag_id) VALUES ?", [input.tagIds.map((tagId) => [id, tagId])]);
     const after = await snapshot(c, id);
+    await refreshObjectUsage(c, [input.imageKey]);
     await audit(c, adminId, id, "create", `${input.name}: eklendi`, null, after);
     await touchMenu(c);
     return { id, slug };
@@ -297,6 +311,7 @@ export async function deleteProduct(pool: Pool, adminId: number, id: number): Pr
       before.product.sort_order,
     ]);
     await audit(c, adminId, id, "delete", `${before.product.name}: silindi`, before, null);
+    await refreshObjectUsage(c, [before.product.image_key]);
     await touchMenu(c);
   });
 }
@@ -334,6 +349,7 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
   return inTx(pool, async (c) => {
     const [[top]] = await c.query<Rows>("SELECT * FROM audit_log ORDER BY id DESC LIMIT 1 FOR UPDATE");
     if (!top || top.action === "undo" || top.undone_by !== null) throw new Error("Geri alınacak işlem yok.");
+    const current = top.entity === "product" && top.entity_id ? await snapshot(c, top.entity_id, true) : null;
     if (top.entity === "product") {
       if (["update", "sold_out", "visibility"].includes(top.action)) {
         const before = JSON.parse(top.before_json) as ProductSnapshot;
@@ -364,9 +380,13 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
       } else {
         throw new Error("Bu işlem geri alınamıyor.");
       }
+    } else if ((top.entity === "group" || top.entity === "category") && top.action === "image") {
+      await undoPosterPhoto(c, top);
     } else {
       await undoCatalogChange(c, top);
     }
+    const restored = top.entity === "product" && top.entity_id ? await snapshot(c, top.entity_id) : null;
+    if (top.entity === "product") await refreshObjectUsage(c, [current?.product.image_key, restored?.product.image_key]);
     const summary = `Geri alındı: ${top.summary}`.slice(0, 255);
     const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, ?, ?, 'undo', ?)", [adminId, top.entity, top.entity_id, summary]);
     await c.query("UPDATE audit_log SET undone_by = ? WHERE id = ?", [(res as { insertId: number }).insertId, top.id]);

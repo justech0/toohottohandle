@@ -12,14 +12,14 @@ describe.skipIf(!url)("veritabanı (MariaDB/MySQL)", () => {
 
   beforeAll(async () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z", multipleStatements: false });
-    for (const t of ["audit_undo_secrets", "product_tags", "tags", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
+    for (const t of ["audit_undo_secrets", "storage_objects", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_tags", "tags", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
       await pool.query(`DROP TABLE IF EXISTS ${t}`);
     }
   });
   afterAll(async () => pool?.end());
 
   it("applies the schema once", async () => {
-    expect(await migrate(pool)).toEqual(["001_menu", "002_auth", "003_audit", "004_snapshots", "005_catalog"]);
+    expect(await migrate(pool)).toEqual(["001_menu", "002_auth", "003_audit", "004_snapshots", "005_catalog", "006_photos"]);
     expect(await migrate(pool)).toEqual([]);
   });
 
@@ -46,5 +46,13 @@ describe.skipIf(!url)("veritabanı (MariaDB/MySQL)", () => {
     await pool.query("INSERT INTO menu_snapshots (reason, data) VALUES ('silme öncesi', '{}')");
     const [rows] = await pool.query("SELECT reason, data FROM menu_snapshots");
     expect(rows).toEqual([{ reason: "silme öncesi", data: "{}" }]);
+  });
+
+  it("creates storage metadata and poster focus columns", async () => {
+    await pool.query("INSERT INTO storage_objects (`key`, size, orphaned_at) VALUES (?, 123, NOW())", ["a".repeat(64)]);
+    const [[stored]] = (await pool.query("SELECT size, orphaned_at FROM storage_objects WHERE `key` = ?", ["a".repeat(64)])) as unknown as [[{ size: number; orphaned_at: Date }]];
+    expect(stored.size).toBe(123);
+    const [[group]] = (await pool.query("SELECT image_key, image_focus_x, image_focus_y FROM menu_groups LIMIT 1")) as unknown as [[{ image_key: null; image_focus_x: number; image_focus_y: number }]];
+    expect(group).toEqual({ image_key: null, image_focus_x: 0.5, image_focus_y: 0.5 });
   });
 });
