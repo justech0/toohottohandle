@@ -78,6 +78,7 @@ export function HeroSlides() {
             alt=""
             decoding="async"
             fetchPriority={k === 0 ? "high" : "low"}
+            loading={k === 0 ? "eager" : "lazy"}
             onError={(e) => {
               e.currentTarget.style.visibility = "hidden";
               setBroken((b) => ({ ...b, [s.key]: true }));
