@@ -7,6 +7,8 @@ import { IMAGE_KEY, refreshObjectUsage } from "@/lib/storage/images";
 import { priceChanges, sizeSetOf, type ProductInput } from "./productInput";
 import { undoCatalogChange } from "./catalog";
 import { undoPosterPhoto } from "./photos";
+import { undoBulkPrice } from "./bulkPrice";
+import { takeMenuSnapshot } from "./snapshots";
 
 /** Ürünün geçmişe yazılan tam hali: satır + boylar (spec 4.4: geri alınan ürün eksik dönmez). */
 interface ProductSnapshot {
@@ -172,17 +174,6 @@ async function uniqueSlug(c: PoolConnection, name: string): Promise<string> {
   throw new Error("Ürün adı için benzersiz adres oluşturulamadı.");
 }
 
-async function menuSnapshotData(c: PoolConnection): Promise<Record<string, unknown[]>> {
-  const query = async (sql: string) => (await c.query<Rows>(sql))[0];
-  const [groups, categories, products, variants, extras, extraCategories, tags, productTags, settings] = await Promise.all([
-    query("SELECT * FROM menu_groups"), query("SELECT * FROM categories"), query("SELECT * FROM products"),
-    query("SELECT * FROM product_variants"), query("SELECT * FROM extras"), query("SELECT * FROM extra_categories"),
-    query("SELECT * FROM tags"), query("SELECT * FROM product_tags"),
-    query("SELECT id, wifi_ssid, wifi_username, wifi_note_tr, wifi_note_en, wifi_note_ar, opening_time, footer_note_tr, footer_note_en, footer_note_ar, stats_enabled, menu_updated_at, last_backup_at FROM settings WHERE id = 1"),
-  ]);
-  return { groups, categories, products, variants, extras, extraCategories, tags, productTags, settings };
-}
-
 function withBoundedSuffix(value: string, suffix: string, maxLength: number): string {
   const suffixCharacters = [...suffix];
   return [...value].slice(0, maxLength - suffixCharacters.length).join("") + suffix;
@@ -190,8 +181,7 @@ function withBoundedSuffix(value: string, suffix: string, maxLength: number): st
 
 async function snapshotMenuBeforeDelete(c: PoolConnection, productName: string): Promise<void> {
   const reason = withBoundedSuffix(productName, " silme öncesi", 120);
-  await c.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [reason, JSON.stringify(await menuSnapshotData(c))]);
-  await c.query("DELETE FROM menu_snapshots WHERE id NOT IN (SELECT id FROM (SELECT id FROM menu_snapshots ORDER BY id DESC LIMIT 25) AS kept)");
+  await takeMenuSnapshot(c, reason);
 }
 
 function summarize(before: ProductSnapshot, input: ProductInput): string {
@@ -339,9 +329,9 @@ export async function moveProduct(pool: Pool, adminId: number, id: number, direc
 export interface LastChange { id: number; summary: string; at: string; canUndo: boolean }
 
 export async function lastChange(pool: Pool): Promise<LastChange | null> {
-  const [[r]] = await pool.query<Rows>("SELECT id, summary, at, action, undone_by FROM audit_log ORDER BY id DESC LIMIT 1");
+  const [[r]] = await pool.query<Rows>("SELECT id, summary, at, entity, action, undone_by FROM audit_log ORDER BY id DESC LIMIT 1");
   if (!r) return null;
-  return { id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: r.action !== "undo" && r.undone_by === null };
+  return { id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: r.entity !== "menu_snapshot" && r.action !== "undo" && r.undone_by === null };
 }
 
 /** Yalnızca geçmişin en üstündeki işlem geri alınır (spec 4.4). Geri alma kendisi geri alınamaz. */
@@ -350,7 +340,9 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
     const [[top]] = await c.query<Rows>("SELECT * FROM audit_log ORDER BY id DESC LIMIT 1 FOR UPDATE");
     if (!top || top.action === "undo" || top.undone_by !== null) throw new Error("Geri alınacak işlem yok.");
     const current = top.entity === "product" && top.entity_id ? await snapshot(c, top.entity_id, true) : null;
-    if (top.entity === "product") {
+    if (top.entity === "bulk_price") {
+      await undoBulkPrice(c, top);
+    } else if (top.entity === "product") {
       if (["update", "sold_out", "visibility"].includes(top.action)) {
         const before = JSON.parse(top.before_json) as ProductSnapshot;
         const { id, ...cols } = before.product;

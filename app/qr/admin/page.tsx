@@ -12,23 +12,26 @@ import { undoLastAction } from "./urunler/actions";
 const when = (iso: string) =>
   new Intl.DateTimeFormat("tr-TR", { timeZone: "Europe/Istanbul", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
-async function Content({ searchParams }: { searchParams: Promise<{ geri?: string }> }) {
+async function Content({ searchParams }: { searchParams: Promise<{ geri?: string; toplu?: string }> }) {
   await connection();
   if (!hasDb()) redirect("/qr/admin/giris");
   const admin = await requireAdmin();
   const [last, catalog] = await Promise.all([lastChange(getPool()), catalogData(getPool())]);
-  const undone = Boolean((await searchParams).geri);
+  const query = await searchParams;
+  const undone = Boolean(query.geri);
   return (
     <>
       <p className="adm-lead" data-testid="admin-email">{admin.email}</p>
       {undone ? <p className="adm-ok" role="status">Son işlem geri alındı.</p> : null}
+      {query.toplu ? <p className="adm-ok" role="status">Toplu fiyat uygulandı.</p> : null}
       {catalog.usesTestWifi ? <p className="adm-warning" role="alert">WiFi test bilgisi kullanılıyor</p> : null}
 
       <nav className="adm-card" aria-label="Bölümler">
         <Link href="/qr/admin/urunler" className="adm-btn adm-btn--main adm-btn--block">Ürünler ve fiyatlar</Link>
         <Link href="/qr/admin/katalog" className="adm-btn adm-btn--block">Katalog ve ayarlar</Link>
         <Link href="/qr/admin/fotograflar" className="adm-btn adm-btn--block">Afiş fotoğrafları</Link>
-        <p className="adm-note">Toplu fiyat sıradaki adımda eklenecek.</p>
+        <Link href="/qr/admin/toplu-fiyat" className="adm-btn adm-btn--block">Toplu fiyat</Link>
+        <Link href="/qr/admin/kopyalar" className="adm-btn adm-btn--block">Kopyalar</Link>
       </nav>
 
       <section className="adm-card" aria-labelledby="last-title">
@@ -63,7 +66,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
   );
 }
 
-export default function AdminHome(props: { searchParams: Promise<{ geri?: string }> }) {
+export default function AdminHome(props: { searchParams: Promise<{ geri?: string; toplu?: string }> }) {
   return (
     <>
       <h1 className="adm-h1">Menü yönetimi</h1>

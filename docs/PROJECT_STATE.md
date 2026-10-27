@@ -7,24 +7,23 @@ Son güncelleme: 2026-10-27. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 - `/` yakında sayfası, `/qr` menü (v1 "Afiş" tasarımı: vitrin, grup afişleri, Ne içsem, fiyat çipleri, arama, WiFi, detay).
 - MySQL veritabanı: açılışta şema + seed (19 kategori, 129 ürün, 4 ekstra). Menü veritabanından, önbellekli.
 - Foto klasörü `THTH_UPLOAD_DIR` deploy sonrası kalıcı (doğrulandı).
-- Admin: kurulum (PR #4); ürün düzenleme ve geçmiş (PR #5); ürün işlemleri (PR #7); kategori, grup, ekstra, etiket ve ayar yönetimi (PR #8).
+- Admin: kurulum (PR #4); ürün düzenleme ve geçmiş (PR #5); ürün işlemleri (PR #7); kategori, grup, ekstra, etiket ve ayar yönetimi (PR #8); güvenli fotoğraf yönetimi (PR #9).
 - DNS hâlâ Vercel'i gösteriyor; alan adı bağlanınca SSL + HTTPS yönlendirmesi açılacak.
 
 ## Bekleyen PR
 
-- PR #9 (`a2-5-photos`): güvenli fotoğraf yükleme, odak noktası, ürün/grup/kategori fotoğrafları ve yetim dosya temizliği.
+- `a2-6-bulk`: toplu fiyat güncelleme ve menü kopyaları (PR açılacak).
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
 
 1. Geri bildirim (HVK uyarlaması, yalnızca admin görür) — prompt 12
-2. 6 — toplu fiyat + menü kopyaları
-3. 7 — ZIP yedek / geri yükleme
-4. 8 — istatistik + logolu QR
-5. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
-6. EN + AR (RTL)
-7. 3D (A3)
-8. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
+2. 7 — ZIP yedek / geri yükleme
+3. 8 — istatistik + logolu QR
+4. Ertelenen küçükler (`docs/superpowers/plans/2026-10-26-v1-review-todo.md`)
+5. EN + AR (RTL)
+6. 3D (A3)
+7. DNS + SSL + Vercel'den alan adını kaldırma (Enes'le)
 
 ## Açık konular
 
