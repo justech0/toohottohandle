@@ -12,6 +12,7 @@ export function HeroSlides() {
   const [index, setIndex] = useState(0);
   // Kendi kendine dönerken ekran okuyucuya duyurulmaz; ziyaretçi bir slayt seçince duyurulur (WCAG 2.2.2).
   const [announce, setAnnounce] = useState(false);
+  const [broken, setBroken] = useState<Record<string, boolean>>({});
   const ref = useRef<HTMLElement>(null);
   const resetTimer = useRef<() => void>(() => {});
   const slide = HERO_SLIDES[index];
@@ -69,7 +70,7 @@ export function HeroSlides() {
   }, []);
 
   return (
-    <section ref={ref} className={`hero hero--${slide.color}`} data-testid="hero" data-active={slide.key} aria-label="Vitrin">
+    <section ref={ref} className={`hero hero--${slide.color}`} data-testid="hero" data-active={slide.key} data-broken={broken[slide.key] ? "true" : undefined} aria-label="Vitrin">
       {HERO_SLIDES.map((s, k) => (
         <div key={s.key} className="hero__slide" data-on={k === index} aria-hidden={k !== index}>
           <img
@@ -79,6 +80,7 @@ export function HeroSlides() {
             fetchPriority={k === 0 ? "high" : "low"}
             onError={(e) => {
               e.currentTarget.style.visibility = "hidden";
+              setBroken((b) => ({ ...b, [s.key]: true }));
             }}
           />
         </div>
