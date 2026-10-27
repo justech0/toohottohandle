@@ -12,7 +12,7 @@ Son güncelleme: 2026-10-27. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- `a2-6-bulk`: toplu fiyat güncelleme ve menü kopyaları (PR açılacak).
+- PR #10 (`a2-6-bulk`): toplu fiyat güncelleme ve menü kopyaları.
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
