@@ -12,7 +12,7 @@ Son güncelleme: 2026-10-27. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- `a2-5-photos`: güvenli fotoğraf yükleme, odak noktası, ürün/grup/kategori fotoğrafları ve yetim dosya temizliği. PR açılacak.
+- PR #9 (`a2-5-photos`): güvenli fotoğraf yükleme, odak noktası, ürün/grup/kategori fotoğrafları ve yetim dosya temizliği.
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
