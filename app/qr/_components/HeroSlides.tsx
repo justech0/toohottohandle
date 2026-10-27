@@ -13,6 +13,7 @@ export function HeroSlides() {
   // Kendi kendine dönerken ekran okuyucuya duyurulmaz; ziyaretçi bir slayt seçince duyurulur (WCAG 2.2.2).
   const [announce, setAnnounce] = useState(false);
   const ref = useRef<HTMLElement>(null);
+  const resetTimer = useRef<() => void>(() => {});
   const slide = HERO_SLIDES[index];
 
   useEffect(() => {
@@ -54,6 +55,7 @@ export function HeroSlides() {
     root.addEventListener("focusin", onFocusIn);
     root.addEventListener("focusout", onFocusOut);
     document.addEventListener("visibilitychange", sync);
+    resetTimer.current = sync;
     sync();
     return () => {
       io.disconnect();
@@ -98,6 +100,7 @@ export function HeroSlides() {
             onClick={() => {
               setAnnounce(true);
               setIndex(k);
+              resetTimer.current();
             }}
           />
         ))}
