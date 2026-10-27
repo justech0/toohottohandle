@@ -1,4 +1,4 @@
-import type { BrandIconName } from "@/app/qr/_components/BrandIcon";
+import type { BrandIconName } from "./icons";
 
 export type HeroSlide = {
   key: "fast" | "free" | "shine";

@@ -1,4 +1,5 @@
-export type BrandIconName = "lips" | "rabbit" | "star" | "logo";
+import type { BrandIconName } from "@/lib/brand/icons";
+export type { BrandIconName };
 
 /**
  * Resmi logo/ikon PNG'leri alfa maskesi olarak kullanılır; renk currentColor'dan gelir.
