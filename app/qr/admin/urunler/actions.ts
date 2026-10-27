@@ -1,6 +1,6 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import type { RowDataPacket } from "mysql2/promise";
 import { getPool } from "@/lib/db/client";
@@ -119,5 +119,6 @@ export async function undoLastAction(): Promise<void> {
     // Düğme pasifken gelen istek: sessizce sayfaya dön, son durum zaten ekranda.
   }
   updateTag("menu");
+  revalidatePath("/qr");
   redirect("/qr/admin?geri=1");
 }

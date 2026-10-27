@@ -99,3 +99,14 @@
 .adm-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
 .adm-jump { display: flex; gap: 8px; overflow-x: auto; margin: 16px 0; padding-bottom: 4px; }
 .adm-jump a { white-space: nowrap; color: inherit; font-size: 13px; font-weight: 600; padding: 8px 12px; border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-white); }
+.adm-table-wrap { overflow-x: auto; margin-top: 10px; border: 1.5px solid var(--c-line); border-radius: 14px; background: var(--c-white); }
+.adm-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.adm-table th, .adm-table td { padding: 11px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--c-line); min-width: 130px; }
+.adm-table th:first-child { min-width: 160px; }
+.adm-table tbody th { font-family: var(--f-text); font-weight: 600; overflow-wrap: anywhere; }
+.adm-table tr:last-child th, .adm-table tr:last-child td { border-bottom: 0; }
+.adm-apply { display: grid; gap: 10px; margin-top: 12px; justify-items: start; }
+.adm-history { list-style: none; display: grid; gap: 10px; padding: 0; margin: 10px 0 0; }
+.adm-history > li { min-width: 0; }
+.adm-history > li:not(.adm-card) { display: grid; gap: 3px; padding: 10px 0; border-bottom: 1px solid var(--c-line); overflow-wrap: anywhere; }
+.adm-history time { color: var(--c-ink-soft); font-size: 13px; font-variant-numeric: tabular-nums; }
