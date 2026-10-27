@@ -183,4 +183,27 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "007_stats",
+    statements: [
+      `CREATE TABLE stats_daily (
+        date DATE PRIMARY KEY,
+        menu_opens BIGINT UNSIGNED NOT NULL DEFAULT 0
+      ) ${T}`,
+      `CREATE TABLE stats_hourly (
+        date DATE NOT NULL,
+        hour TINYINT UNSIGNED NOT NULL,
+        opens BIGINT UNSIGNED NOT NULL DEFAULT 0,
+        PRIMARY KEY (date, hour),
+        CONSTRAINT stats_hour_valid CHECK (hour BETWEEN 0 AND 23)
+      ) ${T}`,
+      `CREATE TABLE stats_product (
+        date DATE NOT NULL,
+        product_id INT NOT NULL,
+        views BIGINT UNSIGNED NOT NULL DEFAULT 0,
+        PRIMARY KEY (date, product_id),
+        INDEX (product_id, date)
+      ) ${T}`,
+    ],
+  },
 ];

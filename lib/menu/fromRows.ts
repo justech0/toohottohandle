@@ -29,6 +29,7 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
       imageKey: c.image_key, imageFocusX: c.image_focus_x, imageFocusY: c.image_focus_y,
     })),
     products: [...rows.products].sort(bySort).map((p) => ({
+      id: p.id,
       slug: p.slug,
       name: p.name,
       category: catSlug.get(p.category_id)!,
