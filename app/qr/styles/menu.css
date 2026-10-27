@@ -77,11 +77,11 @@ html[data-hero-visible="false"] .topbar .icon-btn { color: var(--c-ink); backgro
   border-radius: 18px; font-family: var(--f-text); }
 .card--photo { min-height: 236px; padding: 0 0 14px; background: var(--c-white); color: var(--c-ink); }
 .card__img { width: 100%; height: 156px; object-fit: cover; border-radius: 18px 18px 0 0; display: block; background: var(--c-line); }
-.card--photo .card__name { padding: 12px 12px 0; font: 600 14px/1.2 var(--f-text); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: anywhere; }
-.card__cat { padding: 4px 12px 0; font: 600 10px/1.2 var(--f-text); letter-spacing: .14em; text-transform: uppercase; color: var(--c-ink-soft); }
+.card--photo .card__name { padding: 12px 12px 0; font: 600 14px/1.25 var(--f-text); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: break-word; word-break: normal; hyphens: auto; }
+.card__cat { padding: 4px 12px 0; font: 600 10px/1.2 var(--f-text); letter-spacing: .14em; text-transform: uppercase; color: var(--c-ink-soft); min-height: 16px; margin-bottom: 2px; }
 .card--plain { min-height: 132px; padding: 12px 12px 12px; gap: 10px; justify-content: space-between; background: var(--gc); color: var(--gt); }
 .card__icon { height: 30px; }
-.card--plain .card__name { font: 800 16px/1.1 var(--f-display); overflow-wrap: anywhere; hyphens: auto; }
+.card--plain .card__name { font: 800 16px/1.1 var(--f-display); overflow-wrap: break-word; word-break: normal; hyphens: auto; }
 .card__out { margin-top: auto; padding: 6px 10px; border-radius: 8px; background: var(--c-ink); color: var(--c-paper); font: 600 13px/1 var(--f-text); }
 .card--photo .card__out { margin: 10px 12px 0; }
 .card--out .card__img { filter: grayscale(1); }
