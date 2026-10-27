@@ -52,7 +52,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
     clear();
     // Tek öneri: üç kutu da aynı içecekte hizalanır (Enes, 2026-10-26).
     const next = pickSuggestions(pool, 1, Math.random, lastPicks.current);
-    lastPicks.current = next;
+    lastPicks.current = [next[0], ...lastPicks.current].filter(Boolean).slice(0, 6);
     setPicks(next);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPhase("done");

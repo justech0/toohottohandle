@@ -134,3 +134,26 @@ for (const size of [{ width: 768, height: 1024 }, { width: 1440, height: 900 }])
     await expect(page.getByTestId("category-tab").filter({ hasText: "Kasa Önü" })).toHaveAttribute("aria-current", "true");
   });
 }
+
+test("at 360px both price chips on a two-size card are fully visible without clipping", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await openMenu(page);
+  const card = row(page, "cappuccino").locator("button");
+  const chips = card.locator(".chip");
+  await expect(chips).toHaveCount(2);
+  await expect(chips.nth(0)).toBeVisible();
+  await expect(chips.nth(1)).toBeVisible();
+  await expect(chips.nth(0)).toContainText("Normal");
+  await expect(chips.nth(0)).toContainText("180 ₺");
+  await expect(chips.nth(1)).toContainText("Büyük");
+  await expect(chips.nth(1)).toContainText("200 ₺");
+  const cardBox = (await card.boundingBox())!;
+  for (const chip of await chips.all()) {
+    const box = (await chip.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(cardBox.x - 1);
+    expect(box.x + box.width).toBeLessThanOrEqual(cardBox.x + cardBox.width + 1);
+    const clipped = await chip.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(clipped).toBe(false);
+  }
+});
+
