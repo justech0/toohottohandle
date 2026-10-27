@@ -12,7 +12,7 @@ Son güncelleme: 2026-10-27. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- `a2-7-backup`: ZIP yedek ve geri yükleme (PR açılacak).
+- PR #11 (`a2-7-backup`): ZIP yedek ve geri yükleme.
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
 
 ## Sıradaki (sırayla)
