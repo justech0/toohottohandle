@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { getPool, hasDb } from "@/lib/db/client";
 import { lastChange } from "@/lib/admin/products";
 import { catalogData } from "@/lib/admin/catalog";
+import { getBackupStatus } from "@/lib/admin/backups";
 import { logout, logoutEverywhere } from "./actions";
 import { undoLastAction } from "./urunler/actions";
 
@@ -16,7 +17,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
   await connection();
   if (!hasDb()) redirect("/qr/admin/giris");
   const admin = await requireAdmin();
-  const [last, catalog] = await Promise.all([lastChange(getPool()), catalogData(getPool())]);
+  const [last, catalog, backup] = await Promise.all([lastChange(getPool()), catalogData(getPool()), getBackupStatus(getPool())]);
   const query = await searchParams;
   const undone = Boolean(query.geri);
   return (
@@ -25,6 +26,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
       {undone ? <p className="adm-ok" role="status">Son işlem geri alındı.</p> : null}
       {query.toplu ? <p className="adm-ok" role="status">Toplu fiyat uygulandı.</p> : null}
       {catalog.usesTestWifi ? <p className="adm-warning" role="alert">WiFi test bilgisi kullanılıyor</p> : null}
+      <p className={`adm-backup-status${backup.stale ? " adm-backup-status--stale" : ""}`}>{backup.label}</p>
 
       <nav className="adm-card" aria-label="Bölümler">
         <Link href="/qr/admin/urunler" className="adm-btn adm-btn--main adm-btn--block">Ürünler ve fiyatlar</Link>
@@ -32,6 +34,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
         <Link href="/qr/admin/fotograflar" className="adm-btn adm-btn--block">Afiş fotoğrafları</Link>
         <Link href="/qr/admin/toplu-fiyat" className="adm-btn adm-btn--block">Toplu fiyat</Link>
         <Link href="/qr/admin/kopyalar" className="adm-btn adm-btn--block">Kopyalar</Link>
+        <Link href="/qr/admin/yedek" className="adm-btn adm-btn--block">Yedek</Link>
       </nav>
 
       <section className="adm-card" aria-labelledby="last-title">

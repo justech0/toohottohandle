@@ -2,7 +2,7 @@ import type { Pool, PoolConnection, RowDataPacket } from "mysql2/promise";
 import { refreshObjectUsage } from "@/lib/storage/images";
 
 type Rows = RowDataPacket[];
-type SnapshotData = Record<string, Record<string, unknown>[]>;
+export type SnapshotData = Record<string, Record<string, unknown>[]>;
 
 const TABLES = {
   groups: { table: "menu_groups", columns: ["id", "slug", "name_tr", "name_en", "name_ar", "color", "sort_order", "image_key", "image_focus_x", "image_focus_y"] },
@@ -15,7 +15,7 @@ const TABLES = {
   productTags: { table: "product_tags", columns: ["product_id", "tag_id"] },
 } as const;
 
-const snapshotData = async (connection: PoolConnection): Promise<SnapshotData> => {
+export const readMenuSnapshotData = async (connection: PoolConnection): Promise<SnapshotData> => {
   const query = async (sql: string) => (await connection.query<Rows>(sql))[0] as Record<string, unknown>[];
   const [groups, categories, products, variants, extras, extraCategories, tags, productTags, settings] = await Promise.all([
     query("SELECT * FROM menu_groups"), query("SELECT * FROM categories"), query("SELECT * FROM products"),
@@ -28,7 +28,7 @@ const snapshotData = async (connection: PoolConnection): Promise<SnapshotData> =
 
 export async function takeMenuSnapshot(connection: PoolConnection, reason: string): Promise<number> {
   const safeReason = [...reason.trim()].slice(0, 120).join("") || "menü kopyası";
-  const [result] = await connection.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [safeReason, JSON.stringify(await snapshotData(connection))]);
+  const [result] = await connection.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [safeReason, JSON.stringify(await readMenuSnapshotData(connection))]);
   await connection.query("DELETE FROM menu_snapshots WHERE id NOT IN (SELECT id FROM (SELECT id FROM menu_snapshots ORDER BY id DESC LIMIT 25) AS kept)");
   return (result as { insertId: number }).insertId;
 }
@@ -62,7 +62,7 @@ export async function listHistory(pool: Pool): Promise<HistoryItem[]> {
   return rows.map((row) => ({ id: row.id, at: new Date(row.at).toISOString(), summary: row.summary, entity: row.entity, action: row.action }));
 }
 
-function parseSnapshot(raw: string): SnapshotData {
+export function parseSnapshotData(raw: string): SnapshotData {
   const value = JSON.parse(raw) as unknown;
   if (!value || typeof value !== "object") throw new Error("Menü kopyası bozuk.");
   const data = value as SnapshotData;
@@ -82,7 +82,7 @@ function parseSnapshot(raw: string): SnapshotData {
   return data;
 }
 
-const dbValue = (column: string, value: unknown) => column.endsWith("_at") && typeof value === "string" ? new Date(value) : value;
+const dbValue = (column: string, value: unknown) => (column.endsWith("_at") || column.endsWith("_until")) && typeof value === "string" ? new Date(value) : value;
 
 async function insertRows(connection: PoolConnection, key: keyof typeof TABLES, rows: Record<string, unknown>[]): Promise<void> {
   if (!rows.length) return;
@@ -92,12 +92,32 @@ async function insertRows(connection: PoolConnection, key: keyof typeof TABLES, 
   ]);
 }
 
-const activeImageKeys = async (connection: PoolConnection) => {
+export const activeImageKeys = async (connection: PoolConnection) => {
   const [rows] = await connection.query<Rows>(
     "SELECT image_key FROM products WHERE image_key IS NOT NULL UNION SELECT image_key FROM menu_groups WHERE image_key IS NOT NULL UNION SELECT image_key FROM categories WHERE image_key IS NOT NULL",
   );
   return rows.map((row) => String(row.image_key));
 };
+
+export async function replaceMenuData(connection: PoolConnection, data: SnapshotData): Promise<void> {
+  for (const table of ["product_tags", "product_variants", "products", "extra_categories", "extras", "categories", "menu_groups", "tags"]) {
+    await connection.query(`DELETE FROM ${table}`);
+  }
+  await insertRows(connection, "groups", data.groups);
+  await insertRows(connection, "categories", data.categories);
+  await insertRows(connection, "products", data.products);
+  await insertRows(connection, "variants", data.variants);
+  await insertRows(connection, "extras", data.extras);
+  await insertRows(connection, "extraCategories", data.extraCategories);
+  await insertRows(connection, "tags", data.tags);
+  await insertRows(connection, "productTags", data.productTags);
+
+  const settings = data.settings[0];
+  await connection.query(
+    "UPDATE settings SET opening_time = ?, footer_note_tr = ?, footer_note_en = ?, footer_note_ar = ?, stats_enabled = ?, menu_updated_at = CURRENT_TIMESTAMP(3) WHERE id = 1",
+    [settings.opening_time, settings.footer_note_tr, settings.footer_note_en, settings.footer_note_ar, settings.stats_enabled],
+  );
+}
 
 export async function restoreMenuSnapshot(pool: Pool, adminId: number, snapshotId: number): Promise<void> {
   if (!Number.isInteger(snapshotId) || snapshotId < 1) throw new Error("Menü kopyası bulunamadı.");
@@ -106,27 +126,11 @@ export async function restoreMenuSnapshot(pool: Pool, adminId: number, snapshotI
     await connection.beginTransaction();
     const [[snapshot]] = await connection.query<Rows>("SELECT id, data FROM menu_snapshots WHERE id = ? FOR UPDATE", [snapshotId]);
     if (!snapshot) throw new Error("Menü kopyası bulunamadı.");
-    const data = parseSnapshot(String(snapshot.data));
+    const data = parseSnapshotData(String(snapshot.data));
     const oldImageKeys = await activeImageKeys(connection);
     const currentSnapshotId = await takeMenuSnapshot(connection, "kopyaya dönüş öncesi");
 
-    for (const table of ["product_tags", "product_variants", "products", "extra_categories", "extras", "categories", "menu_groups", "tags"]) {
-      await connection.query(`DELETE FROM ${table}`);
-    }
-    await insertRows(connection, "groups", data.groups);
-    await insertRows(connection, "categories", data.categories);
-    await insertRows(connection, "products", data.products);
-    await insertRows(connection, "variants", data.variants);
-    await insertRows(connection, "extras", data.extras);
-    await insertRows(connection, "extraCategories", data.extraCategories);
-    await insertRows(connection, "tags", data.tags);
-    await insertRows(connection, "productTags", data.productTags);
-
-    const settings = data.settings[0];
-    await connection.query(
-      "UPDATE settings SET opening_time = ?, footer_note_tr = ?, footer_note_en = ?, footer_note_ar = ?, stats_enabled = ?, menu_updated_at = CURRENT_TIMESTAMP(3) WHERE id = 1",
-      [settings.opening_time, settings.footer_note_tr, settings.footer_note_en, settings.footer_note_ar, settings.stats_enabled],
-    );
+    await replaceMenuData(connection, data);
     await refreshObjectUsage(connection, [...oldImageKeys, ...await activeImageKeys(connection)]);
     await connection.query("DELETE FROM audit_undo_secrets");
     await connection.query(
