@@ -331,7 +331,7 @@ export interface LastChange { id: number; summary: string; at: string; canUndo: 
 export async function lastChange(pool: Pool): Promise<LastChange | null> {
   const [[r]] = await pool.query<Rows>("SELECT id, summary, at, entity, action, undone_by FROM audit_log ORDER BY id DESC LIMIT 1");
   if (!r) return null;
-  return { id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: r.entity !== "menu_snapshot" && r.action !== "undo" && r.undone_by === null };
+  return { id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: !["menu_snapshot", "backup"].includes(r.entity) && r.action !== "undo" && r.undone_by === null };
 }
 
 /** Yalnızca geçmişin en üstündeki işlem geri alınır (spec 4.4). Geri alma kendisi geri alınamaz. */
