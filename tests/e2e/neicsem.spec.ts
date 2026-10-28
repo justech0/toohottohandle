@@ -14,6 +14,7 @@ test("opens in place and all three boxes land on the same drink", async ({ page 
   await expect(reels(page)).toHaveCount(3);
   await expect(reels(page).first().locator(".brand-icon").first()).toBeAttached();
   await expect(names(page)).toHaveCount(1, { timeout: 4000 });
+  await expect(reels(page).first()).toHaveAttribute("data-open-product", /.+/, { timeout: 4000 });
   const name = (await names(page).textContent())!;
   const labels = await reels(page).evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")));
   expect(new Set(labels).size).toBe(1);
