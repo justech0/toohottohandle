@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { HERO_INTERVAL_MS, HERO_SLIDES } from "@/lib/brand/hero";
 import { BrandIcon } from "./BrandIcon";
+import { Relief } from "./three/Relief";
 
 /**
  * Vitrin (spec v3 3.1). Yalnızca ekranda, sekme önde ve hareket azaltma kapalıyken döner.
@@ -69,16 +70,21 @@ export function HeroSlides() {
   return (
     <section ref={ref} className={`hero hero--${slide.color}`} data-testid="hero" data-active={slide.key} aria-label="Vitrin">
       {HERO_SLIDES.map((s, k) => (
-        <div key={s.key} className="hero__slide" data-on={k === index} aria-hidden={k !== index}>
-          <img
-            src={s.image}
-            alt=""
-            decoding="async"
-            fetchPriority={k === 0 ? "high" : "low"}
-            onError={(e) => {
-              e.currentTarget.style.visibility = "hidden";
-            }}
-          />
+        <div key={s.key} className={`hero__slide${s.key === "fast" ? " hero__slide--hot" : ""}`} data-on={k === index} aria-hidden={k !== index}>
+          {s.key === "fast" ? (
+            <Relief asset="hot" active={k === index} interactive className="hot-relief" testId="hot-relief" />
+          ) : (
+            <img
+              src={s.image}
+              alt=""
+              decoding="async"
+              fetchPriority="low"
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.visibility = "hidden";
+              }}
+            />
+          )}
         </div>
       ))}
       <div className="hero__shade" aria-hidden="true" />
