@@ -26,4 +26,5 @@ Son güncelleme: 2026-10-28. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 - Belirsiz fotoğraflar hangi ürün: matcha içecek, gözlüklü frappe, portakallı soğuk, tepside fincan, yaban mersinli tart, çörekler.
 - Hostinger'de IP başlığı doğrulaması (sahte `x-forwarded-for` ile kilit atlatılamıyor mu) — DNS sonrası, admin hesabı açılınca.
-- Build uyarısı: vitest'in alt paketlerinde (tinypool) kritik açık; yalnızca test aracı. `vitest` 3.2.7'ye yükselt.
+- Güvenlik güncellemesi (`a2-vitest-security`): Vitest 4.1.12'ye sabitlendi; mocker 4.1.12, tinypool bağımlılığı kaldırıldı. Tekrarlanabilir kurulum için package-lock.json eklendi. npm audit: 0 açık; veritabanlı Vitest: 171/171; TypeScript ve üretim build başarılı. Yayın PR merge sonrasında.
+`a2-vitest-security` doğrulaması: veritabanlı Playwright 104/104 geçti (2026-10-28).
