@@ -77,3 +77,18 @@ test("shows the allergen note when no allergens are entered", async ({ page }) =
   await openRow(page, "cortado");
   await expect(page.getByTestId("product-sheet")).toContainText("Alerjen bilgisi için ekibimize sorabilirsin.");
 });
+
+test("photo products show watermark ornament, non-photo products show large header icon", async ({ page }) => {
+  await openMenu(page);
+  // Non-photo product (cortado)
+  await openRow(page, "cortado");
+  const sheet = page.getByTestId("product-sheet");
+  await expect(sheet.locator(".sheet__icon:not(.sheet__icon--watermark)")).toHaveCount(1);
+  await expect(sheet.locator(".sheet__icon--watermark")).toHaveCount(0);
+  await sheet.getByRole("button", { name: "Kapat" }).click();
+
+  // Photo product (ube-latte has a real photo)
+  await openRow(page, "ube-latte");
+  await expect(sheet.locator(".sheet__icon--watermark")).toHaveCount(1);
+  await expect(sheet.locator(".sheet__icon:not(.sheet__icon--watermark)")).toHaveCount(0);
+});

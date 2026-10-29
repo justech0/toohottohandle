@@ -26,7 +26,7 @@ const done = (anchor: string): never => {
 const fail = (error: unknown): CatalogState => ({ error: (error as Error).message || "Kaydedilemedi. Tekrar deneyin." });
 
 export async function saveGroupAction(_: CatalogState, formData: FormData): Promise<CatalogState> {
-  const parsed = parseGroupInput(raw(formData, ["name", "color", "sortOrder"]));
+  const parsed = parseGroupInput(raw(formData, ["name", "nameEn", "nameAr", "color", "sortOrder"]));
   if (!parsed.ok) return { error: parsed.error };
   let id: number;
   try {
@@ -47,7 +47,7 @@ export async function deleteGroupAction(_: CatalogState, formData: FormData): Pr
 }
 
 export async function saveCategoryAction(_: CatalogState, formData: FormData): Promise<CatalogState> {
-  const parsed = parseCategoryInput(raw(formData, ["name", "groupId", "sortOrder", "isVisible", "defaultInSuggest", "defaultTemp"]));
+  const parsed = parseCategoryInput(raw(formData, ["name", "nameEn", "nameAr", "groupId", "sortOrder", "isVisible", "defaultInSuggest", "defaultTemp"]));
   if (!parsed.ok) return { error: parsed.error };
   let id: number;
   try {
@@ -69,7 +69,7 @@ export async function deleteCategoryAction(_: CatalogState, formData: FormData):
 
 export async function saveExtraAction(_: CatalogState, formData: FormData): Promise<CatalogState> {
   const parsed = parseExtraInput({
-    ...raw(formData, ["name", "price"]),
+    ...raw(formData, ["name", "nameEn", "nameAr", "price"]),
     categoryIds: formData.getAll("categoryIds").map(String),
   });
   if (!parsed.ok) return { error: parsed.error };
@@ -103,7 +103,10 @@ export async function addTagAction(_: CatalogState, formData: FormData): Promise
 }
 
 export async function saveSettingsAction(_: CatalogState, formData: FormData): Promise<CatalogState> {
-  const parsed = parseSettingsInput(raw(formData, ["wifiSsid", "wifiUsername", "wifiPassword", "wifiNoteTr", "openingTime", "footerNoteTr", "statsEnabled"]));
+  const parsed = parseSettingsInput(raw(formData, [
+    "wifiSsid", "wifiUsername", "wifiPassword", "wifiNoteTr", "wifiNoteEn", "wifiNoteAr",
+    "openingTime", "footerNoteTr", "footerNoteEn", "footerNoteAr", "statsEnabled",
+  ]));
   if (!parsed.ok) return { error: parsed.error };
   try {
     const admin = await requireAdmin();

@@ -1,3 +1,5 @@
+"use client";
+
 import type { MenuData } from "@/lib/menu/types";
 import { BrandIcon } from "./BrandIcon";
 import { HeroSlides } from "./HeroSlides";
@@ -15,8 +17,11 @@ import type { CardProduct } from "./clientTypes";
 import { priceLabel } from "@/lib/menu/soldout";
 import { priceBadges } from "@/lib/menu/badges";
 import { groupStyle } from "@/lib/brand/groups";
+import { LanguageProvider, useLanguage } from "@/lib/i18n/context";
+import { resolveText } from "@/lib/i18n/resolve";
 
-export function MenuShell({ menu }: { menu: MenuData }) {
+function MenuShellInner({ menu }: { menu: MenuData }) {
+  const { lang } = useLanguage();
   const visible = menu.products.filter((p) => p.isVisible);
   const sections = menu.groups.flatMap((g) =>
     menu.categories
@@ -32,8 +37,14 @@ export function MenuShell({ menu }: { menu: MenuData }) {
         id: p.id,
         slug: p.slug,
         name: p.name,
+        nameEn: p.nameEn,
+        nameAr: p.nameAr,
         descTr: p.descTr,
+        descEn: p.descEn,
+        descAr: p.descAr,
         categoryName: category.nameTr,
+        categoryNameEn: category.nameEn,
+        categoryNameAr: category.nameAr,
         groupColor: group.color,
         groupIcon: groupStyle(group.slug).icon,
         imageKey: p.imageKey,
@@ -43,7 +54,6 @@ export function MenuShell({ menu }: { menu: MenuData }) {
         full: badges.full,
         stars: badges.stars,
         sizes: priceLabel(p, menu.serverNow).parts,
-        inSuggest: category.defaultInSuggest,
         tags: p.tags,
       };
     }
@@ -60,21 +70,27 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       </header>
       <HeroSlides />
       <GroupTiles
-        groups={groupsWithItems}
+        groups={groupsWithItems.map((g) => ({ ...g, nameTr: resolveText(lang, g.nameAr, g.nameEn, g.nameTr) }))}
         firstCategoryOf={Object.fromEntries(groupsWithItems.map((g) => [g.slug, sections.find((x) => x.group.slug === g.slug)!.category.slug]))}
         neIcsem={<NeIcsem pool={suggestPool(visible, menu.categories, menu.serverNow).map((p) => cards[p.slug]).filter(Boolean)} />}
       />
       <div className="sticky">
         <CategoryStrip
-          groups={groupsWithItems.map(({ slug, nameTr, color }) => ({ slug, nameTr, color }))}
-          categories={sections.map((s) => ({ slug: s.category.slug, nameTr: s.category.nameTr, group: s.group.slug }))}
+          groups={groupsWithItems.map(({ slug, nameTr, nameEn, nameAr, color }) => ({ slug, nameTr: resolveText(lang, nameAr, nameEn, nameTr), color }))}
+          categories={sections.map((s) => ({ slug: s.category.slug, nameTr: resolveText(lang, s.category.nameAr, s.category.nameEn, s.category.nameTr), group: s.group.slug }))}
         />
       </div>
       <main className="list">
         {sections.map(({ group, category, items }) => (
           <section key={category.slug} id={`cat-${category.slug}`} className="cat" data-color={group.color}>
-            <CategoryPoster name={category.nameTr} color={group.color} icon={groupStyle(group.slug).icon}
-              imageKey={category.imageKey} focusX={category.imageFocusX} focusY={category.imageFocusY} />
+            <CategoryPoster
+              name={resolveText(lang, category.nameAr, category.nameEn, category.nameTr)}
+              color={group.color}
+              icon={groupStyle(group.slug).icon}
+              imageKey={category.imageKey}
+              focusX={category.imageFocusX}
+              focusY={category.imageFocusY}
+            />
             <ul className="cards">
               {items.map((p) => (
                 <ProductCard key={p.slug} p={cards[p.slug]} />
@@ -91,5 +107,13 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       </button>
       <Footer settings={menu.settings} />
     </div>
+  );
+}
+
+export function MenuShell({ menu }: { menu: MenuData }) {
+  return (
+    <LanguageProvider>
+      <MenuShellInner menu={menu} />
+    </LanguageProvider>
   );
 }

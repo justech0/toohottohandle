@@ -10,3 +10,6 @@ button { font: inherit; color: inherit; }
 .brand-icon--lips { aspect-ratio: 324 / 190; }
 .brand-icon--rabbit { aspect-ratio: 235 / 336; }
 .brand-icon--star { aspect-ratio: 1; }
+@media (forced-colors: active) {
+  .brand-icon { forced-color-adjust: none; background-color: ButtonText; }
+}

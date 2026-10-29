@@ -1,10 +1,17 @@
+"use client";
+
 import { imageSrc } from "@/lib/menu/image";
 import { BrandIcon } from "./BrandIcon";
 import { PriceChips } from "./PriceChips";
 import type { CardProduct } from "./clientTypes";
+import { useLanguage } from "@/lib/i18n/context";
+import { resolveText } from "@/lib/i18n/resolve";
 
 /** Ürün kartı (spec v3 4). Hem sunucu listesinde hem aramada kullanılır; dokununca MenuClient detayı açar. */
 export function ProductCard({ p }: { p: CardProduct }) {
+  const { lang, t } = useLanguage();
+  const displayName = resolveText(lang, p.nameAr, p.nameEn, p.name);
+  const displayCategory = resolveText(lang, p.categoryNameAr, p.categoryNameEn, p.categoryName);
   const photo = Boolean(p.imageKey);
   const cls = ["card", photo ? "card--photo" : "card--plain", p.soldOut ? "card--out" : ""].filter(Boolean).join(" ");
   return (
@@ -24,10 +31,10 @@ export function ProductCard({ p }: { p: CardProduct }) {
         ) : (
           <BrandIcon name={p.groupIcon} className="card__icon" />
         )}
-        <span className="card__name">{p.name}</span>
-        {photo ? <span className="card__cat">{p.categoryName}</span> : null}
+        <span className="card__name">{displayName}</span>
+        {photo ? <span className="card__cat">{displayCategory}</span> : null}
         <span className="sr-only" data-testid="price-full">{p.full}</span>
-        {p.soldOut ? <span className="card__out" aria-hidden="true">Tükendi</span> : <PriceChips p={p} />}
+        {p.soldOut ? <span className="card__out" aria-hidden="true">{t.product.soldOut}</span> : <PriceChips p={p} />}
       </button>
     </li>
   );

@@ -18,12 +18,15 @@ test("starts on HOT & FAST and rotates every 4 s", async ({ page }) => {
   await expect(title(page)).toHaveText("HOT & FAST");
 });
 
-test("dots switch slides", async ({ page }) => {
+test("dots switch slides and reset the interval timer", async ({ page }) => {
   await openMenu(page);
+  await page.clock.runFor(3500);
   const dot = page.getByRole("button", { name: "3. slayt" });
   await dot.click();
   await expect(page.getByTestId("hero")).toHaveAttribute("data-active", "shine");
   await expect(dot).toHaveAttribute("aria-current", "true");
+  await expect(title(page)).toHaveText("HOT & SHINE");
+  await page.clock.runFor(1000);
   await expect(title(page)).toHaveText("HOT & SHINE");
 });
 
@@ -88,3 +91,17 @@ test("pauses while search is open over it", async ({ page }) => {
   await page.clock.runFor(4100);
   await expect(title(page)).toHaveText("HOT & FREE");
 });
+
+test("pauses auto-rotation when scrolled out of view", async ({ page }) => {
+  await openMenu(page);
+  await expect(title(page)).toHaveText("HOT & FAST");
+  await page.locator("#cat-sicak-kahveler").evaluate((el) => el.scrollIntoView());
+  await expect(page.locator("html")).toHaveAttribute("data-hero-visible", "false");
+  await page.clock.runFor(9000);
+  await expect(title(page)).toHaveText("HOT & FAST");
+  await page.getByTestId("hero").evaluate((el) => el.scrollIntoView());
+  await expect(page.locator("html")).toHaveAttribute("data-hero-visible", "true");
+  await page.clock.runFor(4100);
+  await expect(title(page)).toHaveText("HOT & FREE");
+});
+

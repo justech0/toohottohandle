@@ -7,8 +7,8 @@ export interface SeedFile {
   groups: { slug: string; nameTr: string; color: string }[];
   categories: { slug: string; nameTr: string; group: string; defaultTemp: string | null; defaultInSuggest: boolean }[];
   products: SeedProduct[] | { slug: string; name: string; category: string; temp: string | null; variants: { key: string | null; priceKurus: number }[] }[];
-  extras: MenuData["extras"];
-  settings: MenuData["settings"];
+  extras: { slug: string; nameTr: string; priceKurus: number; categories: string[] }[];
+  settings: { wifiSsid: string; wifiUsername: string; wifiPassword: string; wifiNoteTr: string; openingTime: string; footerNoteTr: string; statsEnabled: boolean; menuUpdatedAt: string };
 }
 
 /** menu.json + photos.json → tablo satırları. Kimlikler liste sırasından gelir (1'den başlar). */
@@ -22,8 +22,14 @@ export function seedRows(seed: SeedFile, photos: Record<string, string>): MenuRo
   };
 
   const products: ProductRow[] = (seed.products as SeedProduct[]).map((p, i) => ({
-    id: i + 1, slug: p.slug, category_id: need(catId, p.category, "kategori"), name: p.name, name_en: null, name_ar: null,
-    desc_tr: null, desc_en: null, desc_ar: null, ingredients_tr: null, ingredients_en: null, ingredients_ar: null,
+    id: i + 1, slug: p.slug, category_id: need(catId, p.category, "kategori"),
+    name: p.name,
+    name_en: (p as any).nameEn ?? (p as any).name_en ?? null,
+    name_ar: (p as any).nameAr ?? (p as any).name_ar ?? null,
+    desc_tr: (p as any).descTr ?? (p as any).desc_tr ?? null,
+    desc_en: (p as any).descEn ?? (p as any).desc_en ?? null,
+    desc_ar: (p as any).descAr ?? (p as any).desc_ar ?? null,
+    ingredients_tr: null, ingredients_en: null, ingredients_ar: null,
     kcal: null, allergens: "", allergens_entered: 0, temp: p.temp, in_suggest: null,
     image_key: photos[p.slug] ?? null, image_focus_x: 0.5, image_focus_y: 0.5,
     is_new: 0, is_featured: 0, is_visible: 1, sold_out_until: null, sort_order: i,

@@ -4,9 +4,15 @@ import type { MenuVariant, VariantKey } from "@/lib/menu/types";
 /** Ürün formu → doğrulanmış değer. Sunucu her zaman yeniden doğrular (spec 5.5). */
 export interface ProductInput {
   name: string;
+  nameEn: string | null;
+  nameAr: string | null;
   categoryId: number;
   descTr: string | null;
+  descEn: string | null;
+  descAr: string | null;
   ingredientsTr: string | null;
+  ingredientsEn: string | null;
+  ingredientsAr: string | null;
   temp: "hot" | "cold" | null;
   inSuggest: boolean | null;
   isNew: boolean;
@@ -71,10 +77,24 @@ export function parseProductInput(raw: Raw): Result {
     variants.push({ key: keys[i], priceKurus: p });
   }
 
+  const nameEn = text(raw.nameEn, 160, "İngilizce ürün adı");
+  if (nameEn && typeof nameEn === "object") return { ok: false, error: nameEn.error };
+  const nameAr = text(raw.nameAr, 160, "Arapça ürün adı");
+  if (nameAr && typeof nameAr === "object") return { ok: false, error: nameAr.error };
+
   const descTr = text(raw.descTr, 1000, "Açıklama");
   if (descTr && typeof descTr === "object") return { ok: false, error: descTr.error };
+  const descEn = text(raw.descEn, 1000, "İngilizce açıklama");
+  if (descEn && typeof descEn === "object") return { ok: false, error: descEn.error };
+  const descAr = text(raw.descAr, 1000, "Arapça açıklama");
+  if (descAr && typeof descAr === "object") return { ok: false, error: descAr.error };
+
   const ingredientsTr = text(raw.ingredientsTr, 1000, "İçindekiler");
   if (ingredientsTr && typeof ingredientsTr === "object") return { ok: false, error: ingredientsTr.error };
+  const ingredientsEn = text(raw.ingredientsEn, 1000, "İngilizce içindekiler");
+  if (ingredientsEn && typeof ingredientsEn === "object") return { ok: false, error: ingredientsEn.error };
+  const ingredientsAr = text(raw.ingredientsAr, 1000, "Arapça içindekiler");
+  if (ingredientsAr && typeof ingredientsAr === "object") return { ok: false, error: ingredientsAr.error };
 
   const temp = raw.temp === "hot" || raw.temp === "cold" ? raw.temp : null;
   const tagIds = [...new Set((raw.tagIds ?? "").split(",").map(Number).filter((id) => Number.isInteger(id) && id > 0))];
@@ -89,7 +109,11 @@ export function parseProductInput(raw: Raw): Result {
   return {
     ok: true,
     value: {
-      name, categoryId, descTr, ingredientsTr, temp, inSuggest: tri(raw.inSuggest),
+      name, nameEn: (nameEn as string | null) ?? null, nameAr: (nameAr as string | null) ?? null,
+      categoryId,
+      descTr: (descTr as string | null) ?? null, descEn: (descEn as string | null) ?? null, descAr: (descAr as string | null) ?? null,
+      ingredientsTr: (ingredientsTr as string | null) ?? null, ingredientsEn: (ingredientsEn as string | null) ?? null, ingredientsAr: (ingredientsAr as string | null) ?? null,
+      temp, inSuggest: tri(raw.inSuggest),
       isNew: raw.isNew === "on", isFeatured: raw.isFeatured === "on", isVisible: raw.isVisible === "on",
       tagIds, imageKey, imageFocusX, imageFocusY, variants,
     },
