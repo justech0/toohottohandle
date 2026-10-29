@@ -4,6 +4,29 @@ import { openMenu } from "./helpers/menu";
 const names = (page: import("@playwright/test").Page) => page.getByTestId("neicsem-name");
 const reels = (page: import("@playwright/test").Page) => page.getByTestId("neicsem-reel");
 
+test("visible slot strips move downward and stop left to right on the result", async ({ page }) => {
+  await openMenu(page);
+  await page.getByTestId("neicsem-tile").click();
+  const strips = reels(page).locator(".ne-strip");
+  await expect(strips.first()).toHaveCSS("transition-duration", "1.4s");
+  const movement = await strips.first().evaluate((element) => new Promise<number>((resolve) => {
+    const start = new DOMMatrix(getComputedStyle(element).transform).m42;
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve(new DOMMatrix(getComputedStyle(element).transform).m42 - start)));
+  }));
+  expect(movement).toBeGreaterThan(0);
+  expect(await reels(page).first().evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return Boolean(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)?.closest(".ne-strip"));
+  })).toBe(true);
+  await expect(strips.nth(1)).toHaveCSS("transition-duration", "1.9s");
+  await expect(strips.nth(2)).toHaveCSS("transition-duration", "2.4s");
+  await expect(names(page)).toHaveCount(1, { timeout: 4000 });
+  for (const strip of await strips.all()) {
+    expect(await strip.evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).m42)).toBe(0);
+    expect(await strip.evaluate((element) => element.firstElementChild?.classList.contains("ne-frame--result"))).toBe(true);
+  }
+});
+
 test("opens in place and all three boxes land on the same drink", async ({ page }) => {
   await openMenu(page);
   const before = await page.evaluate(() => history.length);
