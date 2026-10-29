@@ -39,7 +39,7 @@ Next.js 16.4 (App Router, `cacheComponents: true`), React 19, TypeScript, MySQL/
 
 ## Hostinger (canlı)
 
-- Business plan, site `toohottohandlecoffee.com` (Node.js Web App). GitHub `main` dalından **otomatik deploy**. DNS henüz Vercel'de; test için sunucu IP'si `92.113.23.76` (`curl --resolve toohottohandlecoffee.com:80:92.113.23.76 http://toohottohandlecoffee.com/qr`).
+- Business plan, site `toohottohandlecoffee.com` (Node.js Web App). GitHub `main` dalından **otomatik deploy**. HTTPS ve alan adı Hostinger üzerinden çalışır (2026-10-29 doğrulandı). Kontrol: `curl -I https://toohottohandlecoffee.com/qr`; yanıtta `platform: hostinger` görülür. Eski tarihli planlardaki farklı sağlayıcı ayarları güncel yayın talimatı değildir.
 - Ortam değişkenleri: `DATABASE_URL` (+ `DB_*`, Hostinger yazdı, değeri kimse bilmiyor), `THTH_UPLOAD_DIR` (kalıcı foto klasörü, deploy silmez).
 - **Hostinger API ile ortam değişkenlerini "replace" etme**: tam küme ister, veritabanı şifresi bilinmediği için silinir. Yeni değişken gerekirse Enes hPanel'den tek tek ekler.
 - **Hostinger'de `main` dışı bir daldan build başlatma**: otomatik deploy dalını o dala çeviriyor. Doğrulama yerel/sandbox'ta yapılır.
