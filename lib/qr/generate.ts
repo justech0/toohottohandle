@@ -26,7 +26,6 @@ function modulePath(size: number, get: (row: number, col: number) => number): st
 export function renderBrandedQrSvg(logoDataUrl: string): string {
   const code = QRCode.create(QR_URL, { errorCorrectionLevel: QR_ERROR_LEVEL });
   const qrSize = code.modules.size + QR_MARGIN * 2;
-  const captionHeight = 8;
   const plateWidth = qrSize * 0.3;
   const plateHeight = qrSize * 0.105;
   const plateX = (qrSize - plateWidth) / 2;
@@ -35,15 +34,14 @@ export function renderBrandedQrSvg(logoDataUrl: string): string {
   const logoInset = qrSize * 0.024;
   const pathData = modulePath(code.modules.size, (row, col) => code.modules.get(row, col));
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="40mm" height="${(40 * (qrSize + captionHeight) / qrSize).toFixed(2)}mm" viewBox="0 0 ${qrSize} ${qrSize + captionHeight}" role="img" aria-labelledby="title desc" data-error-correction="${QR_ERROR_LEVEL}" data-margin="${QR_MARGIN}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="40mm" height="40mm" viewBox="0 0 ${qrSize} ${qrSize}" role="img" aria-labelledby="title desc" data-error-correction="${QR_ERROR_LEVEL}" data-margin="${QR_MARGIN}">
   <title id="title">Too Hot To Handle menü QR kodu</title>
   <desc id="desc">${QR_SHORT_ADDRESS} adresini açar</desc>
-  <rect width="${qrSize}" height="${qrSize + captionHeight}" fill="#fff"/>
+  <rect width="${qrSize}" height="${qrSize}" fill="#fff"/>
   <path d="${pathData}" fill="#16120f"/>
   <rect x="${plateX}" y="${plateY}" width="${plateWidth}" height="${plateHeight}" rx="${inset * 1.2}" fill="#fff"/>
   <rect x="${plateX + inset}" y="${plateY + inset}" width="${plateWidth - inset * 2}" height="${plateHeight - inset * 2}" rx="${inset * .65}" fill="#DC2524"/>
   <image href="${logoDataUrl}" x="${plateX + logoInset}" y="${plateY + logoInset}" width="${plateWidth - logoInset * 2}" height="${plateHeight - logoInset * 2}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="${qrSize / 2}" y="${qrSize + 4.6}" text-anchor="middle" font-family="Arial, sans-serif" font-size="2.7" font-weight="700" fill="#16120f">${QR_SHORT_ADDRESS}</text>
 </svg>`;
 }
 
