@@ -18,14 +18,15 @@ export async function sessionToken(): Promise<string | null> {
   return (await cookies()).get(COOKIE)?.value ?? null;
 }
 
-export async function currentAdmin(): Promise<{ adminId: number; email: string } | null> {
+export async function currentAdmin(): Promise<{ adminId: number; email: string; mustChangePassword: boolean } | null> {
   const token = await sessionToken();
   return token ? findSession(getPool(), token) : null;
 }
 
 /** Oturum yoksa giriş sayfasına gönderir. */
-export async function requireAdmin(): Promise<{ adminId: number; email: string }> {
+export async function requireAdmin(): Promise<{ adminId: number; email: string; mustChangePassword: boolean }> {
   const admin = await currentAdmin();
   if (!admin) redirect("/qr/admin/giris");
+  if (admin.mustChangePassword) redirect("/qr/admin/sifre-degistir");
   return admin;
 }

@@ -15,7 +15,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ kaydedildi?: 
     <>
       {saved ? <p className="adm-ok" role="status">Kaydedildi.</p> : null}
       <nav className="adm-jump" aria-label="Katalog bölümleri">
-        <a href="#groups">Gruplar</a><a href="#categories">Kategoriler</a><a href="#extras">Ekstralar</a><a href="#tags">Etiketler</a><a href="#settings">Ayarlar</a>
+        <a className="adm-jump__link" href="#groups">Gruplar</a><a className="adm-jump__link" href="#categories">Kategoriler</a><a className="adm-jump__link" href="#extras">Ekstralar</a><a className="adm-jump__link" href="#tags">Etiketler</a><a className="adm-jump__link" href="#settings">Ayarlar</a>
       </nav>
       <CatalogEditor data={data} />
     </>

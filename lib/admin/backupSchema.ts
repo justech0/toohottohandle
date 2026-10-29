@@ -1,5 +1,5 @@
 import type {
-  CategoryRow, ExtraCategoryRow, ExtraRow, GroupRow, ProductRow, ProductTagRow, TagRow, VariantRow,
+  HeroRow, CategoryRow, ExtraCategoryRow, ExtraRow, GroupRow, ProductRow, ProductTagRow, TagRow, VariantRow,
 } from "@/lib/db/rows";
 
 export const BACKUP_VERSION = 1 as const;
@@ -12,6 +12,7 @@ export const SOURCE_IMAGE_KEY = /^(?:[a-f0-9]{64}|(?:urun|ornek)-[a-z0-9-]{1,80}
 
 export type BackupProductRow = Omit<ProductRow, "sold_out_until"> & { sold_out_until: string | null; updated_at: string };
 export interface BackupSettingsRow {
+  suggest_mode?: "random" | "selected"; suggest_prefer_photos?: 0 | 1;
   id: 1;
   opening_time: string;
   footer_note_tr: string;
@@ -21,6 +22,7 @@ export interface BackupSettingsRow {
   menu_updated_at: string;
 }
 export interface BackupData {
+  heroSlides?: HeroRow[];
   groups: GroupRow[];
   categories: CategoryRow[];
   products: BackupProductRow[];
@@ -123,6 +125,14 @@ export function parseBackupFile(value: unknown): BackupFile {
   const forbidden = ["wifi_ssid", "wifi_username", "wifi_password", "wifi_note_tr", "wifi_note_en", "wifi_note_ar"];
   if (forbidden.some((key) => key in rawData || list(rawData.settings, 1).some((row) => key in row))) fail("Yedekte WiFi bilgisi bulunamaz.");
 
+  const heroSlides: HeroRow[] | undefined = rawData.heroSlides === undefined ? undefined : list(rawData.heroSlides, 500).map(row => ({
+    id: integer(row.id, 1), slide_key: nullableString(row.slide_key, 64), title: string(row.title, 120, false),
+    default_image: oneOf(row.default_image, ["", "/qr/hero/fast.webp", "/qr/hero/free.webp", "/qr/hero/shine.webp"] as const),
+    image_key: imageKey(row.image_key), color: oneOf(row.color, ["red", "yellow", "pink", "blue", "green", "gray"] as const),
+    icon: oneOf(row.icon, ["lips", "rabbit", "star"] as const), sort_order: integer(row.sort_order, 0, 10000), is_visible: bool(row.is_visible),
+    image_focus_x: number(row.image_focus_x, 0, 1), image_focus_y: number(row.image_focus_y, 0, 1),
+  }));
+  if (heroSlides) idSet(heroSlides);
   const groups = list(rawData.groups, 100).map(parseGroup);
   const categories = list(rawData.categories, 500).map(parseCategory);
   const products = list(rawData.products, 5_000).map(parseProduct);
@@ -134,6 +144,7 @@ export function parseBackupFile(value: unknown): BackupFile {
   const [rawSettings] = list(rawData.settings, 1);
   if (!rawSettings || Number(rawSettings.id) !== 1) fail();
   const settings: BackupSettingsRow = {
+    ...(rawSettings.suggest_mode === undefined ? {} : { suggest_mode: oneOf(rawSettings.suggest_mode, ["random", "selected"] as const), suggest_prefer_photos: bool(rawSettings.suggest_prefer_photos) }),
     id: 1, opening_time: typeof rawSettings.opening_time === "string" && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(rawSettings.opening_time) ? rawSettings.opening_time : fail(),
     footer_note_tr: string(rawSettings.footer_note_tr, 255), footer_note_en: nullableString(rawSettings.footer_note_en, 255), footer_note_ar: nullableString(rawSettings.footer_note_ar, 255),
     stats_enabled: bool(rawSettings.stats_enabled), menu_updated_at: dateString(rawSettings.menu_updated_at)!,
@@ -157,12 +168,12 @@ export function parseBackupFile(value: unknown): BackupFile {
   });
   unique(images.map((item) => item.key));
   if (images.reduce((total, image) => total + image.size, 0) > MAX_BACKUP_BYTES - MAX_BACKUP_JSON_BYTES) fail("Yedek dosyası çok büyük.");
-  const referenced = new Set([...groups, ...categories, ...products].map((row) => row.image_key).filter((key): key is string => Boolean(key)));
+  const referenced = new Set([...groups, ...categories, ...products, ...(heroSlides ?? [])].map((row) => row.image_key).filter((key): key is string => Boolean(key)));
   const listed = new Set(images.map((image) => image.key));
   if ([...referenced].some((key) => !listed.has(key))) fail("Yedekte bir fotoğraf eksik.");
   if ([...listed].some((key) => !referenced.has(key))) fail();
 
-  return { version: BACKUP_VERSION, createdAt, data: { groups, categories, products, variants, extras, extraCategories, tags, productTags, settings: [settings] }, images };
+  return { version: BACKUP_VERSION, createdAt, data: { ...(heroSlides ? { heroSlides } : {}), groups, categories, products, variants, extras, extraCategories, tags, productTags, settings: [settings] }, images };
 }
 
 export function backupAge(lastBackupAt: string | Date | null, now = new Date()): { days: number | null; label: string; stale: boolean } {

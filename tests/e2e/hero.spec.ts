@@ -54,6 +54,13 @@ test("a broken hero image still shows the slogan on color", async ({ page }) => 
   expect(await page.getByTestId("hero").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(220, 37, 36)");
 });
 
+test("a missing photo on a light brand color uses readable dark text", async ({ page }) => {
+  await page.route("**/qr/hero/shine.webp", route => route.abort());
+  await openMenu(page);
+  await page.getByRole("button", { name: "3. slayt" }).click();
+  await expect(title(page)).toHaveCSS("color", "rgb(42, 21, 20)");
+});
+
 test("hero says MENÜ and no branch name", async ({ page }) => {
   await openMenu(page);
   await expect(page.getByTestId("hero")).toContainText("MENÜ");

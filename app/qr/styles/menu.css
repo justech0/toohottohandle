@@ -227,7 +227,7 @@ html.intro-seen .intro { display: none; }
 .sheet__labels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .sheet__labels span { padding: 5px 8px; border: 1px solid currentColor; border-radius: 8px; font: 800 10px/1 var(--f-display); }
 
-/* RTL ve Çoklu Dil Kurallarý (Spec 3.9) */
+/* RTL ve Ã‡oklu Dil KurallarÄ± (Spec 3.9) */
 html[dir="rtl"] .topbar__logo,
 html[dir="rtl"] .brand-icon--logo {
   transform: none !important;
@@ -246,7 +246,7 @@ html[dir="rtl"] .card__prices {
   text-align: left;
 }
 
-/* Dil seçici buton ve modal */
+/* Dil seÃ§ici buton ve modal */
 .topbar__lang { font: 700 13px/1 var(--f-display); letter-spacing: .05em; text-transform: uppercase; }
 .lang-modal { max-width: 320px; }
 .lang-modal__title { margin: 0 0 14px; font: 800 18px/1 var(--f-display); text-transform: uppercase; }
@@ -259,8 +259,20 @@ html[dir="rtl"] .card__prices {
 .lang-option__name { flex: 1; }
 .lang-option__check { font-weight: 800; font-size: 16px; color: var(--c-red); }
 
-/* Alt bilgi dil seçimi */
+/* Alt bilgi dil seÃ§imi */
 .menu-footer { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .menu-footer__langs { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .footer-lang-btn { min-width: var(--tap); min-height: var(--tap); padding: 4px 10px; border: 1px solid var(--c-line); border-radius: 8px; background: none; color: var(--c-ink); font: 700 12px/1 var(--f-display); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
 .footer-lang-btn--active { background: var(--c-ink); color: var(--c-paper); border-color: var(--c-ink); }
+
+.hero--pink { background: var(--c-pink); }
+.hero--green { background: var(--c-green); }
+.hero--gray { background: var(--c-gray); }
+.hero__title { overflow-wrap: anywhere; }
+.hero__icon { position: absolute; right: 18px; top: 74px; height: 48px; color: var(--c-white); }
+.hero[data-plain="true"], .hero[data-plain="true"] .hero__icon { color: var(--c-ink); }
+.hero[data-plain="true"] .hero__shade { display: none; }
+.hero[data-plain="true"] .hero__title { text-shadow: none; }
+.hero[data-plain="true"] .hero__dot::before { background: var(--c-ink-soft); }
+.hero[data-plain="true"] .hero__dot[aria-current="true"]::before { background: var(--c-ink); }
+.menu:has(.hero[data-plain="true"]) .topbar, .menu:has(.hero[data-plain="true"]) .topbar .icon-btn { color: var(--c-ink); }

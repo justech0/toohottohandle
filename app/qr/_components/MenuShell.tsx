@@ -1,5 +1,6 @@
 "use client";
 
+import { HERO_SLIDES } from "@/db/seed/hero";
 import type { MenuData } from "@/lib/menu/types";
 import { BrandIcon } from "./BrandIcon";
 import { HeroSlides } from "./HeroSlides";
@@ -68,11 +69,11 @@ function MenuShellInner({ menu }: { menu: MenuData }) {
         <span className="topbar__logo"><BrandIcon name="logo" label="Too Hot To Handle" /></span>
         <MenuClient products={clientProducts} settings={menu.settings} />
       </header>
-      <HeroSlides />
+      <HeroSlides slides={menu.slides ?? HERO_SLIDES} />
       <GroupTiles
         groups={groupsWithItems.map((g) => ({ ...g, nameTr: resolveText(lang, g.nameAr, g.nameEn, g.nameTr) }))}
         firstCategoryOf={Object.fromEntries(groupsWithItems.map((g) => [g.slug, sections.find((x) => x.group.slug === g.slug)!.category.slug]))}
-        neIcsem={<NeIcsem pool={suggestPool(visible, menu.categories, menu.serverNow).map((p) => cards[p.slug]).filter(Boolean)} />}
+        neIcsem={<NeIcsem preferPhotos={menu.settings.suggestPreferPhotos} pool={suggestPool(visible, menu.categories, menu.serverNow, menu.settings.suggestMode).map((p) => cards[p.slug]).filter(Boolean)} />}
       />
       <div className="sticky">
         <CategoryStrip

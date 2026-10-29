@@ -36,6 +36,7 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
       nameAr: p.name_ar ?? null,
       category: catSlug.get(p.category_id)!,
       temp: p.temp,
+      inSuggest: p.in_suggest === null ? null : Boolean(p.in_suggest),
       variants: (variantsOf.get(p.id) ?? []).map((v) => ({ key: v.label_key, priceKurus: v.price_kurus })),
       descTr: p.desc_tr,
       descEn: p.desc_en ?? null,
@@ -57,6 +58,7 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
     settings: {
       wifiSsid: s.wifi_ssid, wifiUsername: s.wifi_username, wifiPassword: s.wifi_password,
       wifiNoteTr: s.wifi_note_tr, wifiNoteEn: s.wifi_note_en ?? null, wifiNoteAr: s.wifi_note_ar ?? null,
+      suggestMode: s.suggest_mode ?? "random", suggestPreferPhotos: s.suggest_prefer_photos === undefined ? true : Boolean(s.suggest_prefer_photos),
       openingTime: s.opening_time,
       footerNoteTr: s.footer_note_tr, footerNoteEn: s.footer_note_en ?? null, footerNoteAr: s.footer_note_ar ?? null,
       statsEnabled: Boolean(s.stats_enabled), menuUpdatedAt: iso(s.menu_updated_at),

@@ -138,8 +138,8 @@ async function audit(
   after: unknown,
 ): Promise<void> {
   await c.query("DELETE FROM audit_undo_secrets");
-  await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, 'product', ?, ?, ?, ?, ?)", [
-    adminId, entityId, action, summary.slice(0, 255), before === null ? null : JSON.stringify(before), after === null ? null : JSON.stringify(after),
+  await c.query("INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, 'product', ?, ?, ?, ?, ?)", [
+    adminId, adminId, entityId, action, summary.slice(0, 255), before === null ? null : JSON.stringify(before), after === null ? null : JSON.stringify(after),
   ]);
 }
 
@@ -333,12 +333,12 @@ export async function moveProduct(pool: Pool, adminId: number, id: number, direc
   });
 }
 
-export interface LastChange { id: number; summary: string; at: string; canUndo: boolean }
+export interface LastChange { email: string; id: number; summary: string; at: string; canUndo: boolean }
 
 export async function lastChange(pool: Pool): Promise<LastChange | null> {
-  const [[r]] = await pool.query<Rows>("SELECT id, summary, at, entity, action, undone_by FROM audit_log ORDER BY id DESC LIMIT 1");
+  const [[r]] = await pool.query<Rows>("SELECT id, summary, at, entity, action, undone_by, admin_email FROM audit_log ORDER BY id DESC LIMIT 1");
   if (!r) return null;
-  return { id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: !["menu_snapshot", "backup"].includes(r.entity) && r.action !== "undo" && r.undone_by === null };
+  return { email: r.admin_email ?? "Bilinmeyen yönetici", id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: !["menu_snapshot", "backup", "admin", "hero", "suggestions"].includes(r.entity) && r.action !== "undo" && r.undone_by === null };
 }
 
 /** Yalnızca geçmişin en üstündeki işlem geri alınır (spec 4.4). Geri alma kendisi geri alınamaz. */
@@ -387,7 +387,7 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
     const restored = top.entity === "product" && top.entity_id ? await snapshot(c, top.entity_id) : null;
     if (top.entity === "product") await refreshObjectUsage(c, [current?.product.image_key, restored?.product.image_key]);
     const summary = `Geri alındı: ${top.summary}`.slice(0, 255);
-    const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, ?, ?, 'undo', ?)", [adminId, top.entity, top.entity_id, summary]);
+    const [res] = await c.query("INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary) VALUES ((SELECT email FROM admins WHERE id = ?), ?, ?, ?, 'undo', ?)", [adminId, adminId, top.entity, top.entity_id, summary]);
     await c.query("UPDATE audit_log SET undone_by = ? WHERE id = ?", [(res as { insertId: number }).insertId, top.id]);
     await touchMenu(c);
     return { summary };

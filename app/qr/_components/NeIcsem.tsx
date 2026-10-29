@@ -18,13 +18,13 @@ const DURATIONS = [1400, 1900, 2400];
  * Ne içsem (spec v3 6): kare yerinde açılır, üç kutuda dudak/tavşan/yıldız slot gibi döner,
  * her kutu bir içecekte durur. Yeni sayfa ya da geçmiş kaydı yok. Sonuca dokununca MenuClient detayı açar.
  */
-export function NeIcsem({ pool }: { pool: CardProduct[] }) {
+export function NeIcsem({ pool, preferPhotos = true }: { pool: CardProduct[]; preferPhotos?: boolean }) {
   const [open, setOpen] = useState(false);
   const [picks, setPicks] = useState<CardProduct[]>([]);
   const [phase, setPhase] = useState<"idle" | "reset" | "spin" | "done">("idle");
   const timers = useRef<number[]>([]);
   const rafRef = useRef<number>(0);
-  const lastPicks = useRef<CardProduct[]>([]);
+  const lastPicks = useRef<string[]>([]);
   const squareRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef(false);
@@ -53,8 +53,22 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
     if (spinning) return;
     clear();
     // Tek öneri: üç kutu da aynı içecekte hizalanır (Enes, 2026-10-26).
-    const next = pickSuggestions(pool, 1, Math.random, lastPicks.current);
-    lastPicks.current = [next[0], ...lastPicks.current].filter(Boolean).slice(0, 6);
+    try {
+      const stored: unknown = JSON.parse(sessionStorage.getItem("thth-suggest-recent") ?? "[]");
+      if (Array.isArray(stored)) lastPicks.current = stored.filter((s): s is string => typeof s === "string").slice(-5);
+    } catch {}
+    const recent = lastPicks.current;
+    let available = pool.filter(p => !recent.includes(p.slug));
+    // Küçük havuzda en uzun süredir önerilmeyen ürünü serbest bırak.
+    if (!available.length && pool.length) {
+      const oldest = [...recent, ...pool.map(p => p.slug)].find(slug => pool.some(p => p.slug === slug));
+      available = pool.filter(p => p.slug === oldest);
+    }
+    const next = pickSuggestions(available, 1, Math.random, [], preferPhotos);
+    if (next[0]) {
+      lastPicks.current = [...recent.filter(s => s !== next[0].slug), next[0].slug].slice(-5);
+      try { sessionStorage.setItem("thth-suggest-recent", JSON.stringify(lastPicks.current)); } catch {}
+    }
     setPicks(next);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPhase("done");
@@ -156,16 +170,8 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
               );
             })}
           </div>
-          {picks[0] ? (
-            <div
-              className="ne-result"
-              aria-hidden="true"
-              style={{
-                visibility: phase === "done" ? "visible" : "hidden",
-                opacity: phase === "done" ? 1 : 0,
-                pointerEvents: phase === "done" ? "auto" : "none",
-              }}
-            >
+          {phase === "done" && picks[0] ? (
+            <div className="ne-result" aria-hidden="true">
               <p className="ne-result__name" data-testid="neicsem-name">{pickName}</p>
               <p className="ne-result__price">{picks[0].full}</p>
             </div>

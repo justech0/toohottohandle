@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { signIn } from "./helpers/admin";
+import { signIn, selectBrand } from "./helpers/admin";
 
 test.skip(!process.env.E2E_DB, "veritabanlı sunucu gerekli");
 test.describe.configure({ mode: "serial" });
@@ -10,11 +10,11 @@ const espressoPrice = (page: import("@playwright/test").Page) =>
 test("previews and applies a category price change, undoes it, and restores its copy", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Toplu fiyat" }).click();
-  await page.getByLabel("Kapsam").selectOption("category");
-  await page.locator('select[name="scopeId"]').selectOption("1");
-  await page.locator('select[name="mode"]').selectOption("percent");
+  await selectBrand(page, "scope", "category");
+  await selectBrand(page, "scopeId", "1");
+  await selectBrand(page, "mode", "percent");
   await page.locator('input[name="amount"]').fill("10");
-  await page.locator('select[name="rounding"]').selectOption("none");
+  await selectBrand(page, "rounding", "none");
   await page.getByRole("button", { name: "Önizle" }).click();
 
   const row = page.getByTestId("bulk-row").filter({ hasText: "Espresso" });
@@ -33,8 +33,8 @@ test("previews and applies a category price change, undoes it, and restores its 
   await expect(espressoPrice(page)).toContainText("110 ₺");
 
   await page.goto("/qr/admin");
-  await page.getByRole("link", { name: "Kopyalar" }).click();
-  await expect(page.getByText("toplu fiyat öncesi", { exact: true }).first()).toBeVisible();
+  await page.getByRole("link", { name: "Loglar" }).click();
+  await expect(page.getByText("Fiyat değişikliği öncesi menü", { exact: true }).first()).toBeVisible();
   await page.getByRole("button", { name: "Bu kopyaya dön" }).first().click();
   await page.getByRole("dialog").getByRole("button", { name: "Evet, bu kopyaya dön" }).click();
   await expect(page.getByRole("status")).toContainText("WiFi bilgileri değiştirilmedi");

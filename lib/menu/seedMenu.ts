@@ -16,6 +16,7 @@ export function seedMenu(samples: Record<string, string>): Omit<MenuData, "serve
     descEn: p.descEn ?? null,
     descAr: p.descAr ?? null,
     soldOutUntil: null,
+    inSuggest: null,
     isNew: false,
     isFeatured: false,
     isVisible: true,
@@ -53,6 +54,7 @@ export function seedMenu(samples: Record<string, string>): Omit<MenuData, "serve
     })),
     tags: [...READY_TAGS],
     settings: {
+      suggestMode: "random", suggestPreferPhotos: true,
       ...seed.settings,
       wifiNoteEn: (seed.settings as any).wifiNoteEn ?? null,
       wifiNoteAr: (seed.settings as any).wifiNoteAr ?? null,

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getPool } from "@/lib/db/client";
 import { requireAdmin } from "@/lib/auth/session";
 import {
-  addTag, deleteCategory, deleteExtra, deleteGroup, saveCategory, saveExtra, saveGroup, saveSettings,
+  catalogData, addTag, deleteCategory, deleteExtra, deleteGroup, saveCategory, saveExtra, saveGroup, saveSettings,
 } from "@/lib/admin/catalog";
 import {
   parseCategoryInput, parseExtraInput, parseGroupInput, parseSettingsInput, parseTagInput,
@@ -103,14 +103,11 @@ export async function addTagAction(_: CatalogState, formData: FormData): Promise
 }
 
 export async function saveSettingsAction(_: CatalogState, formData: FormData): Promise<CatalogState> {
-  const parsed = parseSettingsInput(raw(formData, [
-    "wifiSsid", "wifiUsername", "wifiPassword", "wifiNoteTr", "wifiNoteEn", "wifiNoteAr",
-    "openingTime", "footerNoteTr", "footerNoteEn", "footerNoteAr", "statsEnabled",
-  ]));
+  const admin = await requireAdmin();
+  const data = await catalogData(getPool());
+  const parsed = parseSettingsInput({ ...Object.fromEntries(Object.entries(data.settings).map(([k,v]) => [k, String(v ?? "")])), statsEnabled: data.settings.statsEnabled ? "on" : "", ...raw(formData, ["openingTime", "footerNoteTr", "footerNoteEn", "footerNoteAr"]) });
   if (!parsed.ok) return { error: parsed.error };
-  try {
-    const admin = await requireAdmin();
-    await saveSettings(getPool(), admin.adminId, parsed.value);
-  } catch (error) { return fail(error); }
+  try { await saveSettings(getPool(), admin.adminId, parsed.value, "catalog"); }
+  catch (error) { return fail(error); }
   return done("settings");
 }

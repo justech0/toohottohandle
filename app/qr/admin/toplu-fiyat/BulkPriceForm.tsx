@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandSelect } from "../_components/BrandSelect";
+
 import { startTransition, useActionState, useState } from "react";
 import { formatPrice, variantLabelTr } from "@/lib/format/price";
 import type { BulkFormInput, BulkPreviewProduct } from "@/lib/admin/bulkPrice";
@@ -28,31 +30,31 @@ export function BulkPriceForm({ groups, categories }: Props) {
   const fields = (
     <>
       <label className="adm-field">Kapsam
-        <select name="scope" aria-label="Kapsam" value={scope} onChange={(event) => {
-          const next = event.target.value as BulkFormInput["scope"];
+        <BrandSelect name="scope" aria-label="Kapsam" value={scope} onChange={(event) => {
+          const next = event as BulkFormInput["scope"];
           setScope(next);
           setScopeId(String((next === "group" ? groups : categories)[0]?.id ?? ""));
         }}>
           <option value="category">Kategori</option><option value="group">Grup</option>
-        </select>
+        </BrandSelect>
       </label>
       <label className="adm-field">{scope === "group" ? "Grup" : "Kategori"}
-        <select name="scopeId" aria-label={scope === "group" ? "Grup" : "Kategori"} value={scopeId} onChange={(event) => setScopeId(event.target.value)}>
+        <BrandSelect name="scopeId" aria-label={scope === "group" ? "Grup" : "Kategori"} value={scopeId} onChange={(event) => setScopeId(event)}>
           {options.map((option) => <option key={option.id} value={option.id}>{"groupName" in option ? `${option.groupName} · ${option.name}` : option.name}</option>)}
-        </select>
+        </BrandSelect>
       </label>
       <label className="adm-field">Değişim türü
-        <select name="mode" aria-label="Değişim türü" value={mode} onChange={(event) => setMode(event.target.value as BulkFormInput["mode"])}>
+        <BrandSelect name="mode" aria-label="Değişim türü" value={mode} onChange={(event) => setMode(event as BulkFormInput["mode"])}>
           <option value="percent">Yüzde</option><option value="fixed">Sabit tutar</option>
-        </select>
+        </BrandSelect>
       </label>
       <label className="adm-field">{mode === "percent" ? "Yüzde" : "Tutar (₺)"}
         <input name="amount" aria-label={mode === "percent" ? "Yüzde" : "Tutar (₺)"} value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="decimal" placeholder={mode === "percent" ? "Örn. 10 veya -5" : "Örn. 15 veya -10"} required />
       </label>
       <label className="adm-field">Yuvarlama
-        <select name="rounding" aria-label="Yuvarlama" value={rounding} onChange={(event) => setRounding(event.target.value as BulkFormInput["rounding"])}>
+        <BrandSelect name="rounding" aria-label="Yuvarlama" value={rounding} onChange={(event) => setRounding(event as BulkFormInput["rounding"])}>
           <option value="none">Yok</option><option value="5">En yakın 5 ₺</option><option value="10">En yakın 10 ₺</option>
-        </select>
+        </BrandSelect>
       </label>
     </>
   );

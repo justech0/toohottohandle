@@ -51,11 +51,11 @@ test("counts one menu open per session, deduplicates details, and shows the admi
 
 test("does not send when disabled, returns 204, and downloads branded SVG", async ({ page }) => {
   await signIn(page);
-  await page.goto("/qr/admin/katalog#settings");
+  await page.goto("/qr/admin/istatistik#settings");
   const settings = page.getByTestId("settings-form");
   await settings.getByLabel("İstatistik açık").uncheck();
   await settings.getByRole("button", { name: "Ayarları kaydet" }).click();
-  await page.waitForURL(/#settings$/);
+  await page.waitForURL(/istatistik\?kaydedildi=1#settings$/);
 
   let sent = 0;
   page.on("request", (request) => { if (request.url().endsWith("/qr/api/stats")) sent++; });
@@ -77,11 +77,17 @@ test("does not send when disabled, returns 204, and downloads branded SVG", asyn
   await page.getByRole("link", { name: "Logolu SVG indir" }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe("toohottohandle-qr.svg");
+  const pngResponse = await page.request.get("/qr/brand/qr-logolu.png");
+  expect(pngResponse.status()).toBe(200);
+  expect(pngResponse.headers()["content-type"]).toContain("image/png");
+  const pngPromise = page.waitForEvent("download");
+  await page.getByRole("link", { name: "PNG indir" }).click();
+  expect((await pngPromise).suggestedFilename()).toBe("qr-logolu.png");
 
-  await page.goto("/qr/admin/katalog#settings");
+  await page.goto("/qr/admin/istatistik#settings");
   const restored = page.getByTestId("settings-form");
   await restored.getByLabel("İstatistik açık").check();
   await restored.getByRole("button", { name: "Ayarları kaydet" }).click();
-  await page.waitForURL(/#settings$/);
+  await page.waitForURL(/istatistik\?kaydedildi=1#settings$/);
 });
 

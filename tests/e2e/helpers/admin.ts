@@ -17,3 +17,8 @@ export async function signIn(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Giriş yap" }).click();
   await page.waitForURL(/\/qr\/admin$/);
 }
+
+export async function selectBrand(page: Page, name: string, value: string) {
+  await page.locator(`[data-brand-select="${name}"]`).click();
+  await page.getByRole("listbox").locator(`[role="option"][data-value="${value}"]`).click();
+}

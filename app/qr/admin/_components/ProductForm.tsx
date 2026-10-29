@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandSelect } from "./BrandSelect";
+
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { parseProductInput, priceChanges } from "@/lib/admin/productInput";
@@ -76,13 +78,13 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
       </div>
       <label className="adm-field">
         Kategori
-        <select name="categoryId" defaultValue={initial.categoryId}>
+        <BrandSelect name="categoryId" defaultValue={initial.categoryId}>
           {groups.map((g) => (
             <optgroup key={g} label={g}>
               {categories.filter((c) => c.groupName === g).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </optgroup>
           ))}
-        </select>
+        </BrandSelect>
       </label>
 
       <PhotoPicker initialKey={initial.imageKey} initialFocusX={Number(initial.imageFocusX)} initialFocusY={Number(initial.imageFocusY)} label="Ürün fotoğrafı" />
@@ -91,9 +93,9 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
         <legend>Boy ve fiyat</legend>
         <label className="adm-field">
           Boy
-          <select name="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)}>
+          <BrandSelect name="sizes" value={sizes} onChange={(value) => setSizes(value)}>
             {SIZE_OPTIONS.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
-          </select>
+          </BrandSelect>
         </label>
         <div className="adm-row">
           {labels.map((label, i) => (
@@ -115,19 +117,19 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
       <div className="adm-row">
         <label className="adm-field">
           Sıcak / soğuk
-          <select name="temp" defaultValue={initial.temp}>
+          <BrandSelect name="temp" defaultValue={initial.temp}>
             <option value="">Kategoriye göre</option>
             <option value="hot">Sıcak</option>
             <option value="cold">Soğuk</option>
-          </select>
+          </BrandSelect>
         </label>
         <label className="adm-field">
           Ne içsem&apos;e dahil
-          <select name="inSuggest" defaultValue={initial.inSuggest}>
+          <BrandSelect name="inSuggest" defaultValue={initial.inSuggest}>
             <option value="">Kategoriye göre</option>
             <option value="yes">Evet</option>
             <option value="no">Hayır</option>
-          </select>
+          </BrandSelect>
         </label>
       </div>
 

@@ -22,7 +22,7 @@ export function Footer({ settings }: { settings: MenuSettings }) {
           aria-pressed={lang === "tr"}
           onClick={() => setLang("tr")}
         >
-          TR
+          Türkçe
         </button>
         <button
           type="button"
@@ -31,7 +31,7 @@ export function Footer({ settings }: { settings: MenuSettings }) {
           aria-pressed={lang === "en"}
           onClick={() => setLang("en")}
         >
-          EN
+          English
         </button>
         <button
           type="button"
@@ -40,7 +40,7 @@ export function Footer({ settings }: { settings: MenuSettings }) {
           aria-pressed={lang === "ar"}
           onClick={() => setLang("ar")}
         >
-          AR
+          العربية
         </button>
       </div>
     </footer>

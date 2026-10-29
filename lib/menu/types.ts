@@ -19,6 +19,7 @@ export interface MenuProduct {
   nameAr: string | null;
   category: string;
   temp: Temp;
+  inSuggest?: boolean | null;
   variants: MenuVariant[];
   descTr: string | null;
   descEn: string | null;
@@ -44,10 +45,13 @@ export interface MenuSettings {
   footerNoteTr: string;
   footerNoteEn: string | null;
   footerNoteAr: string | null;
+  suggestMode?: "random" | "selected";
+  suggestPreferPhotos?: boolean;
   statsEnabled: boolean;
   menuUpdatedAt: string;
 }
 export interface MenuData {
+  slides?: import("@/lib/brand/hero").HeroSlide[];
   groups: MenuGroup[];
   categories: MenuCategory[];
   products: MenuProduct[];

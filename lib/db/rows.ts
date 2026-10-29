@@ -30,6 +30,7 @@ export interface SettingsRow {
   id: 1; wifi_ssid: string; wifi_username: string; wifi_password: string;
   wifi_note_tr: string; wifi_note_en: string | null; wifi_note_ar: string | null;
   opening_time: string; footer_note_tr: string; footer_note_en: string | null; footer_note_ar: string | null;
+  suggest_mode?: "random" | "selected"; suggest_prefer_photos?: Bool;
   stats_enabled: Bool; menu_updated_at: Date; last_backup_at: Date | null;
 }
 
@@ -43,4 +44,10 @@ export interface MenuRows {
   tags: TagRow[];
   productTags: ProductTagRow[];
   settings: SettingsRow[];
+}
+
+export interface HeroRow {
+  id: number; slide_key: string | null; title: string; default_image: string; image_key: string | null;
+  color: GroupColor; icon: "lips" | "rabbit" | "star"; sort_order: number; is_visible: Bool;
+  image_focus_x: number; image_focus_y: number;
 }

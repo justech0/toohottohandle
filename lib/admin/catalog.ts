@@ -47,8 +47,8 @@ async function audit(
 ): Promise<number> {
   await connection.query("DELETE FROM audit_undo_secrets");
   const [result] = await connection.query(
-    "INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [adminId, entity, entityId, action, summary.slice(0, 255), json(before), json(after)],
+    "INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, ?, ?, ?, ?, ?, ?)",
+    [adminId, adminId, entity, entityId, action, summary.slice(0, 255), json(before), json(after)],
   );
   return (result as { insertId: number }).insertId;
 }
@@ -258,10 +258,13 @@ export async function addTag(pool: Pool, adminId: number, input: TagInput): Prom
   });
 }
 
-export async function saveSettings(pool: Pool, adminId: number, input: SettingsInput): Promise<void> {
+export async function saveSettings(pool: Pool, adminId: number, input: SettingsInput, section: "all" | "catalog" | "wifi" = "all"): Promise<void> {
   return inTx(pool, async (connection) => {
     const [[before]] = await connection.query<Rows>("SELECT * FROM settings WHERE id = 1 FOR UPDATE");
     if (!before) throw new Error("Ayarlar bulunamadı.");
+    // Diğer ekranın alanları işlem içindeki güncel satırdan korunur.
+    if (section === "catalog") input = { ...input, wifiSsid: before.wifi_ssid, wifiUsername: before.wifi_username, wifiPassword: null, wifiNoteTr: before.wifi_note_tr, wifiNoteEn: before.wifi_note_en, wifiNoteAr: before.wifi_note_ar, statsEnabled: Boolean(before.stats_enabled) };
+    if (section === "wifi") input = { ...input, openingTime: before.opening_time, footerNoteTr: before.footer_note_tr, footerNoteEn: before.footer_note_en, footerNoteAr: before.footer_note_ar };
     const passwordChanged = input.wifiPassword !== null && input.wifiPassword !== before.wifi_password;
     const password = input.wifiPassword ?? before.wifi_password;
     await connection.query(

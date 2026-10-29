@@ -3,7 +3,9 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/session";
-import { hasDb } from "@/lib/db/client";
+import { WifiSettings } from "./WifiSettings";
+import { catalogData } from "@/lib/admin/catalog";
+import { hasDb, getPool } from "@/lib/db/client";
 import { getStatsReport, type StatsReport } from "@/lib/stats/server";
 
 function HourlyChart({ values }: { values: number[] }) {
@@ -34,7 +36,7 @@ function Report({ report }: { report: StatsReport }) {
   return (
     <div className="adm-stats">
       {!report.enabled ? (
-        <p className="adm-warning" role="status">İstatistik kapalı. <Link href="/qr/admin/katalog#settings">Ayarlardan aç</Link></p>
+        <p className="adm-warning" role="status">İstatistik kapalı. <Link href="/qr/admin/istatistik#settings">Ayarlardan aç</Link></p>
       ) : null}
 
       <section className="adm-stat-grid" aria-label="Menü açılışları">
@@ -72,6 +74,7 @@ function Report({ report }: { report: StatsReport }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/qr/api/admin/qr" alt="Logolu menü QR önizlemesi" className="adm-qr__preview" />
         <a className="adm-btn adm-btn--main adm-btn--link" href="/qr/api/admin/qr?indir=1" download>Logolu SVG indir</a>
+        <a className="adm-btn adm-btn--link" href="/qr/brand/qr-logolu.png" download="qr-logolu.png">PNG indir</a>
       </section>
     </div>
   );
@@ -81,14 +84,14 @@ async function Content() {
   await connection();
   if (!hasDb()) redirect("/qr/admin/giris");
   await requireAdmin();
-  return <Report report={await getStatsReport()} />;
+  return <><WifiSettings data={await catalogData(getPool())} /><Report report={await getStatsReport()} /></>;
 }
 
 export default function StatsPage() {
   return (
     <>
       <p className="adm-crumb"><Link href="/qr/admin">← Menü yönetimi</Link></p>
-      <h1 className="adm-h1">İstatistik ve QR</h1>
+      <h1 className="adm-h1">WiFi, istatistik ve QR</h1>
       <p className="adm-lead">Kişisel veri veya çerez tutulmaz.</p>
       <Suspense fallback={<p className="adm-note">Yükleniyor…</p>}><Content /></Suspense>
     </>
