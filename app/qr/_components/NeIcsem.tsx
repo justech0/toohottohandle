@@ -6,7 +6,6 @@ import { imageSrc } from "@/lib/menu/image";
 import { BrandIcon } from "./BrandIcon";
 import { CloseIcon } from "./Icons";
 import type { CardProduct } from "./clientTypes";
-import { Relief } from "./three/Relief";
 
 const ICONS = ["lips", "rabbit", "star"] as const;
 const SPINS = 4; // her makarada 4 tur ikon, sonra sonuç
@@ -112,7 +111,6 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     aria-label={phase === "done" ? `${p.name}, ${p.full}` : `${k + 1}. kutu dönüyor`}
                     aria-disabled={phase !== "done"}
                   >
-                    {spinning ? <Relief asset={ICONS[k]} active className="ne-relief" /> : null}
                     <span className="ne-strip" style={style}>
                       {Array.from({ length: FRAMES - 1 }, (_, i) => (
                         <span key={i} className="ne-frame">
