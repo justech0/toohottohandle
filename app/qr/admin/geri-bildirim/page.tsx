@@ -34,7 +34,7 @@ async function Content({ searchParams }: { searchParams: Promise<Query> }) {
     {!result.items.length ? <section className="adm-card"><h2 className="adm-card__title">Henüz geri bildirim yok</h2><p className="adm-note">Misafirlerin menüden gönderdiği görüşler burada görünür. Filtre kullandıysan temizleyebilirsin.</p></section> : null}
     {result.items.map((item) => <article key={item.id} className="adm-card feedback-entry" data-testid="feedback-entry">
       <div className="feedback-entry__head"><h2 className="adm-card__title">{FEEDBACK_TOPICS[item.topic]}</h2>{!item.is_read ? <span className="feedback-unread">Okunmamış</span> : null}</div>
-      <div className="feedback-entry__rating" aria-label={`${item.rating} / 5 puan`}>{[1, 2, 3, 4, 5].map((n) => <BrandIcon key={n} name="star" className={n <= item.rating ? "" : "feedback-entry__empty-star"} />)}<span>{item.rating}/5</span></div>
+      <div className="feedback-entry__rating" aria-label={`${item.rating} / 5 puan`}>{[1, 2, 3, 4, 5].map((n) => <BrandIcon key={n} name="rabbit" className={n <= item.rating ? "" : "feedback-entry__empty-star"} />)}<span>{item.rating}/5</span></div>
       <p className="adm-note"><time dateTime={new Date(item.created_at).toISOString()}>{when(item.created_at)}</time> · {item.name || "Misafir"}</p>
       {item.contact ? <p className="feedback-entry__contact">İletişim: {item.contact}</p> : null}
       <p className="feedback-entry__message">{item.message}</p>

@@ -86,7 +86,7 @@ export function MenuShell({ menu }: { menu: MenuData }) {
       </main>
       <button type="button" className="feedback-invite" data-open-feedback data-testid="feedback-open">
         <BrandIcon name="rabbit" className="feedback-invite__rabbit" />
-        <span><strong>Nasıldı?</strong><span>Bize yaz. Bir sonraki kahven daha güzel olsun.</span></span>
+        <span><strong>Söz sende.</strong><span>Bir kahve, bir yorum. Seni dinliyoruz.</span></span>
         <span className="feedback-invite__action">Görüşünü paylaş</span>
       </button>
       <Footer settings={menu.settings} />

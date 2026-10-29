@@ -12,7 +12,7 @@ Son güncelleme: 2026-10-29. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Bekleyen PR
 
-- `a2-feedback`: Menü sonunda marka kartı ve geri bildirim formu; konu, 1–5 puan, mesaj, isteğe bağlı ad/iletişim/fotoğraf. Yalnızca admin görür. `/qr/admin/geri-bildirim`: filtre, 30'ar sayfalama, okundu ve kalıcı silme; ana sayfada okunmamış sayısı, son üç mesaj ve son 30 gün ortalaması.
+- PR #17 (`a2-feedback`): Menü sonunda “Söz sende” kartı, temalı konu seçimi, renkli 1–5 tavşan puanı, mesaj, isteğe bağlı ad/iletişim/fotoğraf. Yalnızca admin görür. Başarılı gönderimde beş puana TOOHOTT efekti, düşük puana teşekkür ve iyileştirme mesajı. `/qr/admin/geri-bildirim`: filtre, 30'ar sayfalama, okundu ve kalıcı silme; ana sayfada okunmamış sayısı, son üç mesaj ve son 30 gün ortalaması. Yeni admin tasarımıyla birleştirildi.
 - `008_feedback` yeni tablo ekler. Fotoğraflar mevcut `THTH_UPLOAD_DIR/feedback` altında tutulur; yalnızca oturumlu admin okur, silmede dosya da kaldırılır. Menü yedeğine dahil değildir. Oran sınırı tek sunucunun belleğindedir; yeniden başlatmada sıfırlanır.
 - PR #13 (`a3-3d`): Resmî SVG kaynaklarından uyarlanabilir 3D HOT ve Ne İçsem kabartmaları; 45 ms kare koruması ve SVG düşüşü.
 - Windows veritabanlı testleri için projeye özel Laragon MySQL 3307 yardımcısı eklendi; yerel şifre yalnızca git dışındaki `.env.test.local` dosyasında tutuluyor.
@@ -32,3 +32,5 @@ Son güncelleme: 2026-10-29. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 `a2-vitest-security` doğrulaması: veritabanlı Playwright 104/104 geçti (2026-10-28).
 
 Geri bildirim doğrulaması (2026-10-29): Vitest 176/176 (veritabanı dahil), Playwright 106/106; TypeScript/build ve 3D bütçesi başarılı, npm audit 0 açık. Henüz canlıya alınmadı.
+
+PR #17 form revizyonu ve main çakışma çözümü: 176/176 veritabanlı test, 109/109 tarayıcı testi, TypeScript/build başarılı (2026-10-29).

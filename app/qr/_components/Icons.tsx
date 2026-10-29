@@ -9,3 +9,6 @@ export const WifiIcon = () => (
 export const CloseIcon = () => (
   <svg {...base}><path d="M6 6l12 12M18 6 6 18" /></svg>
 );
+export const PhotoIcon = () => (
+  <svg {...base}><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="8" cy="9" r="1.5" /><path d="m3 16 5-4 4 3 4-5 5 6" /></svg>
+);
