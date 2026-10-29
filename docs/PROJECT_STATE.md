@@ -39,3 +39,5 @@ Geri bildirim ilk doğrulaması (2026-10-29): Vitest 176/176 (veritabanı dahil)
 PR #17 form revizyonu ve main çakışma çözümü: 176/176 veritabanlı test, 109/109 tarayıcı testi, TypeScript/build başarılı (2026-10-29).
 
 Dikey slot düzeltmesi (2026-10-29): 176/176 veritabanlı test ve 110/110 tarayıcı testi, TypeScript/build başarılı. Yeni main'deki görsel düzenlemeler korunarak ayrı PR hazırlandı.
+
+QR alt adres temizliği (a2-qr-without-caption): admin önizlemesi ve indirilen SVG'deki görünür alt adres kaldırıldı; QR hedefi, logo ve hata düzeltme korundu. 176/176 veritabanlı test ve üretim build başarılı.
