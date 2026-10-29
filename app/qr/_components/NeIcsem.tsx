@@ -96,7 +96,8 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
         <>
           <div className="ne-reels">
             {(picks[0] ? [0, 1, 2].map(() => picks[0]) : []).map((p, k) => {
-              const y = phase === "reset" ? 0 : -((FRAMES - 1) / FRAMES) * 100;
+              // Sonuç en üstte; negatif konumdan sıfıra gelen şerit aşağı doğru akar.
+              const y = phase === "reset" ? -((FRAMES - 1) / FRAMES) * 100 : 0;
               const style = {
                 transform: `translateY(${y}%)`,
                 transition: phase === "spin" ? `transform ${DURATIONS[k]}ms cubic-bezier(.12,.75,.2,1)` : "none",
@@ -112,11 +113,6 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     aria-disabled={phase !== "done"}
                   >
                     <span className="ne-strip" data-spinning={phase === "spin"} style={style}>
-                      {Array.from({ length: FRAMES - 1 }, (_, i) => (
-                        <span key={i} className="ne-frame">
-                          <BrandIcon name={ICONS[(i + k) % ICONS.length]} className="ne-frame__icon" />
-                        </span>
-                      ))}
                       <span className="ne-frame ne-frame--result" data-color={p.groupColor}>
                         <BrandIcon name={p.groupIcon} className="ne-frame__icon" />
                         {p.imageKey ? (
@@ -131,6 +127,11 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                           />
                         ) : null}
                       </span>
+                      {Array.from({ length: FRAMES - 1 }, (_, i) => (
+                        <span key={i} className="ne-frame">
+                          <BrandIcon name={ICONS[(i + k) % ICONS.length]} className="ne-frame__icon" />
+                        </span>
+                      ))}
                     </span>
                   </button>
                 </div>
