@@ -206,4 +206,22 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "008_feedback",
+    statements: [
+      `CREATE TABLE feedbacks (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+        topic ENUM('taste','speed','staff','hygiene','other') NOT NULL,
+        rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+        message TEXT NOT NULL,
+        name VARCHAR(80) NULL,
+        contact VARCHAR(120) NULL,
+        image_key VARCHAR(96) NULL,
+        is_read TINYINT NOT NULL DEFAULT 0,
+        lang CHAR(2) NOT NULL DEFAULT 'tr',
+        INDEX (created_at, id), INDEX (is_read, created_at)
+      ) ${T}`,
+    ],
+  },
 ];

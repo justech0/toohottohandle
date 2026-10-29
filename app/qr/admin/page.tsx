@@ -7,6 +7,7 @@ import { getPool, hasDb } from "@/lib/db/client";
 import { lastChange } from "@/lib/admin/products";
 import { catalogData } from "@/lib/admin/catalog";
 import { getBackupStatus } from "@/lib/admin/backups";
+import { feedbackSummary } from "@/lib/feedback/store";
 import { logout, logoutEverywhere } from "./actions";
 import { undoLastAction } from "./urunler/actions";
 
@@ -19,6 +20,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
   const admin = await requireAdmin();
   const [last, catalog, backup] = await Promise.all([lastChange(getPool()), catalogData(getPool()), getBackupStatus(getPool())]);
   const query = await searchParams;
+  const feedback = await feedbackSummary(getPool());
   const undone = Boolean(query.geri);
   return (
     <>
@@ -37,6 +39,13 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
         <Link href="/qr/admin/yedek" className="adm-btn adm-btn--block">Yedek</Link>
         <Link href="/qr/admin/istatistik" className="adm-btn adm-btn--block">İstatistik ve QR</Link>
       </nav>
+
+      <section className="adm-card" data-testid="feedback-summary">
+        <h2 className="adm-card__title">Geri bildirim</h2>
+        <p>{feedback.unread} okunmamış · Son 30 gün: {feedback.average === null ? "Henüz puan yok" : `${feedback.average.toFixed(1)} / 5`}</p>
+        {feedback.latest.length ? <ul className="feedback-latest">{feedback.latest.map((item) => <li key={item.id}>{item.message.split("\n")[0].slice(0, 100)}</li>)}</ul> : <p className="adm-note">Misafirlerin görüşleri burada toplanır.</p>}
+        <Link href="/qr/admin/geri-bildirim" className="adm-btn adm-btn--block">Geri bildirimleri aç</Link>
+      </section>
 
       <section className="adm-card" aria-labelledby="last-title">
         <h2 id="last-title" className="adm-card__title">Son değişiklik</h2>

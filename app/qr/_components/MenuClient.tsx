@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { clearStaleNav, closeNav, navFromState, pushNav, type Overlay } from "@/lib/ui/historySheet";
 import { ProductSheet } from "./ProductSheet";
 import { WifiCard } from "./WifiCard";
+import { FeedbackSheet } from "./FeedbackSheet";
 import type { MenuSettings } from "@/lib/menu/types";
 import type { CardProduct } from "./clientTypes";
 import { SearchOverlay } from "./SearchOverlay";
@@ -24,6 +25,12 @@ export function MenuClient({ products, settings }: { products: CardProduct[]; se
   useEffect(() => {
     clearStaleNav();
     const onClick = (e: MouseEvent) => {
+      if ((e.target as HTMLElement | null)?.closest("[data-open-feedback]")) {
+        pushNav({ overlay: "feedback", sheet: null });
+        setPanel("feedback");
+        setSheet(null);
+        return;
+      }
       const btn = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-open-product]");
       const slug = btn?.dataset.openProduct;
       if (!slug) return;
@@ -96,6 +103,7 @@ export function MenuClient({ products, settings }: { products: CardProduct[]; se
       </div>
       {panel === "search" ? <SearchOverlay products={products} onClose={close} paused={Boolean(sheetProduct)} /> : null}
       {panel === "wifi" ? <WifiCard settings={settings} onClose={close} /> : null}
+      {panel === "feedback" ? <FeedbackSheet onClose={close} /> : null}
       {sheetProduct ? <ProductSheet product={sheetProduct} onClose={close} /> : null}
     </>
   );
