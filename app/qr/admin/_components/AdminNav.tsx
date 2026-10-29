@@ -21,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/qr/admin/kopyalar", label: "Kopyalar", icon: "copies" },
   { href: "/qr/admin/yedek", label: "Yedek", icon: "backup" },
   { href: "/qr/admin/istatistik", label: "İstatistik & QR", icon: "stats" },
+  { href: "/qr/admin/geri-bildirim", label: "Geri Bildirim", icon: "feedback" },
 ];
 
 const MOBILE_NAV_ITEMS: NavItem[] = [

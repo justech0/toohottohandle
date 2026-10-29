@@ -7,8 +7,9 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
+    const previous = document.activeElement as HTMLElement | null;
     const focusables = () =>
-      Array.from(root.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')).filter((el) => !el.hasAttribute("disabled"));
+      Array.from(root.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter((el) => !el.hasAttribute("disabled") && !el.closest("[hidden]") && el.getAttribute("type") !== "hidden");
     focusables()[0]?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -32,6 +33,6 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
       }
     };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); previous?.focus({ preventScroll: true }); };
   }, [ref, onClose]);
 }

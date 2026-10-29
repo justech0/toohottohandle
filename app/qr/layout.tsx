@@ -5,6 +5,7 @@ import "@fontsource/montserrat/600.css";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/menu.css";
+import "./styles/feedback.css";
 
 export const metadata: Metadata = {
   title: "Too Hot To Handle · Menü",
