@@ -112,7 +112,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     aria-label={phase === "done" ? `${p.name}, ${p.full}` : `${k + 1}. kutu dönüyor`}
                     aria-disabled={phase !== "done"}
                   >
-                    <span className="ne-strip" style={style}>
+                    <span className="ne-strip" data-spinning={phase === "spin"} style={style}>
                       <span className="ne-frame ne-frame--result" data-color={p.groupColor}>
                         <BrandIcon name={p.groupIcon} className="ne-frame__icon" />
                         {p.imageKey ? (

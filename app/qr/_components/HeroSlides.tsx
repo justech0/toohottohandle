@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { HERO_INTERVAL_MS, HERO_SLIDES } from "@/lib/brand/hero";
-import { BrandIcon } from "./BrandIcon";
 import { Relief } from "./three/Relief";
 
 /**
@@ -88,7 +87,6 @@ export function HeroSlides() {
         </div>
       ))}
       <div className="hero__shade" aria-hidden="true" />
-      <BrandIcon name={slide.icon} className="hero__icon" />
       <div className="hero__text">
         <p className="hero__menu">MENÜ</p>
         <p className="hero__title" data-testid="hero-title" aria-live={announce ? "polite" : "off"}>{slide.title}</p>

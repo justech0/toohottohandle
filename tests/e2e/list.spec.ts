@@ -62,7 +62,7 @@ test("group tab jumps to its first category and selects it", async ({ page }) =>
 test("scrolling the list updates the selected category tab", async ({ page }) => {
   await openMenu(page);
   await page.locator("#cat-cookies").evaluate((el) => el.scrollIntoView({ block: "start" }));
-  const tab = page.getByTestId("category-tab").filter({ hasText: "Cookies" });
+  const tab = page.getByTestId("category-tab").filter({ hasText: "Kurabiyeler" });
   await expect(tab).toHaveAttribute("aria-current", "true");
   await expect(tab).toBeInViewport();
 });

@@ -27,6 +27,7 @@ Son güncelleme: 2026-10-29. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 
 ## Açık konular
 
+- `a2-slot-reels`: Ne içsem şeridi yukarıdan aşağı kayacak şekilde düzeltildi; üç kutu 1,4 / 1,9 / 2,4 saniyede aynı içecekte hizalanır. PR #19'daki Kurabiyeler adı, slot gölgeleri ve bulanıklık korundu. Plan: `docs/superpowers/plans/2026-10-29-slot-reels.md`.
 - `a2-hostinger-only`: kullanılmayan `vercel.json` kaldırıldı, yerel sağlayıcı metaverisi git dışında tutuldu ve aktif yayın belgeleri Hostinger'e göre düzeltildi. Uygulama, veritabanı ve dosya deposu değişmedi. Hesap tarafındaki bağlantı kaldırma işlemi ayrıca erişim gerektirir.
 - Belirsiz fotoğraflar hangi ürün: matcha içecek, gözlüklü frappe, portakallı soğuk, tepside fincan, yaban mersinli tart, çörekler.
 - Hostinger'de IP başlığı doğrulaması (sahte `x-forwarded-for` ile kilit atlatılamıyor mu) — DNS sonrası, admin hesabı açılınca.
@@ -36,3 +37,5 @@ Son güncelleme: 2026-10-29. Kurallar ve komutlar: `AGENTS.md`. Sıradaki işler
 Geri bildirim ilk doğrulaması (2026-10-29): Vitest 176/176 (veritabanı dahil), Playwright 106/106; TypeScript/build ve 3D bütçesi başarılı, npm audit 0 açık. Sonraki revizyon ve yayın aşağıda kayıtlıdır.
 
 PR #17 form revizyonu ve main çakışma çözümü: 176/176 veritabanlı test, 109/109 tarayıcı testi, TypeScript/build başarılı (2026-10-29).
+
+Dikey slot düzeltmesi (2026-10-29): 176/176 veritabanlı test ve 110/110 tarayıcı testi, TypeScript/build başarılı. Yeni main'deki görsel düzenlemeler korunarak ayrı PR hazırlandı.
