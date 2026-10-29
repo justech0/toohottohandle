@@ -111,7 +111,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     aria-label={phase === "done" ? `${p.name}, ${p.full}` : `${k + 1}. kutu dönüyor`}
                     aria-disabled={phase !== "done"}
                   >
-                    <span className="ne-strip" style={style}>
+                    <span className="ne-strip" data-spinning={phase === "spin"} style={style}>
                       {Array.from({ length: FRAMES - 1 }, (_, i) => (
                         <span key={i} className="ne-frame">
                           <BrandIcon name={ICONS[(i + k) % ICONS.length]} className="ne-frame__icon" />
