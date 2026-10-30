@@ -7,7 +7,6 @@ import { requireAdmin } from "@/lib/auth/session";
 import { getPool, hasDb } from "@/lib/db/client";
 import { lastChange } from "@/lib/admin/products";
 import { catalogData } from "@/lib/admin/catalog";
-import { getBackupStatus } from "@/lib/admin/backups";
 import { feedbackSummary } from "@/lib/feedback/store";
 import { readStatsReport } from "@/lib/stats/server";
 import { logout, logoutEverywhere } from "./actions";
@@ -29,10 +28,9 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
   const admin = await requireAdmin();
   const pool = getPool();
 
-  const [last, catalog, backup, statsReport, [productCounts]] = await Promise.all([
+  const [last, catalog, statsReport, [productCounts]] = await Promise.all([
     lastChange(pool),
     catalogData(pool),
-    getBackupStatus(pool),
     readStatsReport(pool).catch(() => ({ enabled: false, opens: { today: 0, last7: 0, last30: 0 } })),
     pool.query<RowDataPacket[]>(
       `SELECT 
@@ -107,18 +105,6 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
           <span className="adm-kpi-card__sub">Son 7 günde {statsReport.opens.last7} görüntülenme</span>
         </Link>
 
-        <Link href="/qr/admin/yedek" className="adm-kpi-card">
-          <div className="adm-kpi-card__head">
-            <span className="adm-kpi-card__label">Sistem & Yedek</span>
-            <AdminIcon name="backup" size={20} className="adm-kpi-card__icon" />
-          </div>
-          <p className={`adm-backup-status${backup.stale ? " adm-backup-status--stale" : ""}`}>
-            {backup.label}
-          </p>
-          <span className="adm-kpi-card__sub">
-            {backup.stale ? "Yedek alınması önerilir" : "Menü güvende"}
-          </span>
-        </Link>
       </section>
 
       {/* Hızlı Erişim Navigasyon Kartları */}
@@ -140,7 +126,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
           </div>
           <div className="adm-nav-tile__body">
             <h2 className="adm-nav-tile__title">Katalog ve ayarlar</h2>
-            <p className="adm-nav-tile__desc">Gruplar, kategoriler, etiketler, WiFi şifresi ve çalışma saatleri</p>
+            <p className="adm-nav-tile__desc">Gruplar, kategoriler, etiketler ve çalışma saatleri</p>
           </div>
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
@@ -151,7 +137,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
           </div>
           <div className="adm-nav-tile__body">
             <h2 className="adm-nav-tile__title">Afiş fotoğrafları</h2>
-            <p className="adm-nav-tile__desc">Vitrin hero slaytları yükleme ve dokunmatik odak noktası belirleme</p>
+            <p className="adm-nav-tile__desc">Grup ve kategori fotoğrafları</p>
           </div>
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
@@ -172,8 +158,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
             <AdminIcon name="copies" size={24} />
           </div>
           <div className="adm-nav-tile__body">
-            <h2 className="adm-nav-tile__title">Kopyalar</h2>
-            <p className="adm-nav-tile__desc">Otomatik kaydedilen menü kopyaları ve geçmişe anında geri dönme</p>
+            <h2 className="adm-nav-tile__title">Loglar</h2>
+            <p className="adm-nav-tile__desc">Önceki menüler ve kimin ne değiştirdiği</p>
           </div>
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
@@ -183,8 +169,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
             <AdminIcon name="backup" size={24} />
           </div>
           <div className="adm-nav-tile__body">
-            <h2 className="adm-nav-tile__title">Yedek</h2>
-            <p className="adm-nav-tile__desc">Tüm fotoğrafları ve menü veritabanını tek ZIP olarak indirme / geri yükleme</p>
+            <h2 className="adm-nav-tile__title">Dışarı aktar</h2>
+            <p className="adm-nav-tile__desc">Menüyü ve fotoğrafları ZIP olarak indir</p>
           </div>
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
@@ -194,11 +180,13 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
             <AdminIcon name="stats" size={24} />
           </div>
           <div className="adm-nav-tile__body">
-            <h2 className="adm-nav-tile__title">İstatistik ve QR</h2>
-            <p className="adm-nav-tile__desc">Popüler ürünler, saatlik yoğunluk ve baskıya hazır logolu vektör QR kod</p>
+            <h2 className="adm-nav-tile__title">WiFi, istatistik ve QR</h2>
+            <p className="adm-nav-tile__desc">WiFi bilgileri, ziyaretler ve logolu QR</p>
           </div>
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
+
+        {[{ href: "vitrin", title: "Vitrin", description: "Slayt yazıları, fotoğrafları, renkleri ve sırası" }, { href: "ne-icsem", title: "Ne içsem", description: "Önerilecek ürünler ve fotoğraf önceliği" }, { href: "kullanicilar", title: "Kullanıcılar", description: "Admin oluştur ve hesapları yönet" }].map(item => <Link key={item.href} href={`/qr/admin/${item.href}`} className="adm-nav-tile"><div className="adm-nav-tile__body"><h2 className="adm-nav-tile__title">{item.title}</h2><p className="adm-nav-tile__desc">{item.description}</p></div><AdminIcon name="chevron-right" size={18} /></Link>)}
       </nav>
 
       <section className="adm-card" data-testid="feedback-summary">
@@ -218,7 +206,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
           <div className="adm-undo-section__content">
             <div className="adm-undo-section__info">
               <p className="adm-undo-section__summary" data-testid="last-change">{last.summary}</p>
-              <p className="adm-note">{when(last.at)}</p>
+              <p className="adm-note">{last.email} · {when(last.at)}</p>
             </div>
             <form action={undoLastAction} className="adm-undo-section__form">
               <button

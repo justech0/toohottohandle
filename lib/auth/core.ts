@@ -46,7 +46,7 @@ export async function createFirstAdmin(pool: Pool, email: string, password: stri
 /** Tek admin: şifresini değiştirir ve bütün oturumlarını kapatır. */
 export async function resetOnlyAdminPassword(pool: Pool, password: string): Promise<void> {
   const h = await hashPassword(password);
-  await pool.query("UPDATE admins SET password_hash = ? ORDER BY id LIMIT 1", [h]);
+  await pool.query("UPDATE admins SET password_hash = ?, must_change_password = 0 ORDER BY id LIMIT 1", [h]);
   await pool.query("DELETE FROM sessions");
 }
 
@@ -91,12 +91,12 @@ export async function createSession(pool: Pool, adminId: number, now = new Date(
   return { token, expires };
 }
 
-export async function findSession(pool: Pool, token: string, now = new Date()): Promise<{ adminId: number; email: string } | null> {
+export async function findSession(pool: Pool, token: string, now = new Date()): Promise<{ adminId: number; email: string; mustChangePassword: boolean } | null> {
   const [[r]] = await pool.query<RowDataPacket[]>(
-    "SELECT a.id, a.email FROM sessions s JOIN admins a ON a.id = s.admin_id WHERE s.id_hash = ? AND s.expires_at > ?",
+    "SELECT a.id, a.email, a.must_change_password FROM sessions s JOIN admins a ON a.id = s.admin_id WHERE s.id_hash = ? AND s.expires_at > ?",
     [sha256(token), now],
   );
-  return r ? { adminId: r.id as number, email: r.email as string } : null;
+  return r ? { adminId: r.id as number, email: r.email as string, mustChangePassword: Boolean(r.must_change_password) } : null;
 }
 
 export async function deleteSession(pool: Pool, token: string): Promise<void> {

@@ -13,14 +13,17 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
+  { href: "/qr/admin/vitrin", label: "Vitrin", icon: "photos" },
+  { href: "/qr/admin/ne-icsem", label: "Ne içsem", icon: "products" },
+  { href: "/qr/admin/kullanicilar", label: "Kullanıcılar", icon: "overview" },
   { href: "/qr/admin", label: "Genel Bakış", icon: "overview", exact: true },
   { href: "/qr/admin/urunler", label: "Ürünler & Stok", icon: "products" },
   { href: "/qr/admin/katalog", label: "Katalog & Menü", icon: "catalog" },
   { href: "/qr/admin/fotograflar", label: "Afişler", icon: "photos" },
   { href: "/qr/admin/toplu-fiyat", label: "Toplu Fiyat", icon: "bulk" },
-  { href: "/qr/admin/kopyalar", label: "Kopyalar", icon: "copies" },
-  { href: "/qr/admin/yedek", label: "Yedek", icon: "backup" },
-  { href: "/qr/admin/istatistik", label: "İstatistik & QR", icon: "stats" },
+  { href: "/qr/admin/kopyalar", label: "Loglar", icon: "copies" },
+  { href: "/qr/admin/yedek", label: "Dışarı aktar", icon: "backup" },
+  { href: "/qr/admin/istatistik", label: "WiFi, istatistik ve QR", icon: "stats" },
   { href: "/qr/admin/geri-bildirim", label: "Geri Bildirim", icon: "feedback" },
 ];
 

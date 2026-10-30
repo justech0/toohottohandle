@@ -117,8 +117,8 @@ export async function applyBulkPrice(pool: Pool, adminId: number, input: BulkFor
     const after = changes.map(({ oldPriceKurus: _old, newPriceKurus, ...change }) => ({ ...change, priceKurus: newPriceKurus }));
     await connection.query("DELETE FROM audit_undo_secrets");
     await connection.query(
-      "INSERT INTO audit_log (admin_id, entity, action, summary, before_json, after_json) VALUES (?, 'bulk_price', 'update', ?, ?, ?)",
-      [adminId, `${items.length} ürünün fiyatı toplu güncellendi`, JSON.stringify(before), JSON.stringify(after)],
+      "INSERT INTO audit_log (admin_email, admin_id, entity, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, 'bulk_price', 'update', ?, ?, ?)",
+      [adminId, adminId, `${items.length} ürünün fiyatı toplu güncellendi`, JSON.stringify(before), JSON.stringify(after)],
     );
     await connection.query("UPDATE settings SET menu_updated_at = CURRENT_TIMESTAMP(3) WHERE id = 1");
     await connection.commit();

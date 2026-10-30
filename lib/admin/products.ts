@@ -53,7 +53,10 @@ export async function loadProductForm(pool: Pool, id: number): Promise<Record<st
   const tri = (v: number | null) => (v === null ? "" : v ? "yes" : "no");
   const vs = snap.variants;
   return {
-    id: String(p.id), name: p.name, categoryId: String(p.category_id), descTr: p.desc_tr ?? "", ingredientsTr: p.ingredients_tr ?? "",
+    id: String(p.id), name: p.name, nameEn: p.name_en ?? "", nameAr: p.name_ar ?? "",
+    categoryId: String(p.category_id),
+    descTr: p.desc_tr ?? "", descEn: p.desc_en ?? "", descAr: p.desc_ar ?? "",
+    ingredientsTr: p.ingredients_tr ?? "", ingredientsEn: p.ingredients_en ?? "", ingredientsAr: p.ingredients_ar ?? "",
     temp: p.temp ?? "", inSuggest: tri(p.in_suggest), isNew: p.is_new ? "on" : "", isFeatured: p.is_featured ? "on" : "", isVisible: p.is_visible ? "on" : "",
     imageKey: p.image_key ?? "", imageFocusX: String(p.image_focus_x), imageFocusY: String(p.image_focus_y),
     sizes: sizeSetOf(vs.map((v) => ({ key: v.label_key }))), price0: vs[0] ? lira(vs[0].price_kurus) : "", price1: vs[1] ? lira(vs[1].price_kurus) : "",
@@ -135,8 +138,8 @@ async function audit(
   after: unknown,
 ): Promise<void> {
   await c.query("DELETE FROM audit_undo_secrets");
-  await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, 'product', ?, ?, ?, ?, ?)", [
-    adminId, entityId, action, summary.slice(0, 255), before === null ? null : JSON.stringify(before), after === null ? null : JSON.stringify(after),
+  await c.query("INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, 'product', ?, ?, ?, ?, ?)", [
+    adminId, adminId, entityId, action, summary.slice(0, 255), before === null ? null : JSON.stringify(before), after === null ? null : JSON.stringify(after),
   ]);
 }
 
@@ -150,7 +153,11 @@ const bool = (value: boolean | null) => (value === null ? null : value ? 1 : 0);
 
 function inputColumns(input: ProductInput): Record<string, unknown> {
   return {
-    name: input.name, category_id: input.categoryId, desc_tr: input.descTr, ingredients_tr: input.ingredientsTr, temp: input.temp,
+    name: input.name, name_en: input.nameEn, name_ar: input.nameAr,
+    category_id: input.categoryId,
+    desc_tr: input.descTr, desc_en: input.descEn, desc_ar: input.descAr,
+    ingredients_tr: input.ingredientsTr, ingredients_en: input.ingredientsEn, ingredients_ar: input.ingredientsAr,
+    temp: input.temp,
     in_suggest: bool(input.inSuggest), is_new: bool(input.isNew), is_featured: bool(input.isFeatured), is_visible: bool(input.isVisible),
     image_key: input.imageKey, image_focus_x: input.imageFocusX, image_focus_y: input.imageFocusY,
   };
@@ -326,12 +333,12 @@ export async function moveProduct(pool: Pool, adminId: number, id: number, direc
   });
 }
 
-export interface LastChange { id: number; summary: string; at: string; canUndo: boolean }
+export interface LastChange { email: string; id: number; summary: string; at: string; canUndo: boolean }
 
 export async function lastChange(pool: Pool): Promise<LastChange | null> {
-  const [[r]] = await pool.query<Rows>("SELECT id, summary, at, entity, action, undone_by FROM audit_log ORDER BY id DESC LIMIT 1");
+  const [[r]] = await pool.query<Rows>("SELECT id, summary, at, entity, action, undone_by, admin_email FROM audit_log ORDER BY id DESC LIMIT 1");
   if (!r) return null;
-  return { id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: !["menu_snapshot", "backup"].includes(r.entity) && r.action !== "undo" && r.undone_by === null };
+  return { email: r.admin_email ?? "Bilinmeyen yönetici", id: r.id, summary: r.summary, at: new Date(r.at).toISOString(), canUndo: !["menu_snapshot", "backup", "admin", "hero", "suggestions"].includes(r.entity) && r.action !== "undo" && r.undone_by === null };
 }
 
 /** Yalnızca geçmişin en üstündeki işlem geri alınır (spec 4.4). Geri alma kendisi geri alınamaz. */
@@ -380,7 +387,7 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
     const restored = top.entity === "product" && top.entity_id ? await snapshot(c, top.entity_id) : null;
     if (top.entity === "product") await refreshObjectUsage(c, [current?.product.image_key, restored?.product.image_key]);
     const summary = `Geri alındı: ${top.summary}`.slice(0, 255);
-    const [res] = await c.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary) VALUES (?, ?, ?, 'undo', ?)", [adminId, top.entity, top.entity_id, summary]);
+    const [res] = await c.query("INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary) VALUES ((SELECT email FROM admins WHERE id = ?), ?, ?, ?, 'undo', ?)", [adminId, adminId, top.entity, top.entity_id, summary]);
     await c.query("UPDATE audit_log SET undone_by = ? WHERE id = ?", [(res as { insertId: number }).insertId, top.id]);
     await touchMenu(c);
     return { summary };

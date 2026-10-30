@@ -41,3 +41,17 @@ PR #17 form revizyonu ve main çakışma çözümü: 176/176 veritabanlı test, 
 Dikey slot düzeltmesi (2026-10-29): 176/176 veritabanlı test ve 110/110 tarayıcı testi, TypeScript/build başarılı. Yeni main'deki görsel düzenlemeler korunarak ayrı PR hazırlandı.
 
 QR alt adres temizliği (a2-qr-without-caption): admin önizlemesi ve indirilen SVG'deki görünür alt adres kaldırıldı; QR hedefi, logo ve hata düzeltme korundu. 176/176 veritabanlı test ve üretim build başarılı.
+
+## A2 — Admin revize (PR, henüz canlıda değil)
+
+- `a2-admin-revize`, güncel main (`14061a3`) üzerinden açıldı. Kullanıcı onayıyla `i18n-en-ar` altyapısı da dahil edildi.
+- Vitrin slaytları veritabanında: metin, fotoğraf/odak, altı marka rengi, ikon, sıra, ekleme/silme/gizleme. Mevcut üç slayt migration ile bir kez yazılır.
+- Kullanıcılar: admin oluşturma/listeleme/silme, geçici şifreyi ilk girişte değiştirme, kendini/son admini silme koruması. Audit e-postaları hesap silinse de kalır.
+- Dışarı aktar yalnız ZIP indirir. ZIP geri yükleme arayüzü/uçları, yedek yaşı uyarısı ve sistem-yedek kartı kaldırıldı. Loglardan önceki menüye dönüş korunur; vitrin ve öneri ayarları da arşivlenir.
+- Loglar ve audit kayıtları girişte 30 gün kuralıyla temizlenir; her tablonun son 25 kaydı korunur.
+- WiFi ve istatistik ayarları QR ekranında; katalog bölüm düğmeleri ve tüm admin açılır listeleri marka stilinde, klavyeyle kullanılabilir.
+- Ne içsem: kategori havuzu veya işaretlenen ürünler, fotoğraf önceliği anahtarı ve sessionStorage ile son beş öneriyi tekrar etmeme. Beşten küçük havuzda en eski öneri yeniden kullanılabilir.
+- SVG yanında 1600×1600 logolu PNG indirme; PNG mevcut resmi logolu SVG'den üretildi ve bağımsız QR okuyucuyla doğru adrese çözüldü. Dil adları Türkçe / English / العربية.
+- Canlı migration: `009_admin_revision`; yeni ortam değişkeni gerekmez. Vitrin, hesap ve öneri işlemleri geçmişte açıkça geri alınamazdır.
+
+Admin revize doğrulaması (2026-10-29, Node 22.23.4): 201/201 veritabanlı Vitest, 121/121 veritabanlı Playwright, TypeScript/build ve 164.3 KB 3D bütçesi başarılı; npm audit 0 açık. 390/1440 px ekranlar ve bağımsız PNG QR decode kontrol edildi. PR hazır; merge ve canlı yayın yapılmadı.

@@ -6,6 +6,8 @@ import { imageSrc } from "@/lib/menu/image";
 import { BrandIcon } from "./BrandIcon";
 import { CloseIcon } from "./Icons";
 import type { CardProduct } from "./clientTypes";
+import { useLanguage } from "@/lib/i18n/context";
+import { resolveText } from "@/lib/i18n/resolve";
 
 const ICONS = ["lips", "rabbit", "star"] as const;
 const SPINS = 4; // her makarada 4 tur ikon, sonra sonuç
@@ -16,12 +18,13 @@ const DURATIONS = [1400, 1900, 2400];
  * Ne içsem (spec v3 6): kare yerinde açılır, üç kutuda dudak/tavşan/yıldız slot gibi döner,
  * her kutu bir içecekte durur. Yeni sayfa ya da geçmiş kaydı yok. Sonuca dokununca MenuClient detayı açar.
  */
-export function NeIcsem({ pool }: { pool: CardProduct[] }) {
+export function NeIcsem({ pool, preferPhotos = true }: { pool: CardProduct[]; preferPhotos?: boolean }) {
   const [open, setOpen] = useState(false);
   const [picks, setPicks] = useState<CardProduct[]>([]);
   const [phase, setPhase] = useState<"idle" | "reset" | "spin" | "done">("idle");
   const timers = useRef<number[]>([]);
-  const lastPicks = useRef<CardProduct[]>([]);
+  const rafRef = useRef<number>(0);
+  const lastPicks = useRef<string[]>([]);
   const squareRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef(false);
@@ -39,6 +42,10 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
   const clear = () => {
     timers.current.forEach((t) => window.clearTimeout(t));
     timers.current = [];
+    if (rafRef.current) {
+      window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
   };
   useEffect(() => clear, []);
 
@@ -46,22 +53,44 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
     if (spinning) return;
     clear();
     // Tek öneri: üç kutu da aynı içecekte hizalanır (Enes, 2026-10-26).
-    const next = pickSuggestions(pool, 1, Math.random, lastPicks.current);
-    lastPicks.current = next;
+    try {
+      const stored: unknown = JSON.parse(sessionStorage.getItem("thth-suggest-recent") ?? "[]");
+      if (Array.isArray(stored)) lastPicks.current = stored.filter((s): s is string => typeof s === "string").slice(-5);
+    } catch {}
+    const recent = lastPicks.current;
+    let available = pool.filter(p => !recent.includes(p.slug));
+    // Küçük havuzda en uzun süredir önerilmeyen ürünü serbest bırak.
+    if (!available.length && pool.length) {
+      const oldest = [...recent, ...pool.map(p => p.slug)].find(slug => pool.some(p => p.slug === slug));
+      available = pool.filter(p => p.slug === oldest);
+    }
+    const next = pickSuggestions(available, 1, Math.random, [], preferPhotos);
+    if (next[0]) {
+      lastPicks.current = [...recent.filter(s => s !== next[0].slug), next[0].slug].slice(-5);
+      try { sessionStorage.setItem("thth-suggest-recent", JSON.stringify(lastPicks.current)); } catch {}
+    }
     setPicks(next);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPhase("done");
       return;
     }
     setPhase("reset");
-    timers.current.push(window.setTimeout(() => setPhase("spin"), 30));
-    timers.current.push(window.setTimeout(() => setPhase("done"), 30 + DURATIONS[DURATIONS.length - 1] + 80));
+    rafRef.current = window.requestAnimationFrame(() => {
+      rafRef.current = window.requestAnimationFrame(() => {
+        setPhase("spin");
+        timers.current.push(window.setTimeout(() => setPhase("done"), DURATIONS[DURATIONS.length - 1] + 80));
+      });
+    });
   };
+
+  const { lang, t } = useLanguage();
+  const pickName = picks[0] ? resolveText(lang, picks[0].nameAr, picks[0].nameEn, picks[0].name) : "";
 
   if (!open) {
     return (
       <NeIcsemSquare
         ref={squareRef}
+        label={t.neIcsem.title}
         onClick={() => {
           setOpen(true);
           spin();
@@ -74,12 +103,12 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
     <div className="ne-open" data-testid="neicsem-open">
       <div className="ne-open__head">
         <BrandIcon name="rabbit" className="ne-open__rabbit" />
-        <p className="ne-open__title">Ne içsem?</p>
+        <p className="ne-open__title">{t.neIcsem.title}</p>
         <button
           ref={closeRef}
           type="button"
           className="icon-btn ne-open__close"
-          aria-label="Kapat"
+          aria-label={t.nav.close}
           onClick={() => {
             returnFocus.current = true;
             clear();
@@ -91,7 +120,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
         </button>
       </div>
       {pool.length === 0 ? (
-        <p className="ne-open__empty">Şu an önerecek içecek yok. Ekibimize sorabilirsin.</p>
+        <p className="ne-open__empty">{t.neIcsem.empty}</p>
       ) : (
         <>
           <div className="ne-reels">
@@ -102,6 +131,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                 transform: `translateY(${y}%)`,
                 transition: phase === "spin" ? `transform ${DURATIONS[k]}ms cubic-bezier(.12,.75,.2,1)` : "none",
               };
+              const pName = resolveText(lang, p.nameAr, p.nameEn, p.name);
               return (
                 <div key={k} className="ne-col">
                   <button
@@ -109,7 +139,7 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                     className="ne-reel"
                     data-testid="neicsem-reel"
                     data-open-product={phase === "done" ? p.slug : undefined}
-                    aria-label={phase === "done" ? `${p.name}, ${p.full}` : `${k + 1}. kutu dönüyor`}
+                    aria-label={phase === "done" ? `${pName}, ${p.full}` : t.neIcsem.reelSpinning(k + 1)}
                     aria-disabled={phase !== "done"}
                   >
                     <span className="ne-strip" data-spinning={phase === "spin"} style={style}>
@@ -117,7 +147,9 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
                         <BrandIcon name={p.groupIcon} className="ne-frame__icon" />
                         {p.imageKey ? (
                           <img
-                            src={imageSrc(p.imageKey, 320)}
+                            src={imageSrc(p.imageKey, 720)}
+                            srcSet={`${imageSrc(p.imageKey, 320)} 320w, ${imageSrc(p.imageKey, 720)} 720w`}
+                            sizes="(min-width: 768px) 260px, 33vw"
                             style={{ objectPosition: `${p.imageFocusX * 100}% ${p.imageFocusY * 100}%` }}
                             alt=""
                             decoding="async"
@@ -140,15 +172,15 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
           </div>
           {phase === "done" && picks[0] ? (
             <div className="ne-result" aria-hidden="true">
-              <p className="ne-result__name" data-testid="neicsem-name">{picks[0].name}</p>
+              <p className="ne-result__name" data-testid="neicsem-name">{pickName}</p>
               <p className="ne-result__price">{picks[0].full}</p>
             </div>
           ) : null}
           <p className="sr-only" aria-live="polite" data-testid="neicsem-live">
-            {phase === "done" && picks[0] ? `Önerimiz: ${picks[0].name}` : ""}
+            {phase === "done" && picks[0] ? `${t.neIcsem.ourPick} ${pickName}` : ""}
           </p>
           <button type="button" className="ne-again" onClick={spin} aria-disabled={spinning}>
-            Tekrar çevir
+            {t.neIcsem.again}
           </button>
         </>
       )}
@@ -157,11 +189,11 @@ export function NeIcsem({ pool }: { pool: CardProduct[] }) {
 }
 
 /** Ne içsem karesinin kapalı hali: tavşanlı sarı kare (spec v3 3.2). */
-function NeIcsemSquare({ onClick, ref }: { onClick: () => void; ref: React.Ref<HTMLButtonElement> }) {
+function NeIcsemSquare({ label, onClick, ref }: { label: string; onClick: () => void; ref: React.Ref<HTMLButtonElement> }) {
   return (
     <button ref={ref} type="button" className="ne-tile" data-testid="neicsem-tile" onClick={onClick} aria-expanded={false}>
       <span className="ne-tile__disc"><BrandIcon name="rabbit" className="ne-rabbit" /></span>
-      <span className="ne-tile__label">Ne içsem?</span>
+      <span className="ne-tile__label">{label}</span>
     </button>
   );
 }

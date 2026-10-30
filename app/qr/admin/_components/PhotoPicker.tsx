@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { imageSrc } from "@/lib/menu/image";
 import { PHOTO_OPEN_ERROR, prepareImage } from "@/lib/client/prepareImage";
 
@@ -18,6 +18,8 @@ export function PhotoPicker({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const pointer = useRef<number | null>(null);
 
   const chooseFocus = (element: HTMLElement, clientX: number, clientY: number) => {
@@ -78,7 +80,7 @@ export function PhotoPicker({
       <div className="adm-row">
         <label className="adm-btn adm-btn--link adm-photo__choose">
           {uploading ? "Hazırlanıyor…" : key || useDefault ? "Fotoğrafı değiştir" : "Fotoğraf seç"}
-          <input type="file" accept="image/jpeg,image/png,image/webp" aria-label={inputLabel} disabled={uploading}
+          <input type="file" accept="image/jpeg,image/png,image/webp" aria-label={inputLabel} disabled={!ready || uploading}
             onChange={(event) => { void upload(event.target.files?.[0]); event.currentTarget.value = ""; }} />
         </label>
         {key || useDefault ? <button type="button" className="adm-btn" onClick={() => { setKey(""); setUseDefault(false); setMessage("Fotoğraf kaydedince silinecek."); }}>Fotoğrafı sil</button> : null}

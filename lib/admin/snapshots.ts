@@ -5,6 +5,7 @@ type Rows = RowDataPacket[];
 export type SnapshotData = Record<string, Record<string, unknown>[]>;
 
 const TABLES = {
+  heroSlides: { table: "hero_slides", columns: ["id", "slide_key", "title", "default_image", "image_key", "color", "icon", "sort_order", "is_visible", "image_focus_x", "image_focus_y"] },
   groups: { table: "menu_groups", columns: ["id", "slug", "name_tr", "name_en", "name_ar", "color", "sort_order", "image_key", "image_focus_x", "image_focus_y"] },
   categories: { table: "categories", columns: ["id", "slug", "group_id", "name_tr", "name_en", "name_ar", "sort_order", "is_visible", "default_in_suggest", "default_temp", "image_key", "image_focus_x", "image_focus_y"] },
   products: { table: "products", columns: ["id", "slug", "category_id", "name", "name_en", "name_ar", "desc_tr", "desc_en", "desc_ar", "ingredients_tr", "ingredients_en", "ingredients_ar", "kcal", "allergens", "allergens_entered", "temp", "in_suggest", "image_key", "image_focus_x", "image_focus_y", "is_new", "is_featured", "is_visible", "sold_out_until", "sort_order", "updated_at"] },
@@ -17,19 +18,19 @@ const TABLES = {
 
 export const readMenuSnapshotData = async (connection: PoolConnection): Promise<SnapshotData> => {
   const query = async (sql: string) => (await connection.query<Rows>(sql))[0] as Record<string, unknown>[];
-  const [groups, categories, products, variants, extras, extraCategories, tags, productTags, settings] = await Promise.all([
+  const [groups, categories, products, variants, extras, extraCategories, tags, productTags, settings, heroSlides] = await Promise.all([
     query("SELECT * FROM menu_groups"), query("SELECT * FROM categories"), query("SELECT * FROM products"),
     query("SELECT * FROM product_variants"), query("SELECT * FROM extras"), query("SELECT * FROM extra_categories"),
     query("SELECT * FROM tags"), query("SELECT * FROM product_tags"),
-    query("SELECT id, opening_time, footer_note_tr, footer_note_en, footer_note_ar, stats_enabled, menu_updated_at FROM settings WHERE id = 1"),
+    query("SELECT id, opening_time, footer_note_tr, footer_note_en, footer_note_ar, stats_enabled, suggest_mode, suggest_prefer_photos, menu_updated_at FROM settings WHERE id = 1"), query("SELECT * FROM hero_slides ORDER BY sort_order, id"),
   ]);
-  return { groups, categories, products, variants, extras, extraCategories, tags, productTags, settings };
+  return { groups, categories, products, variants, extras, extraCategories, tags, productTags, settings, heroSlides };
 };
 
 export async function takeMenuSnapshot(connection: PoolConnection, reason: string): Promise<number> {
   const safeReason = [...reason.trim()].slice(0, 120).join("") || "menü kopyası";
   const [result] = await connection.query("INSERT INTO menu_snapshots (reason, data) VALUES (?, ?)", [safeReason, JSON.stringify(await readMenuSnapshotData(connection))]);
-  await connection.query("DELETE FROM menu_snapshots WHERE id NOT IN (SELECT id FROM (SELECT id FROM menu_snapshots ORDER BY id DESC LIMIT 25) AS kept)");
+  await connection.query("DELETE FROM menu_snapshots WHERE at < DATE_SUB(UTC_TIMESTAMP(3), INTERVAL 30 DAY) AND id NOT IN (SELECT id FROM (SELECT id FROM menu_snapshots ORDER BY id DESC LIMIT 25) AS kept)");
   return (result as { insertId: number }).insertId;
 }
 
@@ -55,11 +56,11 @@ export async function listMenuSnapshots(pool: Pool): Promise<MenuSnapshotListIte
   return rows.map((row) => ({ id: row.id, at: new Date(row.at).toISOString(), reason: row.reason }));
 }
 
-export interface HistoryItem { id: number; at: string; summary: string; entity: string; action: string }
+export interface HistoryItem { email: string; id: number; at: string; summary: string; entity: string; action: string }
 
 export async function listHistory(pool: Pool): Promise<HistoryItem[]> {
-  const [rows] = await pool.query<Rows>("SELECT id, at, summary, entity, action FROM audit_log ORDER BY id DESC LIMIT 100");
-  return rows.map((row) => ({ id: row.id, at: new Date(row.at).toISOString(), summary: row.summary, entity: row.entity, action: row.action }));
+  const [rows] = await pool.query<Rows>("SELECT id, at, summary, entity, action, admin_email FROM audit_log ORDER BY id DESC LIMIT 100");
+  return rows.map((row) => ({ email: row.admin_email ?? "Bilinmeyen yönetici", id: row.id, at: new Date(row.at).toISOString(), summary: row.summary, entity: row.entity, action: row.action }));
 }
 
 export function parseSnapshotData(raw: string): SnapshotData {
@@ -67,10 +68,11 @@ export function parseSnapshotData(raw: string): SnapshotData {
   if (!value || typeof value !== "object") throw new Error("Menü kopyası bozuk.");
   const data = value as SnapshotData;
   for (const key of [...Object.keys(TABLES), "settings"]) {
+    if (key === "heroSlides" && data[key] === undefined) continue;
     if (!Array.isArray(data[key])) throw new Error("Menü kopyası bozuk.");
   }
   for (const [key, spec] of Object.entries(TABLES)) {
-    for (const row of data[key]) {
+    for (const row of data[key] ?? []) {
       if (!row || typeof row !== "object" || spec.columns.some((column) => !Object.prototype.hasOwnProperty.call(row, column))) {
         throw new Error("Menü kopyası bozuk.");
       }
@@ -94,7 +96,7 @@ async function insertRows(connection: PoolConnection, key: keyof typeof TABLES, 
 
 export const activeImageKeys = async (connection: PoolConnection) => {
   const [rows] = await connection.query<Rows>(
-    "SELECT image_key FROM products WHERE image_key IS NOT NULL UNION SELECT image_key FROM menu_groups WHERE image_key IS NOT NULL UNION SELECT image_key FROM categories WHERE image_key IS NOT NULL",
+    "SELECT image_key FROM products WHERE image_key IS NOT NULL UNION SELECT image_key FROM menu_groups WHERE image_key IS NOT NULL UNION SELECT image_key FROM categories WHERE image_key IS NOT NULL UNION SELECT image_key FROM hero_slides WHERE image_key IS NOT NULL",
   );
   return rows.map((row) => String(row.image_key));
 };
@@ -112,11 +114,16 @@ export async function replaceMenuData(connection: PoolConnection, data: Snapshot
   await insertRows(connection, "tags", data.tags);
   await insertRows(connection, "productTags", data.productTags);
 
+  if (data.heroSlides) {
+    await connection.query("DELETE FROM hero_slides");
+    await insertRows(connection, "heroSlides", data.heroSlides);
+  }
   const settings = data.settings[0];
   await connection.query(
     "UPDATE settings SET opening_time = ?, footer_note_tr = ?, footer_note_en = ?, footer_note_ar = ?, stats_enabled = ?, menu_updated_at = CURRENT_TIMESTAMP(3) WHERE id = 1",
     [settings.opening_time, settings.footer_note_tr, settings.footer_note_en, settings.footer_note_ar, settings.stats_enabled],
   );
+  if (settings.suggest_mode !== undefined) await connection.query("UPDATE settings SET suggest_mode = ?, suggest_prefer_photos = ? WHERE id = 1", [settings.suggest_mode, settings.suggest_prefer_photos]);
 }
 
 export async function restoreMenuSnapshot(pool: Pool, adminId: number, snapshotId: number): Promise<void> {
@@ -134,8 +141,8 @@ export async function restoreMenuSnapshot(pool: Pool, adminId: number, snapshotI
     await refreshObjectUsage(connection, [...oldImageKeys, ...await activeImageKeys(connection)]);
     await connection.query("DELETE FROM audit_undo_secrets");
     await connection.query(
-      "INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, 'menu_snapshot', ?, 'restore', 'Menü kopyasına dönüldü', ?, ?)",
-      [adminId, snapshotId, JSON.stringify({ snapshotId: currentSnapshotId }), JSON.stringify({ snapshotId })],
+      "INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, 'menu_snapshot', ?, 'restore', 'Menü kopyasına dönüldü', ?, ?)",
+      [adminId, adminId, snapshotId, JSON.stringify({ snapshotId: currentSnapshotId }), JSON.stringify({ snapshotId })],
     );
     await connection.commit();
   } catch (error) {

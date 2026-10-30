@@ -2,13 +2,13 @@
  * Açılan her katman (arama, WiFi, ürün detayı) tarayıcı geçmişine bir kayıt ekler.
  * Kapatma her zaman history.back() ile yapılır; ekranda ne açık olduğu geçmiş kaydından okunur.
  */
-export type Overlay = "search" | "wifi" | "feedback";
+export type Overlay = "search" | "wifi" | "feedback" | "lang";
 export type NavState = { overlay: Overlay | null; sheet: string | null };
 
 export function navFromState(state: unknown): NavState {
   const s = state && typeof state === "object" ? (state as Record<string, unknown>) : {};
   return {
-    overlay: s.overlay === "search" || s.overlay === "wifi" || s.overlay === "feedback" ? s.overlay : null,
+    overlay: s.overlay === "search" || s.overlay === "wifi" || s.overlay === "feedback" || s.overlay === "lang" ? s.overlay : null,
     sheet: typeof s.sheet === "string" ? s.sheet : null,
   };
 }

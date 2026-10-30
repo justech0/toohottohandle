@@ -16,7 +16,7 @@ describe.skipIf(!url)("toplu fiyat ve kopyalar (MariaDB)", () => {
     for (const table of [
       "feedbacks", "stats_product", "stats_hourly", "stats_daily",
       "audit_undo_secrets", "storage_objects", "product_tags", "tags", "audit_log", "sessions", "login_attempts", "admins",
-      "menu_snapshots", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations",
+      "hero_slides", "menu_snapshots", "extra_categories", "extras", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations",
     ]) await pool.query(`DROP TABLE IF EXISTS ${table}`);
     await migrate(pool);
     await seedIfEmpty(pool);

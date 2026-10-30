@@ -6,9 +6,9 @@ type Rows = RowDataPacket[];
 type Db = Pool | PoolConnection;
 
 export interface CatalogData {
-  groups: { id: number; name: string; color: GroupInput["color"]; sortOrder: number }[];
-  categories: { id: number; name: string; groupId: number; sortOrder: number; isVisible: boolean; defaultInSuggest: boolean; defaultTemp: "hot" | "cold" | null }[];
-  extras: { id: number; name: string; priceKurus: number; categoryIds: number[] }[];
+  groups: { id: number; name: string; nameEn: string | null; nameAr: string | null; color: GroupInput["color"]; sortOrder: number }[];
+  categories: { id: number; name: string; nameEn: string | null; nameAr: string | null; groupId: number; sortOrder: number; isVisible: boolean; defaultInSuggest: boolean; defaultTemp: "hot" | "cold" | null }[];
+  extras: { id: number; name: string; nameEn: string | null; nameAr: string | null; priceKurus: number; categoryIds: number[] }[];
   tags: { id: number; name: string }[];
   settings: Omit<SettingsInput, "wifiPassword">;
   usesTestWifi: boolean;
@@ -47,8 +47,8 @@ async function audit(
 ): Promise<number> {
   await connection.query("DELETE FROM audit_undo_secrets");
   const [result] = await connection.query(
-    "INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [adminId, entity, entityId, action, summary.slice(0, 255), json(before), json(after)],
+    "INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, ?, ?, ?, ?, ?, ?)",
+    [adminId, adminId, entity, entityId, action, summary.slice(0, 255), json(before), json(after)],
   );
   return (result as { insertId: number }).insertId;
 }
@@ -67,28 +67,31 @@ async function uniqueSlug(connection: PoolConnection, table: "menu_groups" | "ca
 
 export async function catalogData(pool: Pool): Promise<CatalogData> {
   const [groups, categories, extras, links, tags, [settings]] = await Promise.all([
-    pool.query<Rows>("SELECT id, name_tr, color, sort_order FROM menu_groups ORDER BY sort_order, id").then(([rows]) => rows),
-    pool.query<Rows>("SELECT id, name_tr, group_id, sort_order, is_visible, default_in_suggest, default_temp FROM categories ORDER BY sort_order, id").then(([rows]) => rows),
-    pool.query<Rows>("SELECT id, name_tr, price_kurus FROM extras ORDER BY sort_order, id").then(([rows]) => rows),
+    pool.query<Rows>("SELECT id, name_tr, name_en, name_ar, color, sort_order FROM menu_groups ORDER BY sort_order, id").then(([rows]) => rows),
+    pool.query<Rows>("SELECT id, name_tr, name_en, name_ar, group_id, sort_order, is_visible, default_in_suggest, default_temp FROM categories ORDER BY sort_order, id").then(([rows]) => rows),
+    pool.query<Rows>("SELECT id, name_tr, name_en, name_ar, price_kurus FROM extras ORDER BY sort_order, id").then(([rows]) => rows),
     pool.query<Rows>("SELECT extra_id, category_id FROM extra_categories ORDER BY category_id").then(([rows]) => rows),
     pool.query<Rows>("SELECT id, name_tr FROM tags ORDER BY sort_order, id").then(([rows]) => rows),
     pool.query<Rows>("SELECT * FROM settings WHERE id = 1").then(([rows]) => rows),
   ]);
   if (!settings) throw new Error("Ayarlar bulunamadı.");
   return {
-    groups: groups.map((row) => ({ id: row.id, name: row.name_tr, color: row.color, sortOrder: row.sort_order })),
+    groups: groups.map((row) => ({ id: row.id, name: row.name_tr, nameEn: row.name_en ?? null, nameAr: row.name_ar ?? null, color: row.color, sortOrder: row.sort_order })),
     categories: categories.map((row) => ({
-      id: row.id, name: row.name_tr, groupId: row.group_id, sortOrder: row.sort_order,
+      id: row.id, name: row.name_tr, nameEn: row.name_en ?? null, nameAr: row.name_ar ?? null, groupId: row.group_id, sortOrder: row.sort_order,
       isVisible: Boolean(row.is_visible), defaultInSuggest: Boolean(row.default_in_suggest), defaultTemp: row.default_temp,
     })),
     extras: extras.map((row) => ({
-      id: row.id, name: row.name_tr, priceKurus: row.price_kurus,
+      id: row.id, name: row.name_tr, nameEn: row.name_en ?? null, nameAr: row.name_ar ?? null, priceKurus: row.price_kurus,
       categoryIds: links.filter((link) => link.extra_id === row.id).map((link) => link.category_id),
     })),
     tags: tags.map((row) => ({ id: row.id, name: row.name_tr })),
     settings: {
-      wifiSsid: settings.wifi_ssid, wifiUsername: settings.wifi_username, wifiNoteTr: settings.wifi_note_tr,
-      openingTime: settings.opening_time, footerNoteTr: settings.footer_note_tr, statsEnabled: Boolean(settings.stats_enabled),
+      wifiSsid: settings.wifi_ssid, wifiUsername: settings.wifi_username,
+      wifiNoteTr: settings.wifi_note_tr, wifiNoteEn: settings.wifi_note_en ?? null, wifiNoteAr: settings.wifi_note_ar ?? null,
+      openingTime: settings.opening_time,
+      footerNoteTr: settings.footer_note_tr, footerNoteEn: settings.footer_note_en ?? null, footerNoteAr: settings.footer_note_ar ?? null,
+      statsEnabled: Boolean(settings.stats_enabled),
     },
     usesTestWifi: settings.wifi_ssid === TEST_WIFI.wifi_ssid && settings.wifi_username === TEST_WIFI.wifi_username && settings.wifi_password === TEST_WIFI.wifi_password,
   };
@@ -104,10 +107,16 @@ export async function saveGroup(pool: Pool, adminId: number, id: number | null, 
       if (!row) throw new Error("Grup bulunamadı.");
       before = row;
       action = "update";
-      await connection.query("UPDATE menu_groups SET name_tr = ?, color = ?, sort_order = ? WHERE id = ?", [input.name, input.color, input.sortOrder, id]);
+      await connection.query(
+        "UPDATE menu_groups SET name_tr = ?, name_en = ?, name_ar = ?, color = ?, sort_order = ? WHERE id = ?",
+        [input.name, input.nameEn, input.nameAr, input.color, input.sortOrder, id],
+      );
     } else {
       const slug = await uniqueSlug(connection, "menu_groups", input.name);
-      const [result] = await connection.query("INSERT INTO menu_groups (slug, name_tr, color, sort_order) VALUES (?, ?, ?, ?)", [slug, input.name, input.color, input.sortOrder]);
+      const [result] = await connection.query(
+        "INSERT INTO menu_groups (slug, name_tr, name_en, name_ar, color, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+        [slug, input.name, input.nameEn, input.nameAr, input.color, input.sortOrder],
+      );
       entityId = (result as { insertId: number }).insertId;
     }
     const [[after]] = await connection.query<Rows>("SELECT * FROM menu_groups WHERE id = ?", [entityId]);
@@ -143,14 +152,14 @@ export async function saveCategory(pool: Pool, adminId: number, id: number | nul
       before = row;
       action = "update";
       await connection.query(
-        "UPDATE categories SET name_tr = ?, group_id = ?, sort_order = ?, is_visible = ?, default_in_suggest = ?, default_temp = ? WHERE id = ?",
-        [input.name, input.groupId, input.sortOrder, bool(input.isVisible), bool(input.defaultInSuggest), input.defaultTemp, id],
+        "UPDATE categories SET name_tr = ?, name_en = ?, name_ar = ?, group_id = ?, sort_order = ?, is_visible = ?, default_in_suggest = ?, default_temp = ? WHERE id = ?",
+        [input.name, input.nameEn, input.nameAr, input.groupId, input.sortOrder, bool(input.isVisible), bool(input.defaultInSuggest), input.defaultTemp, id],
       );
     } else {
       const slug = await uniqueSlug(connection, "categories", input.name);
       const [result] = await connection.query(
-        "INSERT INTO categories (slug, group_id, name_tr, sort_order, is_visible, default_in_suggest, default_temp) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [slug, input.groupId, input.name, input.sortOrder, bool(input.isVisible), bool(input.defaultInSuggest), input.defaultTemp],
+        "INSERT INTO categories (slug, group_id, name_tr, name_en, name_ar, sort_order, is_visible, default_in_suggest, default_temp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [slug, input.groupId, input.name, input.nameEn, input.nameAr, input.sortOrder, bool(input.isVisible), bool(input.defaultInSuggest), input.defaultTemp],
       );
       entityId = (result as { insertId: number }).insertId;
     }
@@ -198,11 +207,17 @@ export async function saveExtra(pool: Pool, adminId: number, id: number | null, 
       before = await extraSnapshot(connection, id, true);
       if (!before) throw new Error("Ekstra bulunamadı.");
       action = "update";
-      await connection.query("UPDATE extras SET name_tr = ?, price_kurus = ? WHERE id = ?", [input.name, input.priceKurus, id]);
+      await connection.query(
+        "UPDATE extras SET name_tr = ?, name_en = ?, name_ar = ?, price_kurus = ? WHERE id = ?",
+        [input.name, input.nameEn, input.nameAr, input.priceKurus, id],
+      );
     } else {
       const slug = await uniqueSlug(connection, "extras", input.name);
       const [[order]] = await connection.query<Rows>("SELECT COALESCE(MAX(sort_order), -1) + 1 AS n FROM extras");
-      const [result] = await connection.query("INSERT INTO extras (slug, name_tr, price_kurus, sort_order) VALUES (?, ?, ?, ?)", [slug, input.name, input.priceKurus, order.n]);
+      const [result] = await connection.query(
+        "INSERT INTO extras (slug, name_tr, name_en, name_ar, price_kurus, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+        [slug, input.name, input.nameEn, input.nameAr, input.priceKurus, order.n],
+      );
       entityId = (result as { insertId: number }).insertId;
     }
     await connection.query("DELETE FROM extra_categories WHERE extra_id = ?", [entityId]);
@@ -243,15 +258,24 @@ export async function addTag(pool: Pool, adminId: number, input: TagInput): Prom
   });
 }
 
-export async function saveSettings(pool: Pool, adminId: number, input: SettingsInput): Promise<void> {
+export async function saveSettings(pool: Pool, adminId: number, input: SettingsInput, section: "all" | "catalog" | "wifi" = "all"): Promise<void> {
   return inTx(pool, async (connection) => {
     const [[before]] = await connection.query<Rows>("SELECT * FROM settings WHERE id = 1 FOR UPDATE");
     if (!before) throw new Error("Ayarlar bulunamadı.");
+    // Diğer ekranın alanları işlem içindeki güncel satırdan korunur.
+    if (section === "catalog") input = { ...input, wifiSsid: before.wifi_ssid, wifiUsername: before.wifi_username, wifiPassword: null, wifiNoteTr: before.wifi_note_tr, wifiNoteEn: before.wifi_note_en, wifiNoteAr: before.wifi_note_ar, statsEnabled: Boolean(before.stats_enabled) };
+    if (section === "wifi") input = { ...input, openingTime: before.opening_time, footerNoteTr: before.footer_note_tr, footerNoteEn: before.footer_note_en, footerNoteAr: before.footer_note_ar };
     const passwordChanged = input.wifiPassword !== null && input.wifiPassword !== before.wifi_password;
     const password = input.wifiPassword ?? before.wifi_password;
     await connection.query(
-      "UPDATE settings SET wifi_ssid = ?, wifi_username = ?, wifi_password = ?, wifi_note_tr = ?, opening_time = ?, footer_note_tr = ?, stats_enabled = ? WHERE id = 1",
-      [input.wifiSsid, input.wifiUsername, password, input.wifiNoteTr, input.openingTime, input.footerNoteTr, bool(input.statsEnabled)],
+      "UPDATE settings SET wifi_ssid = ?, wifi_username = ?, wifi_password = ?, wifi_note_tr = ?, wifi_note_en = ?, wifi_note_ar = ?, opening_time = ?, footer_note_tr = ?, footer_note_en = ?, footer_note_ar = ?, stats_enabled = ? WHERE id = 1",
+      [
+        input.wifiSsid, input.wifiUsername, password,
+        input.wifiNoteTr, input.wifiNoteEn, input.wifiNoteAr,
+        input.openingTime,
+        input.footerNoteTr, input.footerNoteEn, input.footerNoteAr,
+        bool(input.statsEnabled),
+      ],
     );
     const [[after]] = await connection.query<Rows>("SELECT * FROM settings WHERE id = 1");
     const safe = (row: Record<string, unknown>) => {

@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandSelect } from "./BrandSelect";
+
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { parseProductInput, priceChanges } from "@/lib/admin/productInput";
@@ -69,16 +71,20 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
       <input type="hidden" name="id" value={initial.id} />
       <p role="alert" className={state.error ? "adm-error" : "sr-only"} data-testid="form-error">{state.error ?? ""}</p>
 
-      <label className="adm-field">Ürün adı<input name="name" defaultValue={initial.name} maxLength={160} required /></label>
+      <label className="adm-field">Ürün adı (TR)<input name="name" defaultValue={initial.name} maxLength={160} required /></label>
+      <div className="adm-row">
+        <label className="adm-field">İngilizce ad (EN)<input name="nameEn" defaultValue={initial.nameEn} maxLength={160} placeholder="Boşsa TR gösterilir" /></label>
+        <label className="adm-field">Arapça ad (AR)<input name="nameAr" defaultValue={initial.nameAr} maxLength={160} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+      </div>
       <label className="adm-field">
         Kategori
-        <select name="categoryId" defaultValue={initial.categoryId}>
+        <BrandSelect name="categoryId" defaultValue={initial.categoryId}>
           {groups.map((g) => (
             <optgroup key={g} label={g}>
               {categories.filter((c) => c.groupName === g).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </optgroup>
           ))}
-        </select>
+        </BrandSelect>
       </label>
 
       <PhotoPicker initialKey={initial.imageKey} initialFocusX={Number(initial.imageFocusX)} initialFocusY={Number(initial.imageFocusY)} label="Ürün fotoğrafı" />
@@ -87,9 +93,9 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
         <legend>Boy ve fiyat</legend>
         <label className="adm-field">
           Boy
-          <select name="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)}>
+          <BrandSelect name="sizes" value={sizes} onChange={(value) => setSizes(value)}>
             {SIZE_OPTIONS.map(([k, label]) => <option key={k} value={k}>{label}</option>)}
-          </select>
+          </BrandSelect>
         </label>
         <div className="adm-row">
           {labels.map((label, i) => (
@@ -101,25 +107,29 @@ export function ProductForm({ initial, categories, tags }: { initial: Record<str
         </div>
       </fieldset>
 
-      <label className="adm-field">Açıklama<textarea name="descTr" defaultValue={initial.descTr} maxLength={1000} rows={3} /></label>
+      <label className="adm-field">Açıklama (TR)<textarea name="descTr" defaultValue={initial.descTr} maxLength={1000} rows={2} /></label>
+      <div className="adm-row">
+        <label className="adm-field">İngilizce açıklama (EN)<textarea name="descEn" defaultValue={initial.descEn} maxLength={1000} rows={2} placeholder="Boşsa TR gösterilir" /></label>
+        <label className="adm-field">Arapça açıklama (AR)<textarea name="descAr" defaultValue={initial.descAr} maxLength={1000} rows={2} placeholder="Boşsa TR gösterilir" dir="auto" /></label>
+      </div>
       <label className="adm-field">İçindekiler<textarea name="ingredientsTr" defaultValue={initial.ingredientsTr} maxLength={1000} rows={2} /></label>
 
       <div className="adm-row">
         <label className="adm-field">
           Sıcak / soğuk
-          <select name="temp" defaultValue={initial.temp}>
+          <BrandSelect name="temp" defaultValue={initial.temp}>
             <option value="">Kategoriye göre</option>
             <option value="hot">Sıcak</option>
             <option value="cold">Soğuk</option>
-          </select>
+          </BrandSelect>
         </label>
         <label className="adm-field">
           Ne içsem&apos;e dahil
-          <select name="inSuggest" defaultValue={initial.inSuggest}>
+          <BrandSelect name="inSuggest" defaultValue={initial.inSuggest}>
             <option value="">Kategoriye göre</option>
             <option value="yes">Evet</option>
             <option value="no">Hayır</option>
-          </select>
+          </BrandSelect>
         </label>
       </div>
 

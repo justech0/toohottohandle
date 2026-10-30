@@ -1,3 +1,4 @@
+import { BrandSelect } from "../_components/BrandSelect";
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -25,8 +26,8 @@ async function Content({ searchParams }: { searchParams: Promise<Query> }) {
   };
   return <>
     <form className="adm-card feedback-filters" method="get">
-      <label>Konu<select name="konu" defaultValue={query.konu ?? ""}><option value="">Tüm konular</option>{Object.entries(FEEDBACK_TOPICS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
-      <label>Puan<select name="puan" defaultValue={query.puan ?? ""}><option value="">Tüm puanlar</option>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} puan</option>)}</select></label>
+      <label>Konu<BrandSelect name="konu" defaultValue={query.konu ?? ""}><option value="">Tüm konular</option>{Object.entries(FEEDBACK_TOPICS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</BrandSelect></label>
+      <label>Puan<BrandSelect name="puan" defaultValue={query.puan ?? ""}><option value="">Tüm puanlar</option>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} puan</option>)}</BrandSelect></label>
       <label className="adm-row"><input type="checkbox" name="okunmamis" value="1" defaultChecked={query.okunmamis === "1"} /> Yalnızca okunmamış</label>
       <button className="adm-btn adm-btn--main">Filtrele</button><Link className="adm-btn" href="/qr/admin/geri-bildirim">Temizle</Link>
     </form>

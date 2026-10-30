@@ -224,4 +224,25 @@ export const MIGRATIONS: Migration[] = [
       ) ${T}`,
     ],
   },
+  {
+    id: "009_admin_revision",
+    statements: [
+      "ALTER TABLE admins ADD COLUMN must_change_password TINYINT(1) NOT NULL DEFAULT 0",
+      "ALTER TABLE audit_log ADD COLUMN admin_email VARCHAR(190) NULL",
+      "UPDATE audit_log l JOIN admins a ON a.id = l.admin_id SET l.admin_email = a.email",
+      "ALTER TABLE settings ADD COLUMN suggest_mode ENUM('random','selected') NOT NULL DEFAULT 'random', ADD COLUMN suggest_prefer_photos TINYINT(1) NOT NULL DEFAULT 1",
+      `CREATE TABLE hero_slides (
+        id INT PRIMARY KEY AUTO_INCREMENT, slide_key VARCHAR(64) NULL,
+        title VARCHAR(120) NOT NULL, default_image VARCHAR(120) NOT NULL DEFAULT '', image_key CHAR(64) NULL,
+        color ENUM('red','yellow','pink','blue','green','gray') NOT NULL,
+        icon ENUM('lips','rabbit','star') NOT NULL, sort_order INT NOT NULL DEFAULT 0,
+        is_visible TINYINT(1) NOT NULL DEFAULT 1,
+        image_focus_x DOUBLE NOT NULL DEFAULT 0.5, image_focus_y DOUBLE NOT NULL DEFAULT 0.5
+      ) ${T}`,
+      `INSERT INTO hero_slides (slide_key, title, default_image, color, icon, sort_order) VALUES
+        ('fast', 'HOT & FAST', '/qr/hero/fast.webp', 'red', 'rabbit', 0),
+        ('free', 'HOT & FREE', '/qr/hero/free.webp', 'blue', 'lips', 1),
+        ('shine', 'HOT & SHINE', '/qr/hero/shine.webp', 'yellow', 'star', 2)`,
+    ],
+  },
 ];

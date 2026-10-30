@@ -17,3 +17,10 @@
   --ease: cubic-bezier(.16, 1, .3, 1);
   --tap: 44px;
 }
+
+html[lang="ar"],
+html[dir="rtl"] {
+  --f-display: "Readex Pro", system-ui, sans-serif;
+  --f-text: "Readex Pro", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+

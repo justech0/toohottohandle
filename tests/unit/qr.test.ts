@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import { QR_ERROR_LEVEL, QR_MARGIN, QR_SHORT_ADDRESS, QR_URL, renderBrandedQrSvg } from "@/lib/qr/generate";
 
@@ -17,5 +19,13 @@ describe("logolu QR", () => {
     const viewBox = svg.match(/viewBox="0 0 (\d+) (\d+)"/)!;
     expect(viewBox[1]).toBe(viewBox[2]);
   });
+  it("ships a square PNG export with a readable print resolution", async () => {
+    const bytes = await readFile("public/qr/brand/qr-logolu.png");
+    const metadata = await sharp(bytes).metadata();
+    expect(metadata.format).toBe("png");
+    expect(metadata.width).toBeGreaterThanOrEqual(1200);
+    expect(metadata.width).toBe(metadata.height);
+  });
+
 });
 

@@ -46,8 +46,8 @@ export async function savePosterPhoto(
     }
     await conn.query(`UPDATE ${table} SET image_key = ?, image_focus_x = ?, image_focus_y = ? WHERE id = ?`, [key, focusX, focusY, id]);
     const after = { image_key: key, image_focus_x: focusX, image_focus_y: focusY };
-    await conn.query("INSERT INTO audit_log (admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES (?, ?, ?, 'image', ?, ?, ?)", [
-      adminId, target, id, `${before.name_tr}: fotoğraf güncellendi`, JSON.stringify(before), JSON.stringify(after),
+    await conn.query("INSERT INTO audit_log (admin_email, admin_id, entity, entity_id, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, ?, ?, 'image', ?, ?, ?)", [
+      adminId, adminId, target, id, `${before.name_tr}: fotoğraf güncellendi`, JSON.stringify(before), JSON.stringify(after),
     ]);
     await refreshObjectUsage(conn, [before.image_key, key]);
     await conn.query("UPDATE settings SET menu_updated_at = CURRENT_TIMESTAMP(3) WHERE id = 1");

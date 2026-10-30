@@ -18,12 +18,13 @@ test("admin sees the seed WiFi warning and can edit catalog/settings", async ({ 
   await page.getByRole("button", { name: "Etiket ekle" }).click();
   await expect(page.getByText("FAVORİ", { exact: true })).toBeVisible();
 
+  await page.goto("/qr/admin/istatistik#settings");
   const settings = page.getByTestId("settings-form");
   await settings.getByLabel("Ağ adı").fill("CAFE WIFI");
   await settings.getByLabel("Kullanıcı adı").fill("misafir");
   await settings.getByLabel("Yeni WiFi şifresi").fill("e2e-wifi-987");
   await settings.getByRole("button", { name: "Ayarları kaydet" }).click();
-  await page.waitForURL(/#settings$/);
+  await page.waitForURL(/istatistik\?kaydedildi=1#settings$/);
   await page.goto("/qr/admin");
   await expect(page.getByText("WiFi test bilgisi kullanılıyor", { exact: true })).toHaveCount(0);
   await expect(page.getByTestId("last-change")).toContainText("WiFi şifresi değiştirildi");
@@ -33,12 +34,13 @@ test("admin sees the seed WiFi warning and can edit catalog/settings", async ({ 
   await restoredGroup.getByLabel("Grup adı").fill("Kahve");
   await restoredGroup.getByRole("button", { name: "Grubu kaydet" }).click();
   await page.waitForURL(/#group-1$/);
+  await page.goto("/qr/admin/istatistik#settings");
   const restoredSettings = page.getByTestId("settings-form");
   await restoredSettings.getByLabel("Ağ adı").fill("HOT | WIFI");
   await restoredSettings.getByLabel("Kullanıcı adı").fill("test");
   await restoredSettings.getByLabel("Yeni WiFi şifresi").fill("test1234");
   await restoredSettings.getByRole("button", { name: "Ayarları kaydet" }).click();
-  await page.waitForURL(/#settings$/);
+  await page.waitForURL(/istatistik\?kaydedildi=1#settings$/);
 });
 
 test("product form saves tags and public detail reads them", async ({ page }) => {

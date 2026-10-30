@@ -7,8 +7,14 @@ export interface CardProduct {
   id: number;
   slug: string;
   name: string;
+  nameEn: string | null;
+  nameAr: string | null;
   descTr: string | null;
+  descEn: string | null;
+  descAr: string | null;
   categoryName: string;
+  categoryNameEn: string | null;
+  categoryNameAr: string | null;
   groupColor: GroupColor;
   groupIcon: Exclude<BrandIconName, "logo">;
   imageKey: string | null;
@@ -20,6 +26,5 @@ export interface CardProduct {
   stars: PriceStar[];
   /** Detay için boy-fiyat çiftleri: ["Normal 210 ₺", "Büyük 230 ₺"]; tükendiyse ["Tükendi"] */
   sizes: string[];
-  inSuggest: boolean;
   tags: string[];
 }

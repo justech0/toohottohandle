@@ -65,8 +65,8 @@ const imageKeysIn = (value: unknown, found = new Set<string>()): Set<string> => 
 export async function refreshObjectUsage(conn: PoolConnection, keys: Array<string | null | undefined>): Promise<void> {
   for (const key of new Set(keys.filter((value): value is string => Boolean(value && IMAGE_KEY.test(value))))) {
     const [[usage]] = await conn.query<RowDataPacket[]>(
-      "SELECT (SELECT COUNT(*) FROM products WHERE image_key = ?) + (SELECT COUNT(*) FROM menu_groups WHERE image_key = ?) + (SELECT COUNT(*) FROM categories WHERE image_key = ?) AS n",
-      [key, key, key],
+      "SELECT (SELECT COUNT(*) FROM products WHERE image_key = ?) + (SELECT COUNT(*) FROM menu_groups WHERE image_key = ?) + (SELECT COUNT(*) FROM categories WHERE image_key = ?) + (SELECT COUNT(*) FROM hero_slides WHERE image_key = ?) AS n",
+      [key, key, key, key],
     );
     await conn.query("UPDATE storage_objects SET orphaned_at = ? WHERE `key` = ?", [Number(usage.n) > 0 ? null : new Date(), key]);
   }
@@ -76,7 +76,7 @@ export async function cleanupOrphanedImages(pool: Pool, now = new Date()): Promi
   if (!uploadDir()) return 0;
   const [rows] = await pool.query<RowDataPacket[]>("SELECT `key`, orphaned_at FROM storage_objects WHERE orphaned_at IS NOT NULL");
   const [activeRows] = await pool.query<RowDataPacket[]>(
-    "SELECT image_key FROM products WHERE image_key IS NOT NULL UNION SELECT image_key FROM menu_groups WHERE image_key IS NOT NULL UNION SELECT image_key FROM categories WHERE image_key IS NOT NULL",
+    "SELECT image_key FROM products WHERE image_key IS NOT NULL UNION SELECT image_key FROM menu_groups WHERE image_key IS NOT NULL UNION SELECT image_key FROM categories WHERE image_key IS NOT NULL UNION SELECT image_key FROM hero_slides WHERE image_key IS NOT NULL",
   );
   const [snapshotRows] = await pool.query<RowDataPacket[]>("SELECT data FROM menu_snapshots ORDER BY id DESC LIMIT 25");
   const active = new Set(activeRows.map((row) => String(row.image_key)).filter((key) => IMAGE_KEY.test(key)));
@@ -99,8 +99,8 @@ export async function cleanupOrphanedImages(pool: Pool, now = new Date()): Promi
       const [[object]] = await conn.query<RowDataPacket[]>("SELECT orphaned_at FROM storage_objects WHERE `key` = ? FOR UPDATE", [key]);
       if (object?.orphaned_at && new Date(object.orphaned_at).getTime() < now.getTime() - 30 * 24 * 60 * 60 * 1000) {
         const [[usage]] = await conn.query<RowDataPacket[]>(
-          "SELECT (SELECT COUNT(*) FROM products WHERE image_key = ?) + (SELECT COUNT(*) FROM menu_groups WHERE image_key = ?) + (SELECT COUNT(*) FROM categories WHERE image_key = ?) AS n",
-          [key, key, key],
+          "SELECT (SELECT COUNT(*) FROM products WHERE image_key = ?) + (SELECT COUNT(*) FROM menu_groups WHERE image_key = ?) + (SELECT COUNT(*) FROM categories WHERE image_key = ?) + (SELECT COUNT(*) FROM hero_slides WHERE image_key = ?) AS n",
+          [key, key, key, key],
         );
         const [latest] = await conn.query<RowDataPacket[]>("SELECT data FROM menu_snapshots ORDER BY id DESC LIMIT 25");
         const protectedBySnapshot = latest.some((row) => {

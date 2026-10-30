@@ -13,7 +13,7 @@ export async function createBackupBundle(pool: Pool): Promise<BackupBundle> {
   try {
     await connection.beginTransaction();
     const data = serializedData(await readMenuSnapshotData(connection));
-    const rows = [...data.groups, ...data.categories, ...data.products];
+    const rows = [...data.groups, ...data.categories, ...data.products, ...(data.heroSlides ?? [])];
     const sourceKeys = [...new Set(rows.map((row) => row.image_key).filter((key): key is string => Boolean(key)))];
     const sourceInfo = await Promise.all(sourceKeys.map(backupSourceInfo));
     const replacement = new Map(sourceInfo.map((item) => [item.sourceKey, item.key]));
@@ -61,8 +61,8 @@ export async function restoreBackup(pool: Pool, adminId: number, raw: unknown): 
     await refreshObjectUsage(connection, [...oldImageKeys, ...await activeImageKeys(connection)]);
     await connection.query("DELETE FROM audit_undo_secrets");
     await connection.query(
-      "INSERT INTO audit_log (admin_id, entity, action, summary, before_json, after_json) VALUES (?, 'backup', 'restore', 'ZIP yedeği geri yüklendi', ?, ?)",
-      [adminId, JSON.stringify({ snapshotId }), JSON.stringify({ createdAt: backup.createdAt })],
+      "INSERT INTO audit_log (admin_email, admin_id, entity, action, summary, before_json, after_json) VALUES ((SELECT email FROM admins WHERE id = ?), ?, 'backup', 'restore', 'ZIP yedeği geri yüklendi', ?, ?)",
+      [adminId, adminId, JSON.stringify({ snapshotId }), JSON.stringify({ createdAt: backup.createdAt })],
     );
     await connection.commit();
   } catch (error) {

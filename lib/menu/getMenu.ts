@@ -1,3 +1,5 @@
+import { listSlides } from "@/lib/admin/hero";
+import { HERO_SLIDES } from "@/db/seed/hero";
 import { cacheLife, cacheTag } from "next/cache";
 import samplePhotos from "@/db/seed/sample-photos.json";
 import { getPool, hasDb } from "@/lib/db/client";
@@ -16,7 +18,8 @@ async function fetchMenuCached(): Promise<Menu> {
   "use cache";
   cacheTag("menu");
   cacheLife({ stale: 60 * 60 * 24 * 365, revalidate: 60 * 60 * 24 * 365, expire: 60 * 60 * 24 * 365 });
-  return rowsToMenu(await readMenuRows(getPool()));
+  const [rows, slides] = await Promise.all([readMenuRows(getPool()), listSlides(getPool())]);
+  return { ...rowsToMenu(rows), slides: slides.filter(s => s.isVisible) };
 }
 
 /** Son başarılı okuma; veritabanı geçici hata verirse bu süreç bunu gösterir. */
@@ -32,7 +35,7 @@ function withSamples(m: Menu): Menu {
 export async function getMenu(): Promise<MenuData> {
   let menu: Menu;
   if (!hasDb()) {
-    menu = seedMenu({});
+    menu = { ...seedMenu({}), slides: [...HERO_SLIDES] };
   } else {
     try {
       menu = await fetchMenuCached();

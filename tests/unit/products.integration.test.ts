@@ -39,7 +39,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
 
   beforeAll(async () => {
     pool = mysql.createPool({ uri: url!, connectionLimit: 3, timezone: "Z" });
-    for (const t of ["feedbacks", "stats_product", "stats_hourly", "stats_daily", "audit_undo_secrets", "storage_objects", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_tags", "tags", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
+    for (const t of ["hero_slides", "feedbacks", "stats_product", "stats_hourly", "stats_daily", "audit_undo_secrets", "storage_objects", "audit_log", "menu_snapshots", "sessions", "login_attempts", "admins", "extra_categories", "extras", "product_tags", "tags", "product_variants", "products", "categories", "menu_groups", "settings", "schema_migrations"]) {
       await pool.query(`DROP TABLE IF EXISTS ${t}`);
     }
     await migrate(pool);
@@ -178,6 +178,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     expect(((await pool.query("SELECT id FROM products WHERE id = ?", [copy.id])) as unknown as [unknown[]])[0]).toHaveLength(0);
     const [restoredOrder] = (await pool.query("SELECT id, sort_order FROM products WHERE category_id = 1 ORDER BY sort_order, id")) as unknown as [[{ id: number; sort_order: number }]];
     expect(restoredOrder).toEqual(beforeOrder);
+    await pool.query("UPDATE products SET image_key = NULL WHERE image_key = 'shared-test-photo'");
   });
 
   it("keeps the Kopya suffix when a maximum-length product name is duplicated", async () => {
@@ -188,7 +189,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     expect(row.name.endsWith(" Kopya")).toBe(true);
   });
 
-  it("deletes after a complete menu snapshot, keeps 25 snapshots, and undo restores variants", async () => {
+  it("deletes after a complete menu snapshot, keeps recent snapshots, and undo restores variants", async () => {
     const pid = await id("espresso");
     const [beforeOrder] = (await pool.query("SELECT id, sort_order FROM products WHERE category_id = 1 ORDER BY sort_order, id")) as unknown as [[{ id: number; sort_order: number }]];
     const beforeAudit = await auditCount();
@@ -198,7 +199,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     expect(((await pool.query("SELECT id FROM products WHERE id = ?", [pid])) as unknown as [unknown[]])[0]).toHaveLength(0);
     expect(await auditCount()).toBe(beforeAudit + 1);
     const [[snapshotCount]] = (await pool.query("SELECT COUNT(*) AS n FROM menu_snapshots")) as unknown as [[{ n: number }]];
-    expect(Number(snapshotCount.n)).toBe(25);
+    expect(Number(snapshotCount.n)).toBe(31);
     const [[latest]] = (await pool.query("SELECT reason, data FROM menu_snapshots ORDER BY id DESC LIMIT 1")) as unknown as [[{ reason: string; data: string }]];
     expect(latest.reason).toBe("Espresso silme öncesi");
     expect((JSON.parse(latest.data).products as { id: number }[]).some((p) => p.id === pid)).toBe(true);
@@ -209,6 +210,7 @@ describe.skipIf(!url)("ürün düzenleme (MariaDB)", () => {
     expect((await menuProduct("espresso")).variants).toEqual([{ key: "tek", priceKurus: 11000 }, { key: "duble", priceKurus: 15000 }]);
     const [restoredOrder] = (await pool.query("SELECT id, sort_order FROM products WHERE category_id = 1 ORDER BY sort_order, id")) as unknown as [[{ id: number; sort_order: number }]];
     expect(restoredOrder).toEqual(beforeOrder);
+    await pool.query("UPDATE products SET image_key = NULL WHERE image_key = 'shared-test-photo'");
   });
 
   it("deletes a maximum-length product while keeping the snapshot reason within its column", async () => {
