@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import mysql, { type Pool } from "mysql2/promise";
 import { migrate, seedIfEmpty } from "@/lib/db/setup";
-import { applyBulkPrice, previewBulkPrice } from "@/lib/admin/bulkPrice";
+import { allPrices, applyBulkPrice, previewBulkPrice } from "@/lib/admin/bulkPrice";
 import { createMenuSnapshot, listMenuSnapshots, restoreMenuSnapshot } from "@/lib/admin/snapshots";
 import { undoLast } from "@/lib/admin/products";
 
@@ -25,6 +25,16 @@ describe.skipIf(!url)("toplu fiyat ve kopyalar (MariaDB)", () => {
   });
 
   afterAll(async () => pool?.end());
+
+  it("lists every price and previews the whole menu", async () => {
+    const list = await allPrices(pool);
+    const total = list.reduce((n, category) => n + category.products.length, 0);
+    const [[count]] = await pool.query("SELECT COUNT(DISTINCT product_id) AS n FROM product_variants") as unknown as [[{ n: number }]];
+    expect(total).toBe(Number(count.n));
+    expect(list[0].products[0].variants[0]).toHaveProperty("priceKurus");
+    const preview = await previewBulkPrice(pool, { scope: "all", scopeId: 0, mode: "percent", amount: "5", rounding: "none" });
+    expect(preview.items).toHaveLength(total);
+  });
 
   it("previews and applies every size in one audit row, snapshots first, and undoes once", async () => {
     const input = { scope: "category" as const, scopeId: 1, mode: "percent" as const, amount: "10", rounding: "none" as const };

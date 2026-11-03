@@ -49,6 +49,7 @@ function MenuShellInner({ menu }: { menu: MenuData }) {
         groupColor: group.color,
         groupIcon: groupStyle(group.slug).icon,
         imageKey: p.imageKey,
+        suggestWeight: p.suggestWeight,
         imageFocusX: p.imageFocusX,
         imageFocusY: p.imageFocusY,
         soldOut: badges.soldOut,
@@ -101,10 +102,10 @@ function MenuShellInner({ menu }: { menu: MenuData }) {
           </section>
         ))}
       </main>
-      <button type="button" className="feedback-invite" data-open-feedback data-testid="feedback-open">
-        <BrandIcon name="rabbit" className="feedback-invite__rabbit" />
-        <span><strong>Söz sende.</strong><span>Bir kahve, bir yorum. Seni dinliyoruz.</span></span>
-        <span className="feedback-invite__action">Görüşünü paylaş</span>
+      {/* Kaydırırken hep ekranda kalır; açık katmanların (z 40+) altında kalır. */}
+      <button type="button" className="feedback-fab" data-open-feedback data-testid="feedback-open" aria-label="Söz sende: görüşünü paylaş">
+        <span className="feedback-fab__badge"><BrandIcon name="rabbit" /></span>
+        <span className="feedback-fab__text"><small>BİZE YAZ</small><strong>Söz sende</strong></span>
       </button>
       <Footer settings={menu.settings} />
     </div>

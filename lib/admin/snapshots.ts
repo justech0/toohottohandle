@@ -5,10 +5,10 @@ type Rows = RowDataPacket[];
 export type SnapshotData = Record<string, Record<string, unknown>[]>;
 
 const TABLES = {
-  heroSlides: { table: "hero_slides", columns: ["id", "slide_key", "title", "default_image", "image_key", "color", "icon", "sort_order", "is_visible", "image_focus_x", "image_focus_y"] },
+  heroSlides: { table: "hero_slides", columns: ["id", "slide_key", "title", "default_image", "image_key", "color", "sort_order", "is_visible", "image_focus_x", "image_focus_y"] },
   groups: { table: "menu_groups", columns: ["id", "slug", "name_tr", "name_en", "name_ar", "color", "sort_order", "image_key", "image_focus_x", "image_focus_y"] },
   categories: { table: "categories", columns: ["id", "slug", "group_id", "name_tr", "name_en", "name_ar", "sort_order", "is_visible", "default_in_suggest", "default_temp", "image_key", "image_focus_x", "image_focus_y"] },
-  products: { table: "products", columns: ["id", "slug", "category_id", "name", "name_en", "name_ar", "desc_tr", "desc_en", "desc_ar", "ingredients_tr", "ingredients_en", "ingredients_ar", "kcal", "allergens", "allergens_entered", "temp", "in_suggest", "image_key", "image_focus_x", "image_focus_y", "is_new", "is_featured", "is_visible", "sold_out_until", "sort_order", "updated_at"] },
+  products: { table: "products", columns: ["id", "slug", "category_id", "name", "name_en", "name_ar", "desc_tr", "desc_en", "desc_ar", "ingredients_tr", "ingredients_en", "ingredients_ar", "kcal", "allergens", "allergens_entered", "temp", "in_suggest", "suggest_weight", "image_key", "image_focus_x", "image_focus_y", "is_new", "is_featured", "is_visible", "sold_out_until", "sort_order", "updated_at"] },
   variants: { table: "product_variants", columns: ["id", "product_id", "label_key", "price_kurus", "sort_order"] },
   extras: { table: "extras", columns: ["id", "slug", "name_tr", "name_en", "name_ar", "price_kurus", "sort_order"] },
   extraCategories: { table: "extra_categories", columns: ["extra_id", "category_id"] },
@@ -71,6 +71,8 @@ export function parseSnapshotData(raw: string): SnapshotData {
     if (key === "heroSlides" && data[key] === undefined) continue;
     if (!Array.isArray(data[key])) throw new Error("Menü kopyası bozuk.");
   }
+  // 011 öncesi kopyalarda Ne içsem ağırlığı yok: Normal say.
+  for (const row of data.products) if (row && typeof row === "object" && !("suggest_weight" in row)) row.suggest_weight = 1;
   for (const [key, spec] of Object.entries(TABLES)) {
     for (const row of data[key] ?? []) {
       if (!row || typeof row !== "object" || spec.columns.some((column) => !Object.prototype.hasOwnProperty.call(row, column))) {

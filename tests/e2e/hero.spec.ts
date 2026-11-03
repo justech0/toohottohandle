@@ -61,6 +61,11 @@ test("a missing photo on a light brand color uses readable dark text", async ({ 
   await expect(title(page)).toHaveCSS("color", "rgb(42, 21, 20)");
 });
 
+test("rotating hero has no brand icon overlay", async ({ page }) => {
+  await openMenu(page);
+  await expect(page.getByTestId("hero").locator(".hero__icon")).toHaveCount(0);
+});
+
 test("hero says MENÜ and no branch name", async ({ page }) => {
   await openMenu(page);
   await expect(page.getByTestId("hero")).toContainText("MENÜ");

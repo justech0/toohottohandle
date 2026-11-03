@@ -153,17 +153,6 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
 
-        <Link href="/qr/admin/kopyalar" className="adm-nav-tile">
-          <div className="adm-nav-tile__icon-wrap">
-            <AdminIcon name="copies" size={24} />
-          </div>
-          <div className="adm-nav-tile__body">
-            <h2 className="adm-nav-tile__title">Loglar</h2>
-            <p className="adm-nav-tile__desc">Önceki menüler ve kimin ne değiştirdiği</p>
-          </div>
-          <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
-        </Link>
-
         <Link href="/qr/admin/yedek" className="adm-nav-tile">
           <div className="adm-nav-tile__icon-wrap">
             <AdminIcon name="backup" size={24} />
@@ -187,6 +176,17 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
         </Link>
 
         {[{ href: "vitrin", title: "Vitrin", description: "Slayt yazıları, fotoğrafları, renkleri ve sırası" }, { href: "ne-icsem", title: "Ne içsem", description: "Önerilecek ürünler ve fotoğraf önceliği" }, { href: "kullanicilar", title: "Kullanıcılar", description: "Admin oluştur ve hesapları yönet" }].map(item => <Link key={item.href} href={`/qr/admin/${item.href}`} className="adm-nav-tile"><div className="adm-nav-tile__body"><h2 className="adm-nav-tile__title">{item.title}</h2><p className="adm-nav-tile__desc">{item.description}</p></div><AdminIcon name="chevron-right" size={18} /></Link>)}
+
+        <Link href="/qr/admin/kopyalar" className="adm-nav-tile">
+          <div className="adm-nav-tile__icon-wrap">
+            <AdminIcon name="copies" size={24} />
+          </div>
+          <div className="adm-nav-tile__body">
+            <h2 className="adm-nav-tile__title">Loglar</h2>
+            <p className="adm-nav-tile__desc">Önceki menüler ve kimin ne değiştirdiği</p>
+          </div>
+          <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
+        </Link>
       </nav>
 
       <section className="adm-card" data-testid="feedback-summary">

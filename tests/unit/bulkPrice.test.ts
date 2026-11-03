@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { calculateBulkPrice, previewBulkPrices } from "@/lib/admin/bulkPrice";
+import { calculateBulkPrice, parseBulkInput, previewBulkPrices } from "@/lib/admin/bulkPrice";
 
 describe("toplu fiyat hesabı", () => {
   it("yüzde değişimini en yakın 5 ve 10 liraya yuvarlar", () => {
     expect(calculateBulkPrice(17_300, { mode: "percent", amount: 1_000, rounding: 500 })).toBe(19_000);
     expect(calculateBulkPrice(17_600, { mode: "percent", amount: 1_000, rounding: 1_000 })).toBe(19_000);
+  });
+
+  it("tüm menü kapsamında grup/kategori seçimi istemez", () => {
+    expect(parseBulkInput({ scope: "all", scopeId: 0, mode: "percent", amount: "10", rounding: "none" }).scope).toBe("all");
+    expect(() => parseBulkInput({ scope: "category", scopeId: 0, mode: "percent", amount: "10", rounding: "none" })).toThrow("Grup ya da kategori seç.");
   });
 
   it("iki boylu ürünün her fiyatına sabit tutarı uygular", () => {

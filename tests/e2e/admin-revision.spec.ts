@@ -9,6 +9,7 @@ test("vitrin: add, keyboard choices, edit, hide, order, upload and delete", asyn
   const color = form.getByRole("combobox", { name: "Renk" });
   await color.focus(); await color.press("ArrowDown"); await page.getByRole("listbox").press("End"); await page.getByRole("listbox").press("Enter");
   await expect(form.locator('input[name="color"]')).toHaveValue("gray");
+  await expect(form.getByRole("combobox", { name: "İkon" })).toHaveCount(0);
   await form.getByRole("button", { name: "Slayt ekle" }).click();
   const added = page.locator("article").filter({ has: page.locator('input[value="TEST VİTRİN"]') });
   await expect(added).toHaveCount(1);
@@ -48,9 +49,11 @@ test("suggestions: selected products, photo preference and session history", asy
   await signIn(page); await page.goto("/qr/admin/ne-icsem");
   await page.getByRole("combobox", { name: "Mod" }).click(); await page.getByRole("option", { name: "Seçtiklerim" }).click();
   for (const name of ["Espresso", "Cortado", "Filtre Kahve", "Caffè Americano", "Cappuccino", "Caffè Latte"]) await page.getByLabel(name, { exact: true }).check();
+  await page.getByRole("radiogroup", { name: "Espresso olasılığı", exact: true }).getByRole("radio", { name: "5 kat" }).check();
   await page.getByLabel("Fotoğraflı ürünlere öncelik ver").uncheck(); await page.getByRole("button", { name: "Kaydet", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("Kaydedildi.");
   await page.reload(); await expect(page.getByLabel("Fotoğraflı ürünlere öncelik ver")).not.toBeChecked();
+  await expect(page.getByRole("radiogroup", { name: "Espresso olasılığı", exact: true }).getByRole("radio", { name: "5 kat" })).toBeChecked();
   await page.emulateMedia({ reducedMotion: "reduce" }); await page.addInitScript(() => sessionStorage.setItem("thth-intro-seen", "1"));
   await page.goto("/qr"); await page.getByTestId("neicsem-tile").click();
   const names = [await page.getByTestId("neicsem-name").textContent()];

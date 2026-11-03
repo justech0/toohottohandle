@@ -3,7 +3,7 @@ import type { VariantKey } from "@/lib/menu/types";
 import { takeMenuSnapshot } from "./snapshots";
 
 type Rows = RowDataPacket[];
-export type BulkScope = "group" | "category";
+export type BulkScope = "all" | "group" | "category";
 export type BulkMode = "percent" | "fixed";
 export type BulkRounding = "none" | "5" | "10";
 export interface BulkFormInput { scope: BulkScope; scopeId: number; mode: BulkMode; amount: string; rounding: BulkRounding }
@@ -42,7 +42,8 @@ export function previewBulkPrices(products: BulkSourceProduct[], rule: BulkRule)
 const decimal = (raw: string) => raw.trim().replace(",", ".");
 
 export function parseBulkInput(input: BulkFormInput): { scope: BulkScope; scopeId: number; rule: BulkRule } {
-  if ((input.scope !== "group" && input.scope !== "category") || !Number.isInteger(input.scopeId) || input.scopeId < 1) throw new Error("Grup ya da kategori seç.");
+  // "all": tüm menü; grup/kategori numarası yok sayılır.
+  if (input.scope !== "all" && ((input.scope !== "group" && input.scope !== "category") || !Number.isInteger(input.scopeId) || input.scopeId < 1)) throw new Error("Grup ya da kategori seç.");
   if (input.mode !== "percent" && input.mode !== "fixed") throw new Error("Değişim türünü seç.");
   if (input.rounding !== "none" && input.rounding !== "5" && input.rounding !== "10") throw new Error("Yuvarlama seçimi geçersiz.");
   const value = decimal(input.amount);
@@ -54,7 +55,7 @@ export function parseBulkInput(input: BulkFormInput): { scope: BulkScope; scopeI
   if (input.mode === "fixed" && Math.abs(amount) > 1_000_000) throw new Error("Sabit tutar en fazla 10.000 ₺ olabilir.");
   return {
     scope: input.scope,
-    scopeId: input.scopeId,
+    scopeId: input.scope === "all" ? 0 : input.scopeId,
     rule: { mode: input.mode, amount, rounding: input.rounding === "5" ? 500 : input.rounding === "10" ? 1000 : 0 },
   };
 }
@@ -70,8 +71,29 @@ export async function bulkPriceOptions(pool: Pool) {
   };
 }
 
+export interface PriceListCategory { id: number; name: string; groupName: string; products: BulkSourceProduct[] }
+
+/** Toplu fiyat sayfasındaki tam liste: kategori sırasıyla tüm ürünler ve boy fiyatları. */
+export async function allPrices(pool: Pool): Promise<PriceListCategory[]> {
+  const [rows] = await pool.query<Rows>(
+    `SELECT c.id AS category_id, c.name_tr AS category_name, g.name_tr AS group_name, p.id, p.name, v.id AS variant_id, v.label_key, v.price_kurus
+     FROM products p JOIN categories c ON c.id = p.category_id JOIN menu_groups g ON g.id = c.group_id
+     JOIN product_variants v ON v.product_id = p.id
+     ORDER BY g.sort_order, c.sort_order, c.id, p.sort_order, p.id, v.sort_order, v.id`,
+  );
+  const categories = new Map<number, PriceListCategory>();
+  for (const row of rows) {
+    const category: PriceListCategory = categories.get(row.category_id) ?? { id: row.category_id, name: String(row.category_name), groupName: String(row.group_name), products: [] };
+    categories.set(row.category_id, category);
+    let product = category.products.find((item) => item.id === row.id);
+    if (!product) category.products.push(product = { id: row.id, name: String(row.name), variants: [] });
+    product.variants.push({ id: row.variant_id, labelKey: row.label_key as VariantKey, priceKurus: row.price_kurus });
+  }
+  return [...categories.values()];
+}
+
 async function sourceProducts(db: Pool | PoolConnection, scope: BulkScope, scopeId: number, lock = false): Promise<BulkSourceProduct[]> {
-  const where = scope === "group" ? "g.id = ?" : "c.id = ?";
+  const where = scope === "all" ? "1 = 1" : scope === "group" ? "g.id = ?" : "c.id = ?";
   const [rows] = await db.query<Rows>(
     `SELECT p.id, p.name, v.id AS variant_id, v.label_key, v.price_kurus
      FROM products p JOIN categories c ON c.id = p.category_id JOIN menu_groups g ON g.id = c.group_id

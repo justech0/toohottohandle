@@ -17,6 +17,7 @@ export function seedMenu(samples: Record<string, string>): Omit<MenuData, "serve
     descAr: p.descAr ?? null,
     soldOutUntil: null,
     inSuggest: null,
+    suggestWeight: 1,
     isNew: false,
     isFeatured: false,
     isVisible: true,

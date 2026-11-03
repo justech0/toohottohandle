@@ -1,6 +1,5 @@
 "use client";
 
-import { BrandIcon } from "./BrandIcon";
 import { useLanguage } from "@/lib/i18n/context";
 import { useEffect, useRef, useState } from "react";
 import { HERO_INTERVAL_MS, type HeroSlide } from "@/lib/brand/hero";
@@ -102,7 +101,6 @@ export function HeroSlides({ slides }: { slides: readonly HeroSlide[] }) {
           ) : null}
         </div>
       ))}
-      <BrandIcon name={slide.icon} className="hero__icon" />
       <div className="hero__shade" aria-hidden="true" />
       <div className="hero__text">
         <p className="hero__menu">{t.hero.menu}</p>

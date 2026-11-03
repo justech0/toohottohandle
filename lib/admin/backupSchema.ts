@@ -88,7 +88,8 @@ function parseProduct(value: unknown): BackupProductRow {
     desc_en: nullableString(row.desc_en, 20_000), desc_ar: nullableString(row.desc_ar, 20_000), ingredients_tr: nullableString(row.ingredients_tr, 20_000),
     ingredients_en: nullableString(row.ingredients_en, 20_000), ingredients_ar: nullableString(row.ingredients_ar, 20_000),
     kcal: row.kcal === null ? null : integer(row.kcal, 0, 100_000), allergens: string(row.allergens, 255), allergens_entered: bool(row.allergens_entered),
-    temp: oneOf(row.temp, ["hot", "cold", null] as const), in_suggest: oneOf(row.in_suggest, [0, 1, null] as const), image_key: imageKey(row.image_key),
+    temp: oneOf(row.temp, ["hot", "cold", null] as const), in_suggest: oneOf(row.in_suggest, [0, 1, null] as const),
+    suggest_weight: row.suggest_weight === undefined ? 1 : oneOf(row.suggest_weight, [1, 2, 3, 5] as const), image_key: imageKey(row.image_key),
     image_focus_x: number(row.image_focus_x, 0, 1), image_focus_y: number(row.image_focus_y, 0, 1), is_new: bool(row.is_new),
     is_featured: bool(row.is_featured), is_visible: bool(row.is_visible), sold_out_until: dateString(row.sold_out_until, true),
     sort_order: integer(row.sort_order, -100_000, 100_000), updated_at: dateString(row.updated_at)!,
@@ -129,7 +130,7 @@ export function parseBackupFile(value: unknown): BackupFile {
     id: integer(row.id, 1), slide_key: nullableString(row.slide_key, 64), title: string(row.title, 120, false),
     default_image: oneOf(row.default_image, ["", "/qr/hero/fast.webp", "/qr/hero/free.webp", "/qr/hero/shine.webp"] as const),
     image_key: imageKey(row.image_key), color: oneOf(row.color, ["red", "yellow", "pink", "blue", "green", "gray"] as const),
-    icon: oneOf(row.icon, ["lips", "rabbit", "star"] as const), sort_order: integer(row.sort_order, 0, 10000), is_visible: bool(row.is_visible),
+    sort_order: integer(row.sort_order, 0, 10000), is_visible: bool(row.is_visible),
     image_focus_x: number(row.image_focus_x, 0, 1), image_focus_y: number(row.image_focus_y, 0, 1),
   }));
   if (heroSlides) idSet(heroSlides);

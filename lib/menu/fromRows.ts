@@ -37,6 +37,7 @@ export function rowsToMenu(rows: MenuRows): Omit<MenuData, "serverNow"> {
       category: catSlug.get(p.category_id)!,
       temp: p.temp,
       inSuggest: p.in_suggest === null ? null : Boolean(p.in_suggest),
+      suggestWeight: Number(p.suggest_weight ?? 1),
       variants: (variantsOf.get(p.id) ?? []).map((v) => ({ key: v.label_key, priceKurus: v.price_kurus })),
       descTr: p.desc_tr,
       descEn: p.desc_en ?? null,

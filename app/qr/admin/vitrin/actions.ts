@@ -10,7 +10,7 @@ export async function saveSlideAction(form: FormData) {
     const rawKey = String(form.get("imageKey") ?? "");
     await saveSlide(getPool(), admin.adminId, form.get("id") ? Number(form.get("id")) : null, {
       title: String(form.get("title") ?? ""), imageKey: rawKey === "__default__" ? null : rawKey,
-      color: String(form.get("color")), icon: String(form.get("icon")), sortOrder: Number(form.get("sortOrder")),
+      color: String(form.get("color")), sortOrder: Number(form.get("sortOrder")),
       isVisible: form.get("isVisible") === "on", focusX: Number(form.get("imageFocusX")), focusY: Number(form.get("imageFocusY")),
     });
   } catch (error) { return { error: (error as Error).message }; }
