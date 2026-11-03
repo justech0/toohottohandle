@@ -29,6 +29,23 @@ test("feedback sheet respects back, focus, keyboard and mobile width", async ({ 
   await expect(sheet).toHaveCount(0);
 });
 
+test("Söz sende bubble stays on screen while scrolling", async ({ page }) => {
+  await openMenu(page);
+  const trigger = page.getByTestId("feedback-open");
+  await expect(trigger).toBeInViewport();
+  await expect(trigger).toHaveCSS("position", "fixed");
+  await expect(trigger).toContainText("Söz sende");
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+  await expect(trigger).toBeInViewport();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(trigger).toBeInViewport();
+  await expect(page.locator(".feedback-invite")).toHaveCount(0);
+  await trigger.click();
+  await expect(page.getByTestId("feedback-sheet")).toBeVisible();
+  // Açık formun düğmelerini örtmez.
+  await expect(trigger).toHaveCSS("pointer-events", "none");
+});
+
 test("private feedback goes from menu to admin; photo is protected, read and deletion work", async ({ page, request }) => {
   test.skip(!process.env.E2E_DB, "veritabanlı sunucu gerekli");
   await openMenu(page);
@@ -56,6 +73,8 @@ test("private feedback goes from menu to admin; photo is protected, read and del
   await page.goto("/qr/admin/geri-bildirim");
   const entry = page.getByTestId("feedback-entry").filter({ hasText: message });
   await expect(entry).toContainText("Test Misafir");
+  // Kompakt kart: fotoğraflı tek mesaj bile kısa kalır.
+  await expect.poll(async () => (await entry.boundingBox())?.height ?? Infinity).toBeLessThan(300);
   const imageUrl = await entry.getByRole("img").getAttribute("src");
   expect((await request.get(imageUrl!)).status()).toBe(401);
   expect((await page.request.get(imageUrl!)).status()).toBe(200);

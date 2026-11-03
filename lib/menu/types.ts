@@ -20,6 +20,8 @@ export interface MenuProduct {
   category: string;
   temp: Temp;
   inSuggest?: boolean | null;
+  /** Ne içsem olasılığı: 1 Normal, 2/3/5 kat. */
+  suggestWeight?: number;
   variants: MenuVariant[];
   descTr: string | null;
   descEn: string | null;

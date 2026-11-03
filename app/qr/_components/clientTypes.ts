@@ -18,6 +18,7 @@ export interface CardProduct {
   groupColor: GroupColor;
   groupIcon: Exclude<BrandIconName, "logo">;
   imageKey: string | null;
+  suggestWeight?: number;
   imageFocusX: number;
   imageFocusY: number;
   soldOut: boolean;

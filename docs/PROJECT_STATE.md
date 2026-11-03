@@ -55,3 +55,14 @@ QR alt adres temizliği (a2-qr-without-caption): admin önizlemesi ve indirilen 
 - Canlı migration: `009_admin_revision`; yeni ortam değişkeni gerekmez. Vitrin, hesap ve öneri işlemleri geçmişte açıkça geri alınamazdır.
 
 Admin revize doğrulaması (2026-10-29, Node 22.23.4): 201/201 veritabanlı Vitest, 121/121 veritabanlı Playwright, TypeScript/build ve 164.3 KB 3D bütçesi başarılı; npm audit 0 açık. 390/1440 px ekranlar ve bağımsız PNG QR decode kontrol edildi. PR hazır; merge ve canlı yayın yapılmadı.
+
+### Admin revize ek istekler (2026-11-03, aynı dal, commit yok)
+
+- Admin yan menü: Genel Bakış en üstte, Loglar en altta (Genel Bakış kutularında da Loglar sonda).
+- Vitrin ikonu kaldırıldı: menü, admin vitrin formu ve `010_hero_no_icon` ile `hero_slides.icon` sütunu. Diğer slayt ayarları korunur; eski kopya/ZIP'teki `icon` yok sayılır.
+- Ne içsem: ürün başı olasılık Normal / 2 / 3 / 5 kat (`011_suggest_weight`, `products.suggest_weight`). Ağırlıklı seçim; fotoğraf önceliği ve son-5 kuralı korunur. Eski kopyalarda ağırlık 1 sayılır.
+- Geri bildirim admin: sıkı kartlar, geniş ekranda ızgara, 72 px foto önizleme.
+- "Söz sende": menü sonundaki sarı kart yerine sağ altta sabit baloncuk (kırmızı, sarı daire içinde tavşan). Açık katmanlarda görünmez ve tıklanmaz.
+- Toplu fiyat: "Tüm menü" kapsamı ve her zaman görünen tam fiyat listesi; önizleme aynı listede eski → yeni.
+
+Doğrulama (2026-11-03): Vitest 207/207 (veritabanı dahil), Playwright 123/123 (veritabanlı), TypeScript ve üretim build başarılı.

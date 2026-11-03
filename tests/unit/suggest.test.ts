@@ -40,6 +40,17 @@ describe("pickSuggestions", () => {
     const first = pickSuggestions(pool, 3, seq());
     expect(pickSuggestions(pool, 3, seq(), first)).toHaveLength(3);
   });
+  it("picks heavier products more often", () => {
+    const pool = [{ id: "a", imageKey: null, suggestWeight: 1 }, { id: "b", imageKey: null, suggestWeight: 5 }];
+    const r = seq();
+    let heavy = 0;
+    for (let i = 0; i < 1000; i++) if (pickSuggestions(pool, 1, r)[0].id === "b") heavy++;
+    expect(heavy).toBeGreaterThan(750);
+  });
+  it("keeps photo preference above weight", () => {
+    const pool = [{ id: "plain", imageKey: null, suggestWeight: 5 }, { id: "photo", imageKey: "k", suggestWeight: 1 }];
+    expect(pickSuggestions(pool, 1, seq())[0].id).toBe("photo");
+  });
   it("is deterministic for the same random source", () => {
     expect(pickSuggestions(items(3, 6), 3, seq())).toEqual(pickSuggestions(items(3, 6), 3, seq()));
   });

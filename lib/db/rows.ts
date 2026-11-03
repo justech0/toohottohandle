@@ -17,7 +17,7 @@ export interface ProductRow {
   desc_tr: string | null; desc_en: string | null; desc_ar: string | null;
   ingredients_tr: string | null; ingredients_en: string | null; ingredients_ar: string | null;
   kcal: number | null; allergens: string; allergens_entered: Bool;
-  temp: "hot" | "cold" | null; in_suggest: Bool | null;
+  temp: "hot" | "cold" | null; in_suggest: Bool | null; suggest_weight?: number;
   image_key: string | null; image_focus_x: number; image_focus_y: number;
   is_new: Bool; is_featured: Bool; is_visible: Bool; sold_out_until: Date | null; sort_order: number;
 }
@@ -48,6 +48,6 @@ export interface MenuRows {
 
 export interface HeroRow {
   id: number; slide_key: string | null; title: string; default_image: string; image_key: string | null;
-  color: GroupColor; icon: "lips" | "rabbit" | "star"; sort_order: number; is_visible: Bool;
+  color: GroupColor; sort_order: number; is_visible: Bool;
   image_focus_x: number; image_focus_y: number;
 }

@@ -33,15 +33,24 @@ async function Content({ searchParams }: { searchParams: Promise<Query> }) {
     </form>
     <p className="adm-note">{result.total} geri bildirim · Sayfa {result.page}/{result.pages}</p>
     {!result.items.length ? <section className="adm-card"><h2 className="adm-card__title">Henüz geri bildirim yok</h2><p className="adm-note">Misafirlerin menüden gönderdiği görüşler burada görünür. Filtre kullandıysan temizleyebilirsin.</p></section> : null}
-    {result.items.map((item) => <article key={item.id} className="adm-card feedback-entry" data-testid="feedback-entry">
-      <div className="feedback-entry__head"><h2 className="adm-card__title">{FEEDBACK_TOPICS[item.topic]}</h2>{!item.is_read ? <span className="feedback-unread">Okunmamış</span> : null}</div>
-      <div className="feedback-entry__rating" aria-label={`${item.rating} / 5 puan`}>{[1, 2, 3, 4, 5].map((n) => <BrandIcon key={n} name="rabbit" className={n <= item.rating ? "" : "feedback-entry__empty-star"} />)}<span>{item.rating}/5</span></div>
-      <p className="adm-note"><time dateTime={new Date(item.created_at).toISOString()}>{when(item.created_at)}</time> · {item.name || "Misafir"}</p>
-      {item.contact ? <p className="feedback-entry__contact">İletişim: {item.contact}</p> : null}
-      <p className="feedback-entry__message">{item.message}</p>
-      {item.image_key ? <a className="feedback-entry__photo" href={`/qr/api/admin/feedback-image/${item.image_key}`} target="_blank" rel="noopener noreferrer" aria-label="Fotoğrafı büyük aç"><img src={`/qr/api/admin/feedback-image/${item.image_key}`} alt="Misafirin eklediği fotoğraf" loading="lazy" /><span>Fotoğrafı büyük aç</span></a> : null}
+    <div className="feedback-grid">{result.items.map((item) => <article key={item.id} className={`feedback-entry${item.is_read ? " feedback-entry--read" : ""}`} data-testid="feedback-entry">
+      <header className="feedback-entry__head">
+        <h2 className="feedback-entry__topic">{FEEDBACK_TOPICS[item.topic]}</h2>
+        {!item.is_read ? <span className="feedback-unread">Okunmamış</span> : null}
+      </header>
+      <p className="feedback-entry__meta">
+        <span className="feedback-entry__rating" aria-label={`${item.rating} / 5 puan`}>{[1, 2, 3, 4, 5].map((n) => <BrandIcon key={n} name="rabbit" className={n <= item.rating ? "" : "feedback-entry__empty-star"} />)}<b>{item.rating}/5</b></span>
+        <span><time dateTime={new Date(item.created_at).toISOString()}>{when(item.created_at)}</time> · {item.name || "Misafir"}</span>
+      </p>
+      <div className="feedback-entry__body">
+        <div className="feedback-entry__text">
+          <p className="feedback-entry__message">{item.message.trim()}</p>
+          {item.contact ? <p className="feedback-entry__contact">İletişim: {item.contact}</p> : null}
+        </div>
+        {item.image_key ? <a className="feedback-entry__photo" href={`/qr/api/admin/feedback-image/${item.image_key}`} target="_blank" rel="noopener noreferrer" aria-label="Fotoğrafı büyük aç" title="Fotoğrafı büyük aç"><img src={`/qr/api/admin/feedback-image/${item.image_key}`} alt="Misafirin eklediği fotoğraf" loading="lazy" /></a> : null}
+      </div>
       <FeedbackControls id={item.id} isRead={Boolean(item.is_read)} />
-    </article>)}
+    </article>)}</div>
     <nav className="adm-row" aria-label="Geri bildirim sayfaları">{result.page > 1 ? <Link className="adm-btn" href={pageLink(result.page - 1)}>Önceki</Link> : null}{result.page < result.pages ? <Link className="adm-btn" href={pageLink(result.page + 1)}>Sonraki</Link> : null}</nav>
   </>;
 }

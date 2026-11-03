@@ -17,7 +17,6 @@ function SlideForm({ slide, order }: { slide?: AdminSlide; order: number }) {
       <label className="adm-field">Yazı<input name="title" defaultValue={slide?.title} maxLength={120} required /></label>
       <div className="adm-row">
         <label className="adm-field">Renk<BrandSelect name="color" defaultValue={slide?.color ?? "red"}>{[["red", "Kırmızı"], ["yellow", "Sarı"], ["pink", "Pembe"], ["blue", "Mavi"], ["green", "Yeşil"], ["gray", "Gri"]].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</BrandSelect></label>
-        <label className="adm-field">İkon<BrandSelect name="icon" defaultValue={slide?.icon ?? "rabbit"}><option value="lips">Dudak</option><option value="rabbit">Tavşan</option><option value="star">Yıldız</option></BrandSelect></label>
         <label className="adm-field">Sıra<input name="sortOrder" type="number" defaultValue={slide?.sortOrder ?? order} min={0} max={10000} required /></label>
       </div>
       <PhotoPicker initialKey={slide?.imageKey ?? null} fallbackSrc={slide?.image || null} initialFocusX={slide?.focusX} initialFocusY={slide?.focusY} />

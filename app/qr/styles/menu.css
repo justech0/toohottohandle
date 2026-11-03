@@ -269,8 +269,7 @@ html[dir="rtl"] .card__prices {
 .hero--green { background: var(--c-green); }
 .hero--gray { background: var(--c-gray); }
 .hero__title { overflow-wrap: anywhere; }
-.hero__icon { position: absolute; right: 18px; top: 74px; height: 48px; color: var(--c-white); }
-.hero[data-plain="true"], .hero[data-plain="true"] .hero__icon { color: var(--c-ink); }
+.hero[data-plain="true"] { color: var(--c-ink); }
 .hero[data-plain="true"] .hero__shade { display: none; }
 .hero[data-plain="true"] .hero__title { text-shadow: none; }
 .hero[data-plain="true"] .hero__dot::before { background: var(--c-ink-soft); }

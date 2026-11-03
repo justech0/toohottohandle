@@ -15,9 +15,12 @@ test("previews and applies a category price change, undoes it, and restores its 
   await selectBrand(page, "mode", "percent");
   await page.locator('input[name="amount"]').fill("10");
   await selectBrand(page, "rounding", "none");
+  const row = page.getByTestId("bulk-row").filter({ has: page.getByRole("rowheader", { name: "Espresso", exact: true }) });
+  // Tüm fiyatlar önizlemeden önce de listede.
+  await expect(row).toContainText("Tek 110 ₺ · Duble 150 ₺");
+  await expect(page.getByRole("rowheader", { name: "Cheesecake", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Önizle" }).click();
 
-  const row = page.getByTestId("bulk-row").filter({ hasText: "Espresso" });
   await expect(row).toContainText("Tek 110 ₺ · Duble 150 ₺");
   await expect(row).toContainText("Tek 121 ₺ · Duble 165 ₺");
   await page.getByRole("button", { name: "Uygula" }).click();

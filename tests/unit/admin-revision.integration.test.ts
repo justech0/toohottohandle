@@ -21,9 +21,11 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)("admin revize", () => {
   afterAll(async () => pool?.end());
   it("seeds three slides once and supports validated CRUD, visibility and order", async () => {
     expect((await listSlides(pool)).map(s => s.title)).toEqual(["HOT & FAST", "HOT & FREE", "HOT & SHINE"]);
-    const id = await saveSlide(pool, actor, null, { title: "Yeni vitrin", imageKey: null, color: "pink", icon: "lips", sortOrder: 0, isVisible: false });
+    const id = await saveSlide(pool, actor, null, { title: "Yeni vitrin", imageKey: null, color: "pink", sortOrder: 0, isVisible: false });
     expect(await listSlides(pool)).toContainEqual(expect.objectContaining({ id, color: "pink", isVisible: false }));
-    await expect(saveSlide(pool, actor, id, { title: "", imageKey: "../../x", color: "invalid", icon: "x", sortOrder: -1, isVisible: true })).rejects.toThrow();
+    await expect(saveSlide(pool, actor, id, { title: "", imageKey: "../../x", color: "invalid", sortOrder: -1, isVisible: true })).rejects.toThrow();
+    const [columns] = await pool.query<RowDataPacket[]>("SHOW COLUMNS FROM hero_slides LIKE 'icon'");
+    expect(columns).toHaveLength(0);
     await deleteSlide(pool, actor, id);
     expect((await listSlides(pool)).some(s => s.id === id)).toBe(false);
   });
@@ -67,6 +69,15 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)("admin revize", () => {
     expect(s).toMatchObject({ suggest_mode: "selected", suggest_prefer_photos: 0 });
     await expect(saveSuggestSettings(pool, actor, { mode: "selected", preferPhotos: true, productIds: [9999999] })).rejects.toThrow();
     const [[unchanged]] = await pool.query<RowDataPacket[]>("SELECT suggest_prefer_photos FROM settings WHERE id=1"); expect(unchanged.suggest_prefer_photos).toBe(0);
+  });
+  it("saves per-product suggestion weights and rejects invalid levels", async () => {
+    await saveSuggestSettings(pool, actor, { mode: "random", preferPhotos: true, productIds: [], weights: { 1: 5, 2: 2 } });
+    const [rows] = await pool.query<RowDataPacket[]>("SELECT id, suggest_weight FROM products WHERE id IN (1, 2, 3) ORDER BY id");
+    expect(rows.map(r => r.suggest_weight)).toEqual([5, 2, 1]);
+    await expect(saveSuggestSettings(pool, actor, { mode: "random", preferPhotos: true, productIds: [], weights: { 1: 4 } })).rejects.toThrow();
+    await expect(saveSuggestSettings(pool, actor, { mode: "random", preferPhotos: true, productIds: [], weights: { 9999999: 2 } })).rejects.toThrow();
+    const [[kept]] = await pool.query<RowDataPacket[]>("SELECT suggest_weight FROM products WHERE id = 1"); expect(kept.suggest_weight).toBe(5);
+    await saveSuggestSettings(pool, actor, { mode: "selected", preferPhotos: false, productIds: [1, 2] });
   });
   it("exports hero and suggestion settings with menu data", async () => {
     const exported = await createBackupBundle(pool);

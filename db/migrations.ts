@@ -245,4 +245,14 @@ export const MIGRATIONS: Migration[] = [
         ('shine', 'HOT & SHINE', '/qr/hero/shine.webp', 'yellow', 'star', 2)`,
     ],
   },
+  {
+    // Vitrin ikonu kaldırıldı; diğer slayt ayarları korunur.
+    id: "010_hero_no_icon",
+    statements: ["ALTER TABLE hero_slides DROP COLUMN icon"],
+  },
+  {
+    // Ne içsem olasılığı: 1 Normal, 2/3/5 kat.
+    id: "011_suggest_weight",
+    statements: ["ALTER TABLE products ADD COLUMN suggest_weight TINYINT NOT NULL DEFAULT 1"],
+  },
 ];

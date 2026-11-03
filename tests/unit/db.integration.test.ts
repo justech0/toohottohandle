@@ -19,7 +19,7 @@ describe.skipIf(!url)("veritabanı (MariaDB/MySQL)", () => {
   afterAll(async () => pool?.end());
 
   it("applies the schema once", async () => {
-    expect(await migrate(pool)).toEqual(["001_menu", "002_auth", "003_audit", "004_snapshots", "005_catalog", "006_photos", "007_stats", "008_feedback", "009_admin_revision"]);
+    expect(await migrate(pool)).toEqual(["001_menu", "002_auth", "003_audit", "004_snapshots", "005_catalog", "006_photos", "007_stats", "008_feedback", "009_admin_revision", "010_hero_no_icon", "011_suggest_weight"]);
     expect(await migrate(pool)).toEqual([]);
   });
 
