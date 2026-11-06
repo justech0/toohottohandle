@@ -44,7 +44,7 @@ export function FeedbackSheet({ onClose }: { onClose: () => void }) {
         <button type="button" className="icon-btn sheet__close" aria-label="Kapat" onClick={onClose}><CloseIcon /></button>
         <div className="feedback-sheet__heading">
           <BrandIcon name="rabbit" />
-          <h2 id="feedback-title">Söz sende.</h2>
+          <h2 id="feedback-title">Söz sende</h2>
           <p>Görüşlerin doğrudan yöneticilerimize iletilir. Seni dinliyoruz.</p>
         </div>
         {sent ? <div className="feedback-success" role="status" tabIndex={-1} ref={(el) => el?.focus()} data-testid="feedback-receipt" data-rating={sentRating}>
