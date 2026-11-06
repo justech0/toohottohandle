@@ -6,7 +6,7 @@ import path from "node:path";
 import sharp from "sharp";
 import { migrate, seedIfEmpty } from "@/lib/db/setup";
 import { createBackupBundle } from "@/lib/admin/backups";
-import { createFeedback, listFeedback, feedbackSummary, markFeedbackRead, deleteFeedback } from "@/lib/feedback/store";
+import { createFeedback, listFeedback, feedbackSummary, unreadFeedbackCount, markAllFeedbackRead, markFeedbackRead, deleteFeedback } from "@/lib/feedback/store";
 import { feedbackImagePath, storeFeedbackImage } from "@/lib/feedback/images";
 
 describe.skipIf(!process.env.TEST_DATABASE_URL)("özel geri bildirim", () => {
@@ -37,6 +37,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)("özel geri bildirim", () => {
   });
   it("saves, filters, marks read and permanently deletes the private image", async () => {
     id = await createFeedback(pool, { topic: "taste", rating: 5, message: "Harika kahve", name: null, contact: null, lang: "tr" }, key);
+    expect(await unreadFeedbackCount(pool)).toBe(1);
     expect((await listFeedback(pool, { unread: true })).items[0]).toMatchObject({ id, message: "Harika kahve", is_read: 0 });
     expect((await listFeedback(pool, { topic: "hygiene" })).items).toHaveLength(0);
     expect((await listFeedback(pool, { rating: 1 })).items).toHaveLength(0);
@@ -45,7 +46,12 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)("özel geri bildirim", () => {
     expect(backup).not.toContain("Harika kahve");
     expect(backup).not.toContain(key);
     await markFeedbackRead(pool, id);
+    expect(await unreadFeedbackCount(pool)).toBe(0);
     expect((await listFeedback(pool, { unread: true })).items).toHaveLength(0);
+    await pool.execute("UPDATE feedbacks SET is_read = 0 WHERE id = ?", [id]);
+    expect(await unreadFeedbackCount(pool)).toBe(1);
+    await markAllFeedbackRead(pool);
+    expect(await unreadFeedbackCount(pool)).toBe(0);
     await deleteFeedback(pool, id);
     expect((await listFeedback(pool, {})).items).toHaveLength(0);
     await expect(readFile(feedbackImagePath(key))).rejects.toThrow();

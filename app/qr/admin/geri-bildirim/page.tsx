@@ -4,7 +4,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { requireAdmin } from "@/lib/auth/session";
 import { getPool } from "@/lib/db/client";
-import { listFeedback } from "@/lib/feedback/store";
+import { listFeedback, markAllFeedbackRead } from "@/lib/feedback/store";
 import { FEEDBACK_TOPICS } from "@/lib/feedback/input";
 import { BrandIcon } from "../../_components/BrandIcon";
 import { FeedbackControls } from "./FeedbackControls";
@@ -14,8 +14,10 @@ const when = (date: Date) => new Intl.DateTimeFormat("tr-TR", { timeZone: "Europ
 async function Content({ searchParams }: { searchParams: Promise<Query> }) {
   await connection();
   await requireAdmin();
+  const pool = getPool();
   const query = await searchParams;
-  const result = await listFeedback(getPool(), { topic: query.konu, rating: Number(query.puan), unread: query.okunmamis === "1", page: Number(query.sayfa) });
+  await markAllFeedbackRead(pool);
+  const result = await listFeedback(pool, { topic: query.konu, rating: Number(query.puan), unread: query.okunmamis === "1", page: Number(query.sayfa) });
   const pageLink = (page: number) => {
     const p = new URLSearchParams();
     if (query.konu) p.set("konu", query.konu);

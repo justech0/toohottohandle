@@ -70,7 +70,9 @@ test("private feedback goes from menu to admin; photo is protected, read and del
   await expect(page.getByText(message)).toHaveCount(0);
   await signIn(page);
   await expect(page.getByTestId("feedback-summary")).toContainText(message);
+  await expect(page.getByTestId("feedback-unread-badge")).toHaveText(/^[1-9]\d*$/);
   await page.goto("/qr/admin/geri-bildirim");
+  await expect(page.getByTestId("feedback-unread-badge")).toHaveCount(0);
   const entry = page.getByTestId("feedback-entry").filter({ hasText: message });
   await expect(entry).toContainText("Test Misafir");
   // Kompakt kart: fotoğraflı tek mesaj bile kısa kalır.
@@ -80,7 +82,6 @@ test("private feedback goes from menu to admin; photo is protected, read and del
   expect((await page.request.get(imageUrl!)).status()).toBe(200);
   const key = imageUrl!.split("/").pop();
   expect((await request.get(`/qr/foto/${key}-720.webp`)).status()).toBe(404);
-  await entry.getByRole("button", { name: "Okundu işaretle" }).click();
   await expect(entry).toContainText("Okundu");
   await entry.getByRole("button", { name: "Sil", exact: true }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Vazgeç" }).click();

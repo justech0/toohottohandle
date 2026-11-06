@@ -148,10 +148,15 @@ export default function ProductsPage(props: { searchParams: Promise<{ kaydedildi
           <h1 className="adm-h1">Ürünler ve Fiyatlar</h1>
           <p className="adm-subtitle">Menüdeki tüm ürünleri görüntüleyin, stok durumunu değiştirin veya düzenleyin</p>
         </div>
-        <Link href="/qr/admin/urunler/yeni" className="adm-btn adm-btn--main adm-btn--link" data-testid="product-add">
-          <AdminIcon name="plus" size={18} />
-          <span>Yeni Ürün Ekle</span>
-        </Link>
+        <div className="adm-row">
+          <Link href="/qr/admin/toplu-urun" className="adm-btn adm-btn--outline adm-btn--link" data-testid="product-bulk-import">
+            <span>Toplu Ürün Yükle</span>
+          </Link>
+          <Link href="/qr/admin/urunler/yeni" className="adm-btn adm-btn--main adm-btn--link" data-testid="product-add">
+            <AdminIcon name="plus" size={18} />
+            <span>Yeni Ürün Ekle</span>
+          </Link>
+        </div>
       </div>
 
       <Suspense fallback={<div className="adm-loading" />}>
