@@ -66,3 +66,11 @@ Admin revize doğrulaması (2026-10-29, Node 22.23.4): 201/201 veritabanlı Vite
 - Toplu fiyat: "Tüm menü" kapsamı ve her zaman görünen tam fiyat listesi; önizleme aynı listede eski → yeni.
 
 Doğrulama (2026-11-03): Vitest 207/207 (veritabanı dahil), Playwright 123/123 (veritabanlı), TypeScript ve üretim build başarılı.
+
+## A2 — Toplu ürün yükleme (`a2-toplu-urun`)
+
+- HVK örneğindeki `import-products.php` akışı baz alınarak `/qr/admin/toplu-urun` ekranı eklendi.
+- CSV (`category_name, product_name, description, price, image_url, sort_order`) ve JSON dizisiyle toplu ürün yükleme desteklenir; bozuk satırlar satır numarasıyla atlanıp raporlanır, olmayan kategoriler seçilen grup altında otomatik oluşturulur.
+- Aktarım öncesi otomatik menü kopyası (`toplu ürün yükleme öncesi`) alınır, `audit_log`'a `bulk_import` kaydı düşülür ve `undoLast` ile tek tıkla geri alınabilir.
+- Admin yan menüde "Geri Bildirim" üzerinde okunmamış geri bildirim sayısı bildirim baloncuğu olarak gösterilir; `/qr/admin/geri-bildirim` açıldığında okunmamış kayıtlar otomatik okundu işaretlenir ve baloncuk kaybolur.
+- Doğrulama (2026-11-06): Vitest 211/211 (veritabanı dahil), Playwright E2E, TypeScript ve üretim build başarılı.

@@ -67,7 +67,7 @@ test("admin screens use brand lists and fit mobile and desktop", async ({ page }
   await signIn(page);
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of ["vitrin", "kullanicilar", "ne-icsem", "istatistik", "katalog", "geri-bildirim", "toplu-fiyat", "urunler/yeni"]) {
+    for (const route of ["vitrin", "kullanicilar", "ne-icsem", "istatistik", "katalog", "geri-bildirim", "toplu-fiyat", "toplu-urun", "urunler/yeni"]) {
       await page.goto(`/qr/admin/${route}`);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await expect(page.locator("main form").first()).toBeVisible();

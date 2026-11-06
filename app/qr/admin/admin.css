@@ -66,6 +66,8 @@
 .adm-sidebar__logo-link {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   color: var(--c-ink);
   text-decoration: none;
 }
@@ -99,13 +101,39 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 14px;
+  min-height: 44px;
+  padding: 12px 14px;
+  box-sizing: border-box;
   border-radius: 12px;
   color: var(--c-ink);
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
   transition: background-color .15s ease, color .15s ease;
+}
+
+.adm-sidebar__label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.adm-sidebar__unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  transform: translateY(-6px);
+  border-radius: 999px;
+  background: var(--c-red);
+  color: var(--c-white);
+  font: 800 11px/1 var(--f-display);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgba(220, 37, 36, .35);
+  box-sizing: border-box;
 }
 
 .adm-sidebar__link:hover {
@@ -167,6 +195,8 @@
 .adm-bar__home-link {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   color: var(--c-white);
   text-decoration: none;
 }
@@ -190,11 +220,12 @@
   font-weight: 600;
   font-size: 13px;
   color: var(--c-white);
-  background: rgba(255, 255, 255, .18);
-  padding: 6px 12px;
+  background: var(--c-ink);
+  padding: 6px 14px;
   border-radius: 999px;
   text-decoration: none;
-  min-height: 36px;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 @media (min-width: 900px) {
@@ -403,7 +434,7 @@ a.adm-btn--main {
 .adm .adm-btn--danger:focus-visible,
 .adm-btn--main:focus-visible,
 .adm-btn--danger:focus-visible {
-  outline: 2px solid var(--c-white);
+  outline: 2px solid var(--c-ink);
   outline-offset: 2px;
 }
 
@@ -1246,7 +1277,7 @@ a.adm-btn--main {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 44px;
   font-size: 14px;
 }
 
@@ -1582,3 +1613,12 @@ a.adm-btn--main {
 .adm-price-table th { width: 40%; font-weight: 600; text-align: start; }
 .adm-price-table__next { color: var(--c-red-text); font-weight: 700; white-space: nowrap; }
 .adm-price-table[data-previewing] tr:not([data-in-preview]) { opacity: .45; }
+
+/* Toplu ürün yükleme */
+.adm-field input[type="file"] { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; padding: 6px; color: var(--c-ink-soft); }
+.adm-field input[type="file"]::file-selector-button { min-height: 40px; margin-inline-end: 12px; padding-inline: 14px; border: 0; border-radius: 10px; background: var(--c-paper); color: var(--c-ink); font: 600 14px/1 var(--f-text); cursor: pointer; }
+.adm-import-notes { display: grid; gap: 4px; }
+.adm-import-report { gap: 8px; }
+.adm-import-report__stat { margin: 0; font-size: 14px; color: var(--c-ink); }
+.adm-import-report__stat--inserted { color: var(--c-green-text); font-weight: 600; }
+.adm-import-skipped { margin: 4px 0 0; padding-inline-start: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--c-red-text); }

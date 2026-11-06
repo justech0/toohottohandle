@@ -6,7 +6,7 @@ import { getPool } from "@/lib/db/client";
 import { listHistory, listMenuSnapshots } from "@/lib/admin/snapshots";
 import { RestoreButton } from "./RestoreButton";
 
-const logReason = (reason: string) => reason.includes("silme") ? "Silme öncesi menü" : reason.includes("toplu fiyat") ? "Fiyat değişikliği öncesi menü" : reason.includes("dönüş") ? "Geri dönüş öncesi menü" : reason;
+const logReason = (reason: string) => reason.includes("silme") ? "Silme öncesi menü" : reason.includes("toplu fiyat") ? "Fiyat değişikliği öncesi menü" : reason.includes("toplu ürün") ? "Toplu ürün yükleme öncesi menü" : reason.includes("dönüş") ? "Geri dönüş öncesi menü" : reason;
 
 const when = (iso: string) => new Intl.DateTimeFormat("tr-TR", {
   timeZone: "Europe/Istanbul", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",

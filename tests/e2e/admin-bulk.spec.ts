@@ -42,3 +42,35 @@ test("previews and applies a category price change, undoes it, and restores its 
   await page.getByRole("dialog").getByRole("button", { name: "Evet, bu kopyaya dön" }).click();
   await expect(page.getByRole("status")).toContainText("WiFi bilgileri değiştirilmedi");
 });
+
+test("imports products from CSV, reports skipped rows and created categories, and undoes the import", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Toplu ürün yükle" }).click();
+  await expect(page).toHaveURL("/qr/admin/toplu-urun");
+
+  const csvContent = [
+    "category_name,product_name,description,price,image_url,sort_order",
+    "Sıcak Kahveler,E2E Toplu Kahve,Kavrulmuş fındık notalı,185,,",
+    "E2E Yeni Kategori,E2E Özel İçecek,Taze naneli,210,,1",
+    ",Bozuk Satır,Açıklama,150,,",
+  ].join("\n");
+
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "urunler.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(csvContent, "utf-8"),
+  });
+  await page.getByRole("button", { name: "İçe Aktar" }).click();
+
+  await expect(page.getByRole("status")).toContainText("İçe aktarma tamamlandı.");
+  const results = page.getByTestId("import-results");
+  await expect(results).toContainText("Okunan satır: 3");
+  await expect(results).toContainText("Eklenen ürün: 2");
+  await expect(results).toContainText("Yeni kategoriler: E2E Yeni Kategori");
+  await expect(page.getByTestId("import-skipped")).toContainText("Satır 3: kategori veya ürün adı eksik.");
+
+  await page.goto("/qr/admin");
+  await expect(page.getByTestId("last-change")).toContainText("2 ürün toplu yüklendi");
+  await page.getByTestId("undo").click();
+  await page.waitForURL(/\/qr\/admin\?geri=1/);
+});

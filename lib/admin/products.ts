@@ -8,6 +8,7 @@ import { priceChanges, sizeSetOf, type ProductInput } from "./productInput";
 import { undoCatalogChange } from "./catalog";
 import { undoPosterPhoto } from "./photos";
 import { undoBulkPrice } from "./bulkPrice";
+import { undoBulkImport } from "./bulkImport";
 import { takeMenuSnapshot } from "./snapshots";
 
 /** Ürünün geçmişe yazılan tam hali: satır + boylar (spec 4.4: geri alınan ürün eksik dönmez). */
@@ -349,6 +350,8 @@ export async function undoLast(pool: Pool, adminId: number): Promise<{ summary: 
     const current = top.entity === "product" && top.entity_id ? await snapshot(c, top.entity_id, true) : null;
     if (top.entity === "bulk_price") {
       await undoBulkPrice(c, top);
+    } else if (top.entity === "bulk_import") {
+      await undoBulkImport(c, top);
     } else if (top.entity === "product") {
       if (["update", "sold_out", "visibility"].includes(top.action)) {
         const before = JSON.parse(top.before_json) as ProductSnapshot;

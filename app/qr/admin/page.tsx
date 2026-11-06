@@ -153,6 +153,17 @@ async function Content({ searchParams }: { searchParams: Promise<{ geri?: string
           <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
         </Link>
 
+        <Link href="/qr/admin/toplu-urun" className="adm-nav-tile">
+          <div className="adm-nav-tile__icon-wrap">
+            <AdminIcon name="plus" size={24} />
+          </div>
+          <div className="adm-nav-tile__body">
+            <h2 className="adm-nav-tile__title">Toplu ürün yükle</h2>
+            <p className="adm-nav-tile__desc">CSV veya JSON ile hızlı ürün ve kategori aktarımı</p>
+          </div>
+          <AdminIcon name="chevron-right" size={18} className="adm-nav-tile__arrow" />
+        </Link>
+
         <Link href="/qr/admin/yedek" className="adm-nav-tile">
           <div className="adm-nav-tile__icon-wrap">
             <AdminIcon name="backup" size={24} />

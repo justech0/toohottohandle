@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
+import { getPool, hasDb } from "@/lib/db/client";
+import { unreadFeedbackCount } from "@/lib/feedback/store";
 import { BrandIcon } from "../_components/BrandIcon";
 import { AdminSidebar, AdminBottomNav } from "./_components/AdminNav";
 import { AdminIcon } from "./_components/AdminIcon";
@@ -11,11 +14,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+async function AdminSidebarContainer() {
+  await connection();
+  const unreadFeedback = hasDb() ? await unreadFeedbackCount(getPool()).catch(() => 0) : 0;
+  return <AdminSidebar unreadFeedback={unreadFeedback} />;
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="adm">
       <Suspense fallback={<aside className="adm-sidebar" aria-hidden="true" />}>
-        <AdminSidebar />
+        <AdminSidebarContainer />
       </Suspense>
       <div className="adm-content">
         <header className="adm-bar">

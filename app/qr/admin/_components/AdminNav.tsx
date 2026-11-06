@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BrandIcon } from "@/app/qr/_components/BrandIcon";
@@ -21,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/qr/admin/katalog", label: "Katalog & Menü", icon: "catalog" },
   { href: "/qr/admin/fotograflar", label: "Afişler", icon: "photos" },
   { href: "/qr/admin/toplu-fiyat", label: "Toplu Fiyat", icon: "bulk" },
+  { href: "/qr/admin/toplu-urun", label: "Toplu Ürün Yükle", icon: "plus" },
   { href: "/qr/admin/yedek", label: "Dışarı aktar", icon: "backup" },
   { href: "/qr/admin/istatistik", label: "WiFi, istatistik ve QR", icon: "stats" },
   { href: "/qr/admin/geri-bildirim", label: "Geri Bildirim", icon: "feedback" },
@@ -34,11 +36,25 @@ const MOBILE_NAV_ITEMS: NavItem[] = [
   { href: "/qr/admin/istatistik", label: "İstatistik", icon: "stats" },
 ];
 
-export function AdminSidebar() {
+const AUTH_PATHS = ["/qr/admin/giris", "/qr/admin/kurulum", "/qr/admin/sifirla", "/qr/admin/sifre-degistir"];
+
+export function AdminSidebar({ unreadFeedback = 0 }: { unreadFeedback?: number }) {
   const pathname = usePathname();
+  const [dismissedCount, setDismissedCount] = useState<number | null>(null);
 
   const isCurrent = (item: NavItem) =>
     item.exact ? pathname === item.href : pathname === item.href || pathname?.startsWith(`${item.href}/`);
+
+  const onFeedbackPage = pathname === "/qr/admin/geri-bildirim" || Boolean(pathname?.startsWith("/qr/admin/geri-bildirim/"));
+  const onAuthPage = AUTH_PATHS.some((p) => pathname === p || pathname?.startsWith(`${p}/`));
+
+  useEffect(() => {
+    if (onFeedbackPage && unreadFeedback > 0) {
+      setDismissedCount(unreadFeedback);
+    }
+  }, [onFeedbackPage, unreadFeedback]);
+
+  const effectiveUnread = onFeedbackPage || onAuthPage || dismissedCount === unreadFeedback ? 0 : unreadFeedback;
 
   return (
     <aside className="adm-sidebar" aria-label="Yönetim Menüsü">
@@ -53,6 +69,7 @@ export function AdminSidebar() {
         <ul className="adm-sidebar__list">
           {NAV_ITEMS.map((item) => {
             const active = isCurrent(item);
+            const showUnread = item.href === "/qr/admin/geri-bildirim" && effectiveUnread > 0;
             return (
               <li key={item.href}>
                 <Link
@@ -61,7 +78,18 @@ export function AdminSidebar() {
                   aria-current={active ? "page" : undefined}
                 >
                   <AdminIcon name={item.icon} size={19} />
-                  <span>{item.label}</span>
+                  <span className="adm-sidebar__label">
+                    {item.label}
+                    {showUnread ? (
+                      <span
+                        className="adm-sidebar__unread-badge"
+                        data-testid="feedback-unread-badge"
+                        aria-label={`${effectiveUnread} okunmamış geri bildirim`}
+                      >
+                        {effectiveUnread > 99 ? "99+" : effectiveUnread}
+                      </span>
+                    ) : null}
+                  </span>
                 </Link>
               </li>
             );
@@ -104,4 +132,3 @@ export function AdminBottomNav() {
     </nav>
   );
 }
-

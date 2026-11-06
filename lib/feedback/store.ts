@@ -33,6 +33,13 @@ export async function feedbackSummary(pool: Pool) {
   const [latest] = await pool.query<FeedbackRow[]>("SELECT id, message FROM feedbacks ORDER BY created_at DESC, id DESC LIMIT 3");
   return { unread: Number(row.unread), average: row.average === null ? null : Number(row.average), latest };
 }
+export async function unreadFeedbackCount(pool: Pool): Promise<number> {
+  const [[row]] = await pool.query<RowDataPacket[]>("SELECT COALESCE(SUM(is_read = 0), 0) AS unread FROM feedbacks");
+  return Number(row?.unread ?? 0);
+}
+export async function markAllFeedbackRead(pool: Pool): Promise<void> {
+  await pool.execute("UPDATE feedbacks SET is_read = 1 WHERE is_read = 0");
+}
 export async function markFeedbackRead(pool: Pool, id: number): Promise<void> {
   await pool.execute("UPDATE feedbacks SET is_read = 1 WHERE id = ?", [id]);
 }
