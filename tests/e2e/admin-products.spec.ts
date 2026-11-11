@@ -66,7 +66,8 @@ test("390px product controls keep accessible contrast, targets, and keyboard foc
   expect(await add.evaluate((element) => {
     const style = getComputedStyle(element);
     return [style.outlineWidth, style.outlineStyle, style.outlineOffset, style.outlineColor];
-  })).toEqual(["2px", "solid", "2px", "rgb(255, 255, 255)"]);
+  // Halka düğmenin 2px dışında, açık zeminde durur: koyu halka görünür, beyaz görünmez.
+  })).toEqual(["2px", "solid", "2px", "rgb(42, 21, 20)"]);
 });
 
 test("search narrows the admin list", async ({ page }) => {
