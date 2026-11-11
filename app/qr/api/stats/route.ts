@@ -1,4 +1,5 @@
 import { getMenu } from "@/lib/menu/getMenu";
+import { isSameOrigin } from "@/lib/http/sameOrigin";
 import { hasDb } from "@/lib/db/client";
 import { getStatsBuffer } from "@/lib/stats/server";
 import { MAX_STATS_BODY_BYTES, StatsInputError, parseStatsPayload } from "@/lib/stats/core";
@@ -28,13 +29,7 @@ async function readLimitedBody(request: Request): Promise<string> {
 
 export async function POST(request: Request): Promise<Response> {
   if (!hasDb()) return empty(204);
-  // Proxy TLS'i sonlandırınca request.url http, Origin https olabilir; bu yüzden yalnızca host karşılaştırılır.
-  const ownHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? new URL(request.url).host;
-  const origin = request.headers.get("origin");
-  const fetchSite = request.headers.get("sec-fetch-site");
-  let originHost: string | null = null;
-  try { originHost = origin ? new URL(origin).host : null; } catch { return empty(403); }
-  if ((originHost && originHost !== ownHost) || fetchSite === "cross-site") return empty(403);
+  if (!isSameOrigin(request)) return empty(403);
 
   const menu = await getMenu();
   if (!menu.settings.statsEnabled) return empty(204);

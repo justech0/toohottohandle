@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth/session";
 import { getPool } from "@/lib/db/client";
 import { imageContentType } from "@/lib/storage/images";
 import { processAndStoreImage } from "@/lib/storage/processImage";
+import { isSameOrigin } from "@/lib/http/sameOrigin";
 
 const MAX_UPLOAD = 1_500_000;
 
@@ -10,8 +11,7 @@ const error = (message: string, status = 400) => NextResponse.json({ error: mess
 
 export async function POST(request: Request): Promise<Response> {
   await requireAdmin();
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) return error("İstek kaynağı geçersiz.", 403);
+  if (!isSameOrigin(request)) return error("İstek kaynağı geçersiz.", 403);
 
   let form: FormData;
   try { form = await request.formData(); } catch { return error("Fotoğraf okunamadı."); }
